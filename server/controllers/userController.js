@@ -1,6 +1,20 @@
 const UserModel = require("../models/User");
 const bcrypt = require("bcrypt");
+const z = require("z")
 
+
+
+export async function Login(req,res){
+  try {
+    
+  } catch (error) {
+    if (error instanceof z.ZodError){
+
+    }
+    
+  }
+
+}
 async function SignUpAdmin(req, res) {
   //get the data from the req
   //validate the data
