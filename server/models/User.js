@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     password: { type: String, required: true },
+    school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     role: { type: String, enum: ["admin", "teacher"], default: "teacher" },
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   },
