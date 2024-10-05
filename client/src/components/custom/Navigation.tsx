@@ -110,7 +110,7 @@ function NavigationMenu() {
                   <Link to={"/sys/feesGroup"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Fees group
                   </Link>
-                  <Link to={"/sys/studentFees"} className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  <Link to={"/sys/studentFees"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Student fees
                   </Link>
                   <Link to={"/sys/expenses"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
