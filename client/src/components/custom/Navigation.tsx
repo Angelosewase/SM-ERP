@@ -7,19 +7,20 @@ import {
   RectangleGroupIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { FC, ReactNode, useState } from "react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "../Ui/accordion";
+import { useState } from "react";
+
+import { DropDown, NavigationComponent } from "./NavigationItem";
+import { Link } from "react-router-dom";
 
 function NavigationMenu() {
   const [maximize, setMaximize] = useState<boolean>(true);
 
   return (
-    <div className={`h-[100vh] ${maximize ? "w-72" : "w-20"} bg-blue-900 transition-all duration-300`}>
+    <div
+      className={`h-[100vh] ${
+        !maximize && "w-20"
+      } bg-blue-900 transition-all duration-300 overflow-auto`}
+    >
       <div>
         <div className="bg-red-700 h-24 flex justify-between px-4">
           <img
@@ -35,6 +36,7 @@ function NavigationMenu() {
           Item={<RectangleGroupIcon className="w-8" />}
           label="Dashboard"
           showLabel={maximize}
+          link="/sys"
         />
         <NavigationComponent
           Item={
@@ -45,18 +47,21 @@ function NavigationMenu() {
                 </div>
               }
               content={
-                <div>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
-                    All students
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
-                    Add student
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
-                    Students promotion
-                  </p>
-                </div>
+              
+                  <div >
+                    <Link to={"/sys/allStudents"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                      All students
+                    </Link>
+                    <Link to={"/sys/addStudent"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                      Add student
+                    </Link>
+                    <Link to={"/sys/studentsPromotion"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                      Students promotion
+                    </Link>
+                  </div>
               }
+              maximize={maximize}
+              setMaximize={setMaximize}
             />
           }
         />
@@ -65,6 +70,7 @@ function NavigationMenu() {
           Item={<UserGroupIcon className="w-8" />}
           label="Parents"
           showLabel={maximize}
+          link="/sys/parents"
         />
 
         <NavigationComponent
@@ -77,14 +83,16 @@ function NavigationMenu() {
               }
               content={
                 <div>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  <Link to={"/sys/allTeachers"} className="font-semibold p-2 my-0.5 hover:bg-blue-950  block">
                     All teachers
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  </Link>
+                  <Link to={"/sys/addTeacher"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Add teachers
-                  </p>
+                  </Link>
                 </div>
               }
+              maximize={maximize}
+              setMaximize={setMaximize}
             />
           }
         />
@@ -99,20 +107,22 @@ function NavigationMenu() {
               }
               content={
                 <div>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  <Link to={"/sys/feesGroup"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Fees group
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  </Link>
+                  <Link to={"/sys/studentFees"} className="font-semibold p-2 my-0.5 hover:bg-blue-950">
                     Student fees
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  </Link>
+                  <Link to={"/sys/expenses"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Expenses
-                  </p>
-                  <p className="font-semibold p-2 my-0.5 hover:bg-blue-950">
+                  </Link>
+                  <Link to={"/sys/addExpense"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
                     Add fees
-                  </p>
+                  </Link>
                 </div>
               }
+              maximize={maximize}
+              setMaximize={setMaximize}
             />
           }
         />
@@ -121,11 +131,13 @@ function NavigationMenu() {
           Item={<BookOpenIcon className="w-8" />}
           label="Subjects"
           showLabel={maximize}
+          link="/sys/subject"
         />
         <NavigationComponent
           Item={<Cog8ToothIcon className="w-8" />}
           label="Settings"
           showLabel={maximize}
+          link="/sys/settings"
         />
       </div>
     </div>
@@ -133,37 +145,3 @@ function NavigationMenu() {
 }
 
 export default NavigationMenu;
-
-const NavigationComponent: FC<{
-  Item?: ReactNode;
-  label?: string;
-  showLabel?: boolean;
-}> = ({ Item, label, showLabel }) => {
-  return (
-    <div className="flex items-center gap-4 bg-blue-950 text-white my-1 mx-0.5 p-2 rounded hover:shadow-xl">
-      {Item}
-      {showLabel && <p className="font-semibold text-md">{label}</p>}
-    </div>
-  );
-};
-
-const DropDown: FC<{
-  Item: ReactNode;
-  content: ReactNode;
-}> = ({ content, Item }) => {
-  return (
-    <Accordion type="single" collapsible>
-      <AccordionItem
-        value="item-1"
-        className="border-1 border-red-400  w-[270px] "
-      >
-        <AccordionTrigger className="no-underline hover:no-underline p-0 font-semibold text-md gap-4">
-          {Item}
-        </AccordionTrigger>
-        <AccordionContent className="w-full my-1 px-2 py-1 bg-blue-900">
-          {content}
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
-  );
-};
