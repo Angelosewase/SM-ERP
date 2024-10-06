@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const School = require("../models/School"); // Assuming the School model is in models/School
 const z = require("zod");
 const { schoolValidationSchema } = require("../validators/school");
+const User = require("../models/User");
 
 async function RegisterSchool(req, res) {
   try {
-    // Validate the request body using Zod
     const { schoolName, address, email, admin } = req.body;
     const validatedData = schoolValidationSchema.parse({
       schoolName,
@@ -14,7 +14,6 @@ async function RegisterSchool(req, res) {
       admin,
     });
 
-    // Create a new school
     const newSchool = new School({
       name: validatedData.schoolName,
       address: validatedData.address,
@@ -22,6 +21,11 @@ async function RegisterSchool(req, res) {
       admin: validatedData.admin,
     });
     await newSchool.save();
+    await User.updateOne({_id:admin},{
+      $set:{
+        school:newSchool._id
+      }
+    })
 
     res
       .status(201)
