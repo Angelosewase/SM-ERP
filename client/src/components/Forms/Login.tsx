@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import Input from "../Ui/Input";
-import PasswordInput from "../Ui/PasswordInput";
+import Input from "../ui/Input";
+import PasswordInput from "../ui/PasswordInput";
 import { Login } from "@/app/Api/Login";
 import { useNavigate } from "react-router-dom";
 // import { useNavigate } from "react-router-dom";

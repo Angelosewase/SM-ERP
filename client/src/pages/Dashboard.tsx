@@ -1,6 +1,11 @@
+import Header from "@/components/custom/Header"
+
 function Dashboard() {
   return (
-    <div>Dashboard</div>
+    <div>
+      <Header />
+      <p>dashboard</p>
+    </div>
   )
 }
 

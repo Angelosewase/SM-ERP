@@ -4,7 +4,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "../Ui/accordion";
+} from "../ui/accordion";
 import { Link } from "react-router-dom";
 
 export const NavigationComponent: FC<{

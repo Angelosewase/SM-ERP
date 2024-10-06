@@ -19,14 +19,14 @@ function NavigationMenu() {
     <div
       className={`h-[100vh] ${
         !maximize && "w-20"
-      } bg-blue-900 transition-all duration-300 overflow-auto`}
+      } bg-blue-900 transition-all duration-300 overflow-auto `}
     >
       <div>
-        <div className="bg-red-700 h-24 flex justify-between px-4">
+        <div className="bg-red-700 h-16 flex justify-between px-4">
           <img
             src="/schoolLogo.png"
             alt="school logo"
-            className={`w-16 h-auto self-center ${!maximize && "hidden"}`}
+            className={`w-10 h-auto self-center ${!maximize && "hidden"}`}
           />
           <button onClick={() => setMaximize(!maximize)}>
             <Bars3BottomRightIcon className="text-white h-10" />

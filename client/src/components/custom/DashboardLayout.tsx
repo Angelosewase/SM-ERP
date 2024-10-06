@@ -5,7 +5,7 @@ function DashboardLayout() {
   return (
     <div className="flex">
       <NavigationMenu />
-      <div className="border flex-1  bg-gray-100">
+      <div className=" flex-1  bg-gray-100">
       <Outlet />
       </div>
 
