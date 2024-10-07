@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
-const School = require("../models/School"); // Assuming the School model is in models/School
 const z = require("zod");
 const { schoolValidationSchema } = require("../validators/school");
-const User = require("../models/User");
+const {UserModel, SchoolModel}= require("../models/Schemas")
 
 async function RegisterSchool(req, res) {
   try {
@@ -14,14 +13,14 @@ async function RegisterSchool(req, res) {
       admin,
     });
 
-    const newSchool = new School({
+    const newSchool = new SchoolModel({
       name: validatedData.schoolName,
       address: validatedData.address,
       email: validatedData.email,
       admin: validatedData.admin,
     });
     await newSchool.save();
-    await User.updateOne({_id:admin},{
+    await UserModel.updateOne({_id:admin},{
       $set:{
         school:newSchool._id
       }
@@ -46,7 +45,7 @@ async function getSchoolById(req, res) {
       return res.status(400).json({ error: "Invalid school ID" });
     }
 
-    const school = await School.findById(schoolId);
+    const school = await SchoolModel.findById(schoolId);
 
     if (!school) {
       return res.status(404).json({ error: "School not found" });
@@ -66,7 +65,7 @@ async function deleteSchool(req, res) {
       return res.status(400).json({ error: "Invalid school ID" });
     }
 
-    const deletedSchool = await School.findByIdAndDelete(schoolId);
+    const deletedSchool = await SchoolModel.findByIdAndDelete(schoolId);
 
     if (!deletedSchool) {
       return res.status(404).json({ error: "School not found" });
