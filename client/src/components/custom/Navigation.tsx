@@ -7,22 +7,22 @@ import {
   RectangleGroupIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
-import { useState } from "react";
+
 
 import { DropDown, NavigationComponent } from "./NavigationItem";
 import { Link } from "react-router-dom";
 
-function NavigationMenu() {
-  const [maximize, setMaximize] = useState<boolean>(true);
+function NavigationMenu({maximize,setMaximize }:{maximize:boolean,setMaximize:(val:boolean)=>void }) {
+
 
   return (
     <div
       className={`h-[100vh] ${
         !maximize && "w-20"
-      } bg-blue-900 transition-all duration-300 overflow-auto `}
+      } bg-myBlue transition-all duration-300 overflow-auto fixed `}
     >
       <div>
-        <div className="bg-red-700 h-16 flex justify-between px-4">
+        <div className="bg-myBlue h-16 mb-10 flex justify-between px-4">
           <img
             src="/schoolLogo.png"
             alt="school logo"

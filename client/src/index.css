@@ -1,3 +1,4 @@
+@import "react-calendar/dist/Calendar.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -27,7 +28,7 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem
+    --radius: 0.5rem;
   }
   .dark {
     --background: 0 0% 3.9%;
@@ -53,7 +54,7 @@
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%
+    --chart-5: 340 75% 55%;
   }
 }
 @layer base {
@@ -62,5 +63,30 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  .react-calendar {
+    @apply bg-white border border-gray-300 rounded-lg;
+  }
+
+  .react-calendar__tile {
+    @apply p-4 rounded-md;
+  }
+
+  .react-calendar__tile--active {
+    @apply bg-green-500 text-white font-bold;
+  }
+
+  .react-calendar__navigation button {
+    @apply bg-transparent text-green-500 font-semibold;
+  }
+
+  * {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  *::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, and WebKit browsers */
   }
 }
