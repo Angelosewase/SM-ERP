@@ -1,4 +1,4 @@
-const {UserModel} = require("../models/Schemas.js");
+const { UserModel } = require("../models/Schemas.js");
 const bcrypt = require("bcrypt");
 const z = require("zod");
 const jwt = require("jsonwebtoken");
@@ -8,7 +8,11 @@ const {
   loginInfoValidator,
 } = require("../validators/user.js");
 
-const { generateJwtToken, validateJwtToken } = require("../utils/jwt.js");
+const {
+  generateJwtToken,
+  validateJwtToken,
+  getUserIdFromToken,
+} = require("../utils/jwt.js");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 async function Login(req, res) {
@@ -32,7 +36,7 @@ async function Login(req, res) {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
       secure: false,
-      path:"/"
+      path: "/",
     });
     res.status(200).json({ message: "Login successful", userId: user._id });
   } catch (error) {
@@ -94,4 +98,24 @@ async function isAuth(req, res) {
   res.status(200).json({ message: "Authorized" });
 }
 
-module.exports = { SignUpAdmin, Login, isAuth };
+async function getLoggedInUser(req, res) {
+  const token = req.cookies.token;
+  if (!token) {
+    res.status(401).send({ message: "unauthorised" });
+    return;
+  }
+
+  const UserId = getUserIdFromToken(token);
+  if (!UserId) {
+    re.status(401).send({ message: "Invalid credentials" });
+    return;
+  }
+  const user = await UserModel.findById(UserId);
+  if (!user) {
+    res.status(404).send({ message: "user not found" });
+    return;
+  }
+  res.status(200).json(user);
+}
+
+module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser };
