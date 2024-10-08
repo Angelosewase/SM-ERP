@@ -1,7 +1,7 @@
 const {validateJwtToken}= require("../utils/jwt")
 
 function isAuth(req, res , next){
-      const jwtToken = req.Cookies.jwtToken
+      const jwtToken = req.Cookies.token
       if(!jwtToken){
         res.status(500).send({"message":"user not authorised please login first"})
         return

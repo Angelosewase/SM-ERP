@@ -1,5 +1,5 @@
 const express = require("express");
-const {SchoolModel} = require("../models/Schemas"); 
+const { SchoolModel } = require("../models/Schemas");
 
 const {
   RegisterSchool,
@@ -7,10 +7,12 @@ const {
   getSchoolById,
 } = require("../controllers/SchoolController");
 
+const isAuth = require("../middlewares/authentication");
+
 const router = express.Router();
 router.post("/register", RegisterSchool);
-router.get("/:id", getSchoolById);
-router.get("/", async (req, res) => {
+router.get("/:id", isAuth, getSchoolById);
+router.get("/", isAuth, async (req, res) => {
   try {
     const schools = await SchoolModel.find();
     res.status(200).json(schools);
@@ -18,7 +20,6 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
-
 
 router.delete("/:id", deleteSchool);
 

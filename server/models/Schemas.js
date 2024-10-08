@@ -33,7 +33,7 @@ const studentSchema = new mongoose.Schema(
     email: { type: String, unique: true },
     schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
     classId: { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
-    parents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true }],
+    parents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent" }],
     gender: { type: String, enum: ["male", "female"], required: true },
   },
   { timestamps: true }
@@ -75,7 +75,7 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
-    role: { type: String, enum: ["superadmin", "admin", "teacher", "parent", "student"], default: "teacher" },
+    role: { type: String, enum: ["admin", "teacher"], default: "teacher" },
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
   },
   { timestamps: true }
