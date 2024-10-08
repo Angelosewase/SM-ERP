@@ -1,29 +1,40 @@
-const { ClassModel } = require("../models/Class");
-const { createClassValidator, updateClassValidator } = require("../validators/class");
+const { ClassModel, SchoolModel } = require("../models/Schemas");
+const {
+  createClassValidator,
+  updateClassValidator,
+} = require("../validators/class");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 
 // Get all classes
 const getClasses = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
   try {
-    const classes = await ClassModel.find().populate("students subjects");
+    const classes = await ClassModel.find({ schoolId });
     res.status(200).json(classes);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// Get a single class by ID
 const getClassById = async (req, res) => {
   const { id } = req.params;
-  
   const idValidator = z
     .string()
-    .refine((value) => mongoose.Types.ObjectId.isValid(value), "Invalid class ID");
+    .refine(
+      (value) => mongoose.Types.ObjectId.isValid(value),
+      "Invalid class ID"
+    );
 
   try {
     const validatedId = idValidator.parse(id);
-    const classData = await ClassModel.findById(validatedId).populate("students subjects");
+    const classData = await ClassModel.findById(validatedId).populate(
+      "students subjects"
+    );
     if (!classData) {
       return res.status(404).json({ error: "Class not found" });
     }
@@ -35,8 +46,25 @@ const getClassById = async (req, res) => {
 
 // Create a new class
 const createClass = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+
   try {
-    const validatedData = createClassValidator.parse(req.body);
+    const validatedData = createClassValidator.parse({
+      ...req.body,
+      [schoolId]: schoolId,
+    });
+
+    const schoolId = validatedData.schoolId;
+
+    const school = await SchoolModel.findById(schoolId);
+    if (!school) {
+      res.status(404).send({ message: "school not found" });
+      return;
+    }
 
     const newClass = await ClassModel.create(validatedData);
     res.status(201).json(newClass);
@@ -44,6 +72,7 @@ const createClass = async (req, res) => {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
     }
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -51,16 +80,23 @@ const createClass = async (req, res) => {
 // Update a class by ID
 const updateClass = async (req, res) => {
   const { id } = req.params;
-  
+
   const idValidator = z
     .string()
-    .refine((value) => mongoose.Types.ObjectId.isValid(value), "Invalid class ID");
+    .refine(
+      (value) => mongoose.Types.ObjectId.isValid(value),
+      "Invalid class ID"
+    );
 
   try {
     const validatedId = idValidator.parse(id);
     const validatedData = updateClassValidator.parse(req.body);
 
-    const updatedClass = await ClassModel.findByIdAndUpdate(validatedId, validatedData, { new: true }).populate("students subjects");
+    const updatedClass = await ClassModel.findByIdAndUpdate(
+      validatedId,
+      validatedData,
+      { new: true }
+    ).populate("students subjects");
     if (!updatedClass) {
       return res.status(404).json({ error: "Class not found" });
     }
@@ -76,10 +112,12 @@ const updateClass = async (req, res) => {
 // Delete a class by ID
 const deleteClass = async (req, res) => {
   const { id } = req.params;
-  
   const idValidator = z
     .string()
-    .refine((value) => mongoose.Types.ObjectId.isValid(value), "Invalid class ID");
+    .refine(
+      (value) => mongoose.Types.ObjectId.isValid(value),
+      "Invalid class ID"
+    );
 
   try {
     const validatedId = idValidator.parse(id);
@@ -97,4 +135,10 @@ const deleteClass = async (req, res) => {
   }
 };
 
-module.exports = { getClasses, getClassById, createClass, updateClass, deleteClass };
+module.exports = {
+  getClasses,
+  getClassById,
+  createClass,
+  updateClass,
+  deleteClass,
+};

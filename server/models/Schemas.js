@@ -9,6 +9,7 @@ const parentSchema = new mongoose.Schema(
     address: String,
     phoneNumber: String,
     child: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
   },
   { timestamps: true }
 );
@@ -17,6 +18,7 @@ const parentSchema = new mongoose.Schema(
 const transactionRecordSchema = new mongoose.Schema(
   {
     studentId: { type: mongoose.Schema.Types.ObjectId, ref: "Student", required: true },
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     amount: { type: Number, required: true },
     paymentDate: { type: Date, default: Date.now },
     transactionType: { type: String, enum: ["tuition", "books", "uniform"], required: true },
@@ -96,7 +98,8 @@ const classSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
-    subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }]
+    subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
   },
   { timestamps: true }
 );

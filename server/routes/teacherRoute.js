@@ -2,9 +2,10 @@ const express = require('express');
 const { getTeachers, createTeacher, deleteTeacher, updateTeacher } = require('../controllers/TeacherController');
 
 const {isAuth}= require("../middlewares/authentication")
-router.use(isAuth)
+
 
 const router = express.Router();
+router.use(isAuth)
 
 router.get('/', getTeachers);
 router.post('/', createTeacher);

@@ -1,4 +1,4 @@
-const { StudentModel } = require("../models/Schemas");
+const { StudentModel, ClassModel } = require("../models/Schemas");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const {
@@ -8,9 +8,14 @@ const {
 const {objectIdValidator}= require("../validators/user")
 
 const getStudents = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
   try {
-    const students = await StudentModel.find().populate(
-      "schoolId classId parents"
+    const students = await StudentModel.find({schoolId}).populate(
+      "classId parents"
     );
     res.status(200).json(students);
   } catch (error) {
@@ -19,16 +24,37 @@ const getStudents = async (req, res) => {
 };
 
 const createStudent = async (req, res) => {
-  const { firstName, lastName, email, schoolId, classId, parents, gender } =
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+  const { firstName, lastName, email, classId, parents, gender } =
     req.body;
-  const validateData = registerStudentValidator.parse({
-    firstName,
-    lastName,
-    classId,
-    gender,
-  });
 
   try {
+    const validateData = registerStudentValidator.parse({
+      firstName,
+      lastName,
+      classId,
+      gender,
+      email,
+      schoolId,
+      classId,
+      parents
+    });
+
+    const school = await SchoolModel.findById(schoolId);
+    const Class = await  ClassModel.findById(classId)
+    if (!school ) {
+      res.status(404).send({ message: "school not found" });
+      return;
+    }
+
+    if (!Class ) {
+      res.status(404).send({ message: "class not found" });
+      return;
+    }
     const newStudent = await StudentModel.create({
       firstName: validateData.firstName,
       lastName: validateData.lastName,
@@ -49,9 +75,6 @@ const createStudent = async (req, res) => {
 
 const deleteStudent = async (req, res) => {
   const { id } = req.params;
-
-  
-
   try {
     const validatedId = objectIdValidator.parse(id);
 
@@ -64,7 +87,6 @@ const deleteStudent = async (req, res) => {
 
 const updateStudent = async (req, res) => {
   const { id } = req.params;
-
   try {
     const validID = objectIdValidator.parse(id);
 

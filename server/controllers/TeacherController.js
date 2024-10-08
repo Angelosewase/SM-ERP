@@ -1,45 +1,85 @@
-const {TeacherModel} = require("../models/Schemas");
+const { TeacherModel, SchoolModel } = require("../models/Schemas");
+const { getSchoolIdFromToken } = require("../utils/jwt");
+const {
+  createTeacherValidator,
+  updateTeacherValidator,
+  teacherIdValidator,
+} = require("../validators/teacher");
 
-// GET all teachers
 const getTeachers = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+
   try {
-    const teachers = await TeacherModel.find().populate("subjects classes");
+    const teachers = await TeacherModel.find({ schoolId }).populate(
+      "subjects classes"
+    );
     res.status(200).json(teachers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// POST a new teacher
 const createTeacher = async (req, res) => {
-  const { firstName, lastName, email, schoolId, subjects, classes } = req.body;
   try {
-    const newTeacher = await TeacherModel.create({ firstName, lastName, email, schoolId, subjects, classes });
+    const validatedData = createTeacherValidator.parse(req.body);
+    const schoolExists = SchoolModel.exists({ _id: validatedData.schoolId });
+    if (!schoolExists) {
+      res.status(404).send({ message: "school not found" });
+      return;
+    }
+    const newTeacher = await TeacherModel.create(validatedData);
     res.status(201).json(newTeacher);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
     res.status(500).json({ error: error.message });
   }
 };
 
-// DELETE a teacher by ID
 const deleteTeacher = async (req, res) => {
   const { id } = req.params;
   try {
-    const deletedTeacher = await TeacherModel.findByIdAndDelete(id);
+    const validatedId = teacherIdValidator.parse(id);
+
+    const deletedTeacher = await TeacherModel.findByIdAndDelete(validatedId);
+    if (!deletedTeacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
     res.status(200).json(deletedTeacher);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
     res.status(500).json({ error: error.message });
   }
 };
 
-// UPDATE a teacher by ID
 const updateTeacher = async (req, res) => {
   const { id } = req.params;
-  const updatedData = req.body;
   try {
-    const updatedTeacher = await TeacherModel.findByIdAndUpdate(id, updatedData, { new: true });
+    const validatedId = teacherIdValidator.parse(id);
+    const validatedData = updateTeacherValidator.parse(req.body);
+
+    const updatedTeacher = await TeacherModel.findByIdAndUpdate(
+      validatedId,
+      validatedData,
+      { new: true }
+    );
+
+    if (!updatedTeacher) {
+      return res.status(404).json({ error: "Teacher not found" });
+    }
+
     res.status(200).json(updatedTeacher);
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: error.errors });
+    }
     res.status(500).json({ error: error.message });
   }
 };

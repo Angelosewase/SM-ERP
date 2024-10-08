@@ -77,4 +77,13 @@ async function deleteSchool(req, res) {
   }
 }
 
-module.exports = { RegisterSchool, getSchoolById, deleteSchool };
+const getSchools = async (req, res) => {
+  try {
+    const schools = await SchoolModel.find();
+    res.status(200).json(schools);
+  } catch (error) {
+    res.status(500).json({ error: "Something went wrong" });
+  }
+}
+
+module.exports = { RegisterSchool, getSchoolById, deleteSchool, getSchools };
