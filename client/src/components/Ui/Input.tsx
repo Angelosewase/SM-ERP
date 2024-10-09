@@ -1,45 +1,24 @@
-import React from 'react';
+import * as React from "react"
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  name: string;
-  label?: string;
-  error?: string;
-}
+import { cn } from "@/lib/utils"
 
-function Input({
-  type = "text",
-  name = "",
-  placeholder = "",
-  value = "",
-  onChange,
-  className = "",
-  label = "",
-  error = "",
-  disabled = false,
-  ...props
-}: InputProps) {
-  const inputClasses = `placeholder:text-gray-400 py-1.5 px-4 border rounded border-gray-400 outline-2 outline-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 ${className || ""}`;
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
-  return (
-    <div>
-      {label && (
-        <label className="block text-sm font-medium text-gray-700 mb-1">
-          {label}
-        </label>
-      )}
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
       <input
         type={type}
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        className={inputClasses}
-        disabled={disabled}
+        className={cn(
+          "flex h-9 w-full  border-input bg-transparent text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-gray-400 py-1.5 px-4  rounded border-gray-400 outline-2 outline-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 border-2",
+          className
+        )}
+        ref={ref}
         {...props}
       />
-      {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
-    </div>
-  );
-}
+    )
+  }
+)
+Input.displayName = "Input"
 
-export default Input;
+export { Input }

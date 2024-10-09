@@ -15,6 +15,9 @@ import AddExpenses from "./pages/Account/AddExpenses";
 import Subjects from "./pages/Subjects";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
+import ClassPromotions from "./pages/classes/ClassPromotions";
+import AllClasses from "./pages/classes/AllClasses";
+import registerClass from "./pages/classes/registerClass";
 
 const routes = createBrowserRouter([
   { path: "/", Component: Login },
@@ -53,6 +56,18 @@ const routes = createBrowserRouter([
       {
         path: "/sys/addTeacher",
         Component: AddTeachers,
+      },
+      {
+        path: "/sys/classPromotion",
+        Component: ClassPromotions,
+      },
+      {
+        path: "/sys/allClasses",
+        Component: AllClasses,
+      },
+      {
+        path: "/sys/addClass",
+        Component: registerClass,
       },
       {
         path: "/sys/feesGroup",

@@ -9,6 +9,7 @@ const parentSchema = new mongoose.Schema(
     address: String,
     phoneNumber: String,
     child: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
+    gender: { type: String, enum: ["male", "female"], required: true },
     schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
   },
   { timestamps: true }

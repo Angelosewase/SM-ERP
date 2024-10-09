@@ -1,4 +1,4 @@
-const { UserModel } = require("../models/Schemas.js");
+const { UserModel, SchoolModel } = require("../models/Schemas.js");
 const bcrypt = require("bcrypt");
 const z = require("zod");
 const jwt = require("jsonwebtoken");
@@ -29,6 +29,12 @@ async function Login(req, res) {
     );
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const associatedSchool = SchoolModel.findById(user.school);
+    if (!associatedSchool) {
+      res.status(404).json({ message: "Invalid user data" });
+      return;
     }
 
     const token = generateJwtToken({ id: user._id, role: user.role });

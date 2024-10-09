@@ -5,6 +5,7 @@ const {
 } = require("../validators/class");
 const { z } = require("zod");
 const mongoose = require("mongoose");
+const { getSchoolIdFromToken } = require("../utils/jwt");
 
 // Get all classes
 const getClasses = async (req, res) => {

@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import Button from "../components/ui/Button";
-import Input from "../components/ui/Input";
+import {Button} from "../components/ui/Button";
+import Input from "../components/custom/Input";
 import { Progress } from "@/components/ui/progress";
-import PasswordInput from "@/components/ui/PasswordInput";
+import PasswordInput from "@/components/custom/PasswordInput";
 import { SubmitSchoolInfo, SubmitUserInfo } from "@/app/Api/SignUp";
 
 interface FormData {

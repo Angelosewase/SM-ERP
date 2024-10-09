@@ -2,19 +2,23 @@ import {
   AcademicCapIcon,
   Bars3BottomRightIcon,
   BookOpenIcon,
+  BuildingLibraryIcon,
   CircleStackIcon,
   Cog8ToothIcon,
   RectangleGroupIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
 
-
 import { DropDown, NavigationComponent } from "./NavigationItem";
 import { Link } from "react-router-dom";
 
-function NavigationMenu({maximize,setMaximize }:{maximize:boolean,setMaximize:(val:boolean)=>void }) {
-
-
+function NavigationMenu({
+  maximize,
+  setMaximize,
+}: {
+  maximize: boolean;
+  setMaximize: (val: boolean) => void;
+}) {
   return (
     <div
       className={`h-[100vh] ${
@@ -47,18 +51,62 @@ function NavigationMenu({maximize,setMaximize }:{maximize:boolean,setMaximize:(v
                 </div>
               }
               content={
-              
-                  <div >
-                    <Link to={"/sys/allStudents"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
-                      All students
-                    </Link>
-                    <Link to={"/sys/addStudent"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
-                      Add student
-                    </Link>
-                    <Link to={"/sys/studentsPromotion"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
-                      Students promotion
-                    </Link>
-                  </div>
+                <div>
+                  <Link
+                    to={"/sys/allStudents"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    All students
+                  </Link>
+                  <Link
+                    to={"/sys/addStudent"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    Add student
+                  </Link>
+                  <Link
+                    to={"/sys/studentsPromotion"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    Students promotion
+                  </Link>
+                </div>
+              }
+              maximize={maximize}
+              setMaximize={setMaximize}
+            />
+          }
+        />
+
+        <NavigationComponent
+          Item={
+            <DropDown
+              Item={
+                <div className="flex gap-4 items-center">
+                  <BuildingLibraryIcon className="w-8" /> {maximize && "Classes"}
+                </div>
+              }
+              content={
+                <div>
+                  <Link
+                    to={"/sys/allClasses"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    All classes
+                  </Link>
+                  <Link
+                    to={"/sys/addClass"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    Add class
+                  </Link>
+                  <Link
+                    to={"/sys/classPromotion"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
+                    class Promotion
+                  </Link>
+                </div>
               }
               maximize={maximize}
               setMaximize={setMaximize}
@@ -83,10 +131,16 @@ function NavigationMenu({maximize,setMaximize }:{maximize:boolean,setMaximize:(v
               }
               content={
                 <div>
-                  <Link to={"/sys/allTeachers"} className="font-semibold p-2 my-0.5 hover:bg-blue-950  block">
+                  <Link
+                    to={"/sys/allTeachers"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950  block"
+                  >
                     All teachers
                   </Link>
-                  <Link to={"/sys/addTeacher"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                  <Link
+                    to={"/sys/addTeacher"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
                     Add teachers
                   </Link>
                 </div>
@@ -107,16 +161,28 @@ function NavigationMenu({maximize,setMaximize }:{maximize:boolean,setMaximize:(v
               }
               content={
                 <div>
-                  <Link to={"/sys/feesGroup"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                  <Link
+                    to={"/sys/feesGroup"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
                     Fees group
                   </Link>
-                  <Link to={"/sys/studentFees"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                  <Link
+                    to={"/sys/studentFees"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
                     Student fees
                   </Link>
-                  <Link to={"/sys/expenses"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                  <Link
+                    to={"/sys/expenses"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
                     Expenses
                   </Link>
-                  <Link to={"/sys/addExpense"} className="font-semibold p-2 my-0.5 hover:bg-blue-950 block">
+                  <Link
+                    to={"/sys/addExpense"}
+                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
+                  >
                     Add fees
                   </Link>
                 </div>

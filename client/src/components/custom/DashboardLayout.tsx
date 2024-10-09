@@ -1,13 +1,13 @@
 import { IsAuth } from "@/app/Api/auth";
 import NavigationMenu from "@/components/custom/Navigation";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 function DashboardLayout() {
   const [maximize, setMaximize] = useState<boolean>(true);
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     async function isAuth() {
       const isLoggedIn: string | null = await IsAuth();
 
