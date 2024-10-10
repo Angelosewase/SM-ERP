@@ -1,11 +1,18 @@
 import axios from "axios";
+import { schoolIBase, UserIBase } from "../globals";
 
 interface loginInInfo {
   email: string;
   password: string;
 }
 
-export async function Login(data: loginInInfo): Promise<string | null> {
+export interface loginResponse {
+  user: UserIBase;
+  school: schoolIBase;
+  message: string;
+}
+
+export async function Login(data: loginInInfo): Promise<loginResponse | null> {
   console.log("Sending login request to the server...");
 
   try {
@@ -15,10 +22,8 @@ export async function Login(data: loginInInfo): Promise<string | null> {
       { withCredentials: true }
     );
 
-
     if (response.status === 200) {
-      const userId = response.data.userId;
-      return userId;
+      return response.data
     } else {
       console.log(`Unexpected status code: ${response.status}`);
       return null;

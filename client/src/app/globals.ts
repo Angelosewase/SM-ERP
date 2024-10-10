@@ -7,6 +7,7 @@ export interface schoolIBase {
   teachers?: string[];
   students?: string[];
   classes?: string[];
+  parents?: string[];
   establishedYear?: number;
   createdAt: string;
   updatedAt: string;
@@ -17,7 +18,6 @@ export interface UserIBase {
   firstName: string;
   lastName: string;
   email: string;
-  password: string;
   school?: string;
   role: "admin" | "teacher";
   teacher?: string;
@@ -33,7 +33,7 @@ export interface IStudent {
   schoolId: string; 
   classId: string; 
   parents?: string[]; 
-  gender: "male" | "female"; 
+  gender: "male" | "female" | "unknown"; 
   createdAt?: string; 
   updatedAt?: string;
 }

@@ -3,9 +3,11 @@ import Input from "../custom/Input";
 import PasswordInput from "../custom/PasswordInput";
 import { Login } from "@/app/Api/Login";
 import { useNavigate } from "react-router-dom";
-// import { useNavigate } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { fetchSchoolSuccess } from "@/app/features/schoolSlice";
+import { fetchUserSuccess } from "@/app/features/userSlice";
 function LoginForm() {
+  const dispatch = useDispatch();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -14,13 +16,17 @@ function LoginForm() {
 
   async function handleSubmission(e: React.FormEvent) {
     e.preventDefault();
-    const id = await Login(loginInfo);
+    const res = await Login(loginInfo);
 
-    if (!id) {
+    if (!res) {
       return;
     }
+    console.log("res", res);
 
-    navigate("/sys")
+    dispatch(fetchSchoolSuccess(res.school));
+    dispatch(fetchUserSuccess(res.user));
+
+    navigate("/sys");
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {

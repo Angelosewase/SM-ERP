@@ -9,8 +9,6 @@ const {
 } = require("../controllers/classController");
 
 const {isAuth}= require("../middlewares/authentication")
-
-
 router.use(isAuth)
 
 router.get("/", getClasses);

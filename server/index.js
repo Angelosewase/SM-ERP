@@ -7,6 +7,8 @@ const studentRouter = require("./routes/studentRoute");
 const teacherRouter = require("./routes/teacherRoute");
 const classRouter = require("./routes/classRoute");
 const cookieParser = require("cookie-parser");
+const { isAuth } = require("./middlewares/authentication");
+const { getAccountDetails } = require("./services/userService");
 const app = express();
 
 require("dotenv").config();
@@ -39,5 +41,6 @@ app.use("/school", schoolRouter);
 app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/class", classRouter);
+app.get("/details", isAuth, getAccountDetails);
 
 app.listen(PORT || 5000, () => console.log("server running on port 3000"));

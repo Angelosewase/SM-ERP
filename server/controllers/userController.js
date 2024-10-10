@@ -13,8 +13,9 @@ const {
   validateJwtToken,
   getUserIdFromToken,
 } = require("../utils/jwt.js");
+const mongooose = require("mongoose");
+const { generateTheuserResponse, generateTheSchoolRespose } = require("../services/userService.js");
 
-const JWT_SECRET = process.env.JWT_SECRET;
 async function Login(req, res) {
   try {
     const { email, password } = req.body;
@@ -31,20 +32,28 @@ async function Login(req, res) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const associatedSchool = SchoolModel.findById(user.school);
+    const associatedSchool = await SchoolModel.findOne({ _id: user.school });
+
     if (!associatedSchool) {
       res.status(404).json({ message: "Invalid user data" });
       return;
     }
 
-    const token = generateJwtToken({ id: user._id, role: user.role });
+    const userResponse = generateTheuserResponse(user)
+    const schoolResponse = generateTheSchoolRespose(associatedSchool);
+
+    const token = generateJwtToken({ id: user._id , schoolId: associatedSchool._id});
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
       secure: false,
       path: "/",
     });
-    res.status(200).json({ message: "Login successful", userId: user._id });
+    res.status(200).json({
+      message: "Login successful",
+      user: userResponse,
+      school: schoolResponse,
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res
@@ -124,4 +133,20 @@ async function getLoggedInUser(req, res) {
   res.status(200).json(user);
 }
 
-module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser };
+async function Logout(req, res) {
+  try {
+    res.cookie("token", "", {
+      expires: new Date(Date.now() - 3600000),
+      httpOnly: true,
+      secure: false,
+      path: "/",
+    });
+
+    res.status(400).send({ message: "logged out successfully" });
+  } catch (error) {
+    console.log(erro);
+    res.status(500).send({ message: "request failed" });
+  }
+}
+
+module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser, Logout };

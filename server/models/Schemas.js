@@ -108,6 +108,7 @@ const schoolSchema = new mongoose.Schema(
     ],
     teachers: [{ type: mongoose.Schema.Types.ObjectId, ref: "Teacher" }],
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent" }],
     classes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Class" }],
   },
   { timestamps: true }
@@ -264,10 +265,7 @@ const notificationSchema = new mongoose.Schema(
 // Models
 const UserModel = mongoose.model("User", userSchema);
 const SchoolModel = mongoose.model("School", schoolSchema);
-const FinancialTransactionModel = mongoose.model(
-  "TransactionRecord",
-  transactionRecordSchema
-);
+const FinancialTransactionModel = mongoose.model("TransactionRecord",transactionRecordSchema);
 const ExpenseModel = mongoose.model("ExpenseModel", expenseRecordSchema);
 const TeacherModel = mongoose.model("Teacher", teacherSchema);
 const StudentModel = mongoose.model("Student", studentSchema);

@@ -1,9 +1,31 @@
+import { IStudent } from "@/app/globals";
 import Header from "@/components/custom/Header";
 import AddParentForm from "@/components/Forms/AddParentForm";
 import AddstudentForm from "@/components/Forms/AddstudentForm";
-
+import { useState } from "react";
 
 function AddStudent() {
+  const [studentState, setStudentState] = useState<IStudent>({
+    classId: "",
+    firstName: "",
+    lastName: "",
+    gender: "unknown",
+    schoolId: "",
+  });
+
+
+  function updateStateValue(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value, name } = e.target;
+    setStudentState({ ...studentState, [name]: value });
+  }
+
+  function handleSelectChange(name: string, value: string) {
+    setStudentState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  }
+
   return (
     <div className="h-[100vh]">
       <Header />
@@ -17,11 +39,14 @@ function AddStudent() {
           </p>
         </div>
 
-
         <div className="h-[75vh] w-full bg-white mt-6  rounded py-3 px-4 flex flex-col justify-between pb-10">
-          <div >
+          <div>
             <h1 className="text-xl font-semibold ">Add new student </h1>
-            <AddstudentForm />
+            <AddstudentForm
+              state={studentState}
+              updatefn={updateStateValue}
+              handleSelectChange={handleSelectChange}
+            />
           </div>
           <div className="">
             <h1 className="text-xl font-semibold">
@@ -35,15 +60,22 @@ function AddStudent() {
               <div className=" w-40 h-40 rounded-full bg-gray-200"></div>
               <div>
                 <p>upload student photo (150px by 150px)</p>
-                <input type="file" name="studentPhoto" className="text-sm mb-6 " />
+                <input
+                  type="file"
+                  name="studentPhoto"
+                  className="text-sm mb-6 "
+                />
               </div>
             </div>
             <div className="flex gap-4">
-            <button className="bg-myBlue w-28 px-4 py-1 text-white font-semibold rounded">save</button>
-            <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28">reset</button>
+              <button className="bg-myBlue w-28 px-4 py-1 text-white font-semibold rounded">
+                save
+              </button>
+              <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28">
+                reset
+              </button>
+            </div>
           </div>
-          </div>
-        
         </div>
       </div>
     </div>

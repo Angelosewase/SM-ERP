@@ -8,13 +8,12 @@ import {
 } from "@/components/ui/select"
 import { useState } from "react";
 
-// Define a type for the options
 interface SelectOption {
   name: string;
   value: string;
 }
 
-// Define the props for the SelectComponent
+
 interface SelectComponentProps {
   options: SelectOption[];
   handleSelectChange?: (value: string) => void;
@@ -26,12 +25,13 @@ export function SelectComponent({
   handleSelectChange,
   placeholder = "Select an option",
 }: SelectComponentProps) {
-  // State to manage the selected option
+
   const [selectedValue, setSelectedValue] = useState<string>("");
      
   const onSelectChange = (value: string) => {
     console.log(value)
     setSelectedValue(value);
+
     if (handleSelectChange) {
       handleSelectChange(selectedValue);
     }

@@ -7,7 +7,6 @@ const { z } = require("zod");
 const mongoose = require("mongoose");
 const { getSchoolIdFromToken } = require("../utils/jwt");
 
-// Get all classes
 const getClasses = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
   if (!schoolId) {
@@ -47,8 +46,9 @@ const getClassById = async (req, res) => {
 
 // Create a new class
 const createClass = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
-  if (!schoolId) {
+
+  const schoolID = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolID) {
     res.status(401).json({ message: "invalid credentials" });
     return;
   }
@@ -56,7 +56,7 @@ const createClass = async (req, res) => {
   try {
     const validatedData = createClassValidator.parse({
       ...req.body,
-      [schoolId]: schoolId,
+      "schoolId": schoolID,
     });
 
     const schoolId = validatedData.schoolId;
