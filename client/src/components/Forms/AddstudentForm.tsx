@@ -1,6 +1,6 @@
 import { SelectComponent } from "../custom/SelectComponent";
 import Input from "../custom/Input";
-const genderOptions = [
+export const genderOptions = [
   {
     name: "male",
     value: "male",
@@ -14,11 +14,11 @@ const genderOptions = [
 export const classOptionsPlaceholder = [
   {
     name: "class A",
-    value: "class Id ",
+    value: "class Id1 ",
   },
   {
     name: "class B",
-    value: "class Id ",
+    value: "class Id2 ",
   },
 ];
 

@@ -1,4 +1,5 @@
-import Header from "@/components/custom/Header"
+import Header from "@/components/custom/Header";
+
 
 function Expenses() {
   return (
@@ -8,11 +9,14 @@ function Expenses() {
         <div className="flex flex-col flex-1 ">
           <p className="font-bold  mt-4">Students</p>
           <p className="w-10 mt-1 h-1 bg-myBlue"> </p>
-          <p className="text-gray-600 inline-block">Home /<span className="text-myBlue font-semibold">Expenses</span></p>
+          <p className="text-gray-600 inline-block">
+            Home /<span className="text-myBlue font-semibold">Expenses</span>
+          </p>
         </div>
-        </div>
+        
+      </div>
     </div>
-  )
+  );
 }
 
-export default Expenses
+export default Expenses;

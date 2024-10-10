@@ -1,6 +1,22 @@
+import { useNavigate } from "react-router-dom";
 import LoginForm from "../components/Forms/Login";
+import { useLayoutEffect } from "react";
+import { IsAuth } from "@/app/Api/auth";
 
 function Login() {
+  const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    async function isAuth() {
+      const isLoggedIn: string | null = await IsAuth();
+
+      if (isLoggedIn) {
+        navigate("/sys");
+        return;
+      }
+    }
+    isAuth();
+  }, [navigate]);
   return (
     <div className="flex  w-[100vw] h-[100vh] justify-center items-center">
       <div className=" bg-blue-900 w-[55vw] h-[70vh] flex">

@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import {Button} from "../components/ui/Button";
+import React, { useLayoutEffect, useState } from "react";
+import { Button } from "../components/ui/Button";
 import Input from "../components/custom/Input";
 import { Progress } from "@/components/ui/progress";
 import PasswordInput from "@/components/custom/PasswordInput";
 import { SubmitSchoolInfo, SubmitUserInfo } from "@/app/Api/SignUp";
+import { useNavigate } from "react-router-dom";
+import { IsAuth } from "@/app/Api/auth";
 
 interface FormData {
   adminFirstName: string;
@@ -18,6 +20,21 @@ interface FormData {
 }
 
 function SignUp() {
+  const navigate = useNavigate();
+
+  useLayoutEffect(() => {
+    async function isAuth() {
+      const isLoggedIn: string | null = await IsAuth();
+
+      if (isLoggedIn) {
+        navigate("/sys");
+        return;
+      }
+    }
+    isAuth();
+  }, [navigate]);
+
+
   const [step, setStep] = useState<number>(1);
   const [formData, setFormData] = useState<FormData>({
     adminFirstName: "",
@@ -61,7 +78,7 @@ function SignUp() {
         setFormData({ ...formData, adminUserId: userId });
       } else {
         console.error("Failed to register user.");
-        return
+        return;
       }
 
       setStep(step + 1);
@@ -76,10 +93,10 @@ function SignUp() {
       if (!schoolData.admin) {
         console.log("no user account created");
         return;
-      } 
-    console.log(formData)
+      }
+      console.log(formData);
       const schoolResponse = await SubmitSchoolInfo(schoolData);
-      
+
       if (schoolResponse) {
         console.log("School registered successfully:", schoolResponse);
         window.location.href = "/";

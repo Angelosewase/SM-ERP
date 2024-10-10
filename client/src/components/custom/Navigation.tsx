@@ -79,39 +79,10 @@ function NavigationMenu({
         />
 
         <NavigationComponent
-          Item={
-            <DropDown
-              Item={
-                <div className="flex gap-4 items-center">
-                  <BuildingLibraryIcon className="w-8" /> {maximize && "Classes"}
-                </div>
-              }
-              content={
-                <div>
-                  <Link
-                    to={"/sys/allClasses"}
-                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
-                  >
-                    All classes
-                  </Link>
-                  <Link
-                    to={"/sys/addClass"}
-                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
-                  >
-                    Add class
-                  </Link>
-                  <Link
-                    to={"/sys/classPromotion"}
-                    className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
-                  >
-                    class Promotion
-                  </Link>
-                </div>
-              }
-              maximize={maximize}
-              setMaximize={setMaximize}
-            />
-          }
+          Item={<BuildingLibraryIcon className="w-8" />}
+          label="classes"
+          showLabel={maximize}
+          link="/sys/classes"
         />
 
         <NavigationComponent
@@ -183,7 +154,7 @@ function NavigationMenu({
                     to={"/sys/addExpense"}
                     className="font-semibold p-2 my-0.5 hover:bg-blue-950 block"
                   >
-                    Add fees
+                    Add expense
                   </Link>
                 </div>
               }

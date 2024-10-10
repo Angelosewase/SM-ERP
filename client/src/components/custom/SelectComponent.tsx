@@ -30,6 +30,7 @@ export function SelectComponent({
   const [selectedValue, setSelectedValue] = useState<string>("");
      
   const onSelectChange = (value: string) => {
+    console.log(value)
     setSelectedValue(value);
     if (handleSelectChange) {
       handleSelectChange(selectedValue);
@@ -43,8 +44,8 @@ export function SelectComponent({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
+          {options.map((option, idx) => (
+            <SelectItem key={idx} value={option.value}>
               {option.name}
             </SelectItem>
           ))}

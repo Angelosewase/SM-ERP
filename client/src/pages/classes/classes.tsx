@@ -1,16 +1,17 @@
-import Header from "@/components/custom/Header"
+import Header from '@/components/custom/Header'
 
-function ClassPromotions() {
+
+function Classes() {
   return (
     <div className="h-[100vh]">
-    <Header/>
+    <Header />
     <div className="px-6 flex-1">
-      <div className="flex flex-col">
+      <div className="flex flex-col flex-1 ">
         <p className="font-bold  mt-4">classes</p>
         <p className="w-10 mt-1 h-1 bg-myBlue"> </p>
         <p className="text-gray-600 inline-block">
           Home /
-          <span className="text-myBlue font-semibold">class promotions</span>
+          <span className="text-myBlue font-semibold">classes</span>
         </p>
       </div>
     </div>
@@ -18,4 +19,4 @@ function ClassPromotions() {
   )
 }
 
-export default ClassPromotions
+export default Classes

@@ -1,6 +1,6 @@
 import { IsAuth } from "@/app/Api/auth";
 import NavigationMenu from "@/components/custom/Navigation";
-import { useLayoutEffect, useState } from "react";
+import {  useLayoutEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 function DashboardLayout() {
