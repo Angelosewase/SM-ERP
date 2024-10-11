@@ -26,3 +26,7 @@ const promoteStudent = async (studentId, fromClassId, toClassId) => {
       throw error;
     }
   };
+
+
+
+  module.exports = {promoteStudent}

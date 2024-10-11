@@ -2,7 +2,7 @@ import {  BellIcon, EnvelopeIcon, MagnifyingGlassIcon } from "@heroicons/react/2
 
 function Header() {
   return (
-    <div className="flex-1 shadow-md shadow-gray-200 bg-white h-16 flex items-center justify-between px-2">
+    <div className="flex-1 shadow-md shadow-gray-200 bg-white h-16 flex items-center justify-between px-2 ">
       <HeaderSearchInput />
       <Menu />
     </div>

@@ -2,11 +2,12 @@ const { ClassModel, SchoolModel } = require("../models/Schemas");
 const {
   createClassValidator,
   updateClassValidator,
+  promoteClassInofValidator,
 } = require("../validators/class");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const { getSchoolIdFromToken } = require("../utils/jwt");
-const { formatClassIntoNameValuePair } = require("../services/classService");
+const { formatClassIntoNameValuePair, promoteClass } = require("../services/classService");
 
 const getClasses = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -149,6 +150,15 @@ const deleteClass = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+async function  promoteclassHandler(req,res) {
+   try {
+    const validData = promoteClassInofValidator(req.body)
+    promoteClass(validData.classId ,validData.newClassId)
+   } catch (error) {
+    console.log(error)
+   }
+}
+
 
 module.exports = {
   getClasses,

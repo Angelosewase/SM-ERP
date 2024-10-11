@@ -81,6 +81,7 @@ const Fact: React.FC<FactProps> = ({ color, children, label, value }) => {
 
 const Facts: React.FC = () => {
   const school = useSelector(schoolSelector).school;
+  console.log(school)
   if (!school) {
     console.log("invalid state");
     return (
@@ -113,7 +114,7 @@ const Facts: React.FC = () => {
       <Fact
         color="bg-yellow-200"
         label="parents"
-        value={`${school.teachers?.length}`}
+        value={`${school.parents?.length}`}
       >
         <UserGroupIcon className="h-10 text-yellow-800" />
       </Fact>

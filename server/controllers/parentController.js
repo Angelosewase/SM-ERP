@@ -32,7 +32,9 @@ const createParent = async (req, res) => {
     await StudentModel.findByIdAndUpdate(child, {
       $push: { parents: newParent._id },
     });
+   
 
+    console.log(schoolId)
     await SchoolModel.findByIdAndUpdate(schoolId, {
       $push: { Parents: newParent._id },
     });

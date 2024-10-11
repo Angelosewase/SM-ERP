@@ -32,7 +32,7 @@ function generateTheSchoolRespose(school) {
     admin: school.admin,
     teachers: school.teachers,
     students: school.students,
-    parents: school.parents,
+    parents: school.Parents,
     classes: school.classes,
     establishedYear: school.establishedYear,
     createdAt: school.createdAt,

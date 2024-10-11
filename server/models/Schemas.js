@@ -5,7 +5,7 @@ const parentSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, },
     address: String,
     phoneNumber: String,
     child: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
@@ -75,6 +75,8 @@ const studentSchema = new mongoose.Schema(
     },
     parents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent" }],
     gender: { type: String, enum: ["male", "female"], required: true },
+    balance: { type: Number, default: 0 },  
+    fees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fee" }],
   },
   { timestamps: true }
 );
@@ -267,6 +269,40 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+const feeSchema = new mongoose.Schema({
+  schoolId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
+  classId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Class",
+    required: true,
+  },
+  feeType: { type: String, required: true },  
+  amount: { type: Number, required: true },
+  dueDate: { type: Date, required: true },   
+}, { timestamps: true });
+
+const paymentSchema = new mongoose.Schema({
+  studentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Student",
+    required: true,
+  },
+  feeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Fee",
+    required: true,
+  },
+  amountPaid: { type: Number, required: true },
+  paymentDate: { type: Date, default: Date.now },  
+  paymentMethod: { type: String }, 
+}, { timestamps: true });
+
+
+
 // Models
 const UserModel = mongoose.model("User", userSchema);
 const SchoolModel = mongoose.model("School", schoolSchema);
@@ -285,6 +321,9 @@ const ExamResultsModel = mongoose.model("ExamResults", examResultsSchema);
 const ScheduleModel = mongoose.model("Schedule", scheduleSchema);
 const MessageModel = mongoose.model("Message", messageSchema);
 const NotificationModel = mongoose.model("Notification", notificationSchema);
+const FeeModel = mongoose.model("Fee", feeSchema);
+const PaymentModel = mongoose.model("Payment", paymentSchema);
+
 
 module.exports = {
   UserModel,
@@ -301,4 +340,6 @@ module.exports = {
   ScheduleModel,
   MessageModel,
   NotificationModel,
+  FeeModel,
+  PaymentModel
 };

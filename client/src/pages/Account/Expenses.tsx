@@ -1,5 +1,5 @@
 import Header from "@/components/custom/Header";
-
+import { ExpenseTable } from "@/components/tables/expenses/table";
 
 function Expenses() {
   return (
@@ -13,7 +13,9 @@ function Expenses() {
             Home /<span className="text-myBlue font-semibold">Expenses</span>
           </p>
         </div>
-        
+        <div className="w-full bg-white mt-6  rounded py-3 px-4 flex flex-col justify-between ">
+          <ExpenseTable />
+        </div>
       </div>
     </div>
   );

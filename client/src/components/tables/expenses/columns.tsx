@@ -1,0 +1,111 @@
+// expenseColumns.ts
+import { ColumnDef } from "@tanstack/react-table";
+import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
+import {
+  DropdownMenu,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/Button";
+import { IExpenseRecord } from "@/app/globals"; // Import the interface
+
+export const columns: ColumnDef<IExpenseRecord>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="px-1"
+      >
+        Expense Name
+        <CaretSortIcon className="ml-2 h-4 w-4" />
+      </Button>
+    ),
+    cell: ({ row }) => <div className="lowercase">{row.getValue("name")}</div>,
+  },
+  {
+    accessorKey: "amount",
+    header: "Amount",
+    cell: ({ row }) => <div>${row.getValue("amount")}</div>, // formatted amount
+  },
+  {
+    accessorKey: "paymentDate",
+    header: "Payment Date",
+    cell: ({ row }) => (
+      <div>{new Date(row.getValue("paymentDate")).toLocaleDateString()}</div>
+    ),
+  },
+  {
+    accessorKey: "transactionType",
+    header: "Transaction Type",
+    cell: ({ row }) => <div>{row.getValue("transactionType")}</div>,
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+      return (
+        <div
+          className={`capitalize ${
+            status === "paid"
+              ? "text-green-500"
+              : status === "pending"
+              ? "text-yellow-500"
+              : "text-red-500"
+          }`}
+        >
+          {status as string}
+        </div>
+      );
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const expense = row.original;
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0">
+              <span className="sr-only">Open menu</span>
+              <DotsHorizontalIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => console.log(expense._id)}>Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
+  },
+];

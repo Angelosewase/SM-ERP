@@ -4,9 +4,11 @@ const mongoose = require("mongoose");
 const {
   registerStudentValidator,
   updateStudentValidator,
+  promoteStudentValidator,
 } = require("../validators/student");
 const { objectIdValidator } = require("../validators/user");
 const { getSchoolIdFromToken } = require("../utils/jwt");
+const { promoteStudent } = require("../services/studentService");
 
 const getStudents = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -120,7 +122,24 @@ const updateStudent = async (req, res) => {
   }
 };
 
+async function promoteStudentHandler(req, res) {
+  const { studentId, fromClassId, toClassId } = req.body;
+  try {
+    const validateData = promoteStudentValidator.parse(req.body);
+    await promoteStudent(
+      validateData.studentId,
+      validateData.fromClassId,
+      validateData.toClassId
+    );
+  } catch (error) {
+    res.status(400).send({ message: "error promoting student" });
+  }
+}
 
-
-
-module.exports = { getStudents, createStudent, deleteStudent, updateStudent };
+module.exports = {
+  getStudents,
+  createStudent,
+  deleteStudent,
+  updateStudent,
+  promoteStudentHandler,
+};

@@ -26,71 +26,82 @@ export interface UserIBase {
 }
 
 export interface IStudent {
-  _id?: string; 
+  _id?: string;
   firstName: string;
   lastName: string;
-  email?: string; 
-  schoolId?: string; 
-  classId: string; 
-  parents?: string[]; 
-  gender: string; 
-  createdAt?: string; 
+  email?: string;
+  schoolId?: string;
+  classId: string;
+  parents?: string[];
+  gender: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 
 export interface ITeacher {
-  _id?: string; 
+  _id?: string;
   firstName: string;
   lastName: string;
-  email: string; 
-  schoolId?: string; 
-  subjects: string[]; 
-  classes: string[]; 
-  createdAt?: string; 
-  updatedAt?: string; 
+  email: string;
+  schoolId?: string;
+  subjects: string[];
+  classes: string[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IClass {
-  _id?: string; 
-  name: string; 
-  students?: string[]; 
-  subjects?: string[]; 
-  schoolId?: string; 
-  createdAt?: string; 
-  updatedAt?: string; 
+  _id?: string;
+  name: string;
+  students?: string[];
+  subjects?: string[];
+  schoolId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IParent {
-  _id?: string; 
+  _id?: string;
   firstName: string;
   lastName: string;
   email: string;
   address?: string;
-  phoneNumber?: string; 
-  child: string; 
+  phoneNumber?: string;
+  child: string;
   gender: string;
-  schoolId?: string; 
-  createdAt?: Date; 
+  schoolId?: string;
+  createdAt?: Date;
   updatedAt?: Date;
 }
 
-
 export interface ITeacher {
-  _id?: string; 
-  firstName: string; 
+  _id?: string;
+  firstName: string;
   lastName: string;
-  email: string; 
+  email: string;
   schoolId?: string;
-  subjects: string[]; 
+  subjects: string[];
   classes: string[];
   createdAt?: string;
-  updatedAt?: string; 
+  updatedAt?: string;
 }
 
 export interface ISubject {
-  _id: string; 
-  name: string; 
-  teacherId: string; 
+  _id: string;
+  name: string;
+  teacherId: string;
   classes: string[];
-  days: string[]; 
+  days: string[];
+}
+
+export interface IExpenseRecord {
+  _id: string;
+  name: string;
+  schoolId: string;
+  amount: number;
+  paymentDate: Date;
+  transactionType: string;
+  status: "paid" | "pending" | "overdue";
+  createdAt?: Date;
+  updatedAt?: Date;
 }

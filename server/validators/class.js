@@ -27,7 +27,6 @@ const createClassValidator = z.object({
   schoolId: objectIdValidator,
 });
 
-// Validator for updating a class (all fields optional)
 const updateClassValidator = z.object({
   name: z
     .string()
@@ -55,4 +54,19 @@ const updateClassValidator = z.object({
     .optional(),
 });
 
-module.exports = { createClassValidator, updateClassValidator };
+const promoteClassInofValidator = z.object({
+  classId: z
+    .string()
+    .refine(
+      (value) => mongoose.Types.ObjectId.isValid(value),
+      "invalid classId "
+    ),
+  newClassId: z
+    .string()
+    .refine(
+      (value) => mongoose.Types.ObjectId.isValid(value),
+      "invalid classId "
+    ),
+});
+
+module.exports = { createClassValidator, updateClassValidator, promoteClassInofValidator};
