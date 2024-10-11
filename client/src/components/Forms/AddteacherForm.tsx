@@ -1,6 +1,7 @@
+import { genderOptions } from "@/app/Data/defaults";
 import Input from "../custom/Input";
 import { SelectComponent } from "../custom/SelectComponent";
-import { classOptionsPlaceholder, genderOptions } from "./AddstudentForm";
+import { classOptionsPlaceholder } from "./AddstudentForm";
 
 function AddteacherForm() {
   return (

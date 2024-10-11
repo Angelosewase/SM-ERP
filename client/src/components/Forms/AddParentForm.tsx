@@ -1,5 +1,7 @@
+import { ChangeEvent } from "react";
 import Input from "../custom/Input";
 import { SelectComponent } from "../custom/SelectComponent";
+import { IParent } from "@/app/globals";
 
 const genderOptions = [
   {
@@ -11,7 +13,17 @@ const genderOptions = [
     value: "female",
   },
 ];
-function AddParentForm() {
+
+interface addParentformprops {
+  updatefn(e: ChangeEvent<HTMLInputElement>): void;
+  state: IParent;
+  handleSelectChange?: (val: string, val2: string) => void;
+}
+function AddParentForm({
+  updatefn,
+  state,
+  handleSelectChange,
+}: addParentformprops) {
   return (
     <div className="mt-3  flex gap-8 items-center ">
       <Input
@@ -20,6 +32,8 @@ function AddParentForm() {
         placeholder="First name  "
         className="border-2 mt-1"
         required={true}
+        onChange={updatefn}
+        value={state.firstName}
       />
       <Input
         name="lastName"
@@ -27,6 +41,8 @@ function AddParentForm() {
         placeholder="Last name "
         className="border-2 mt-1"
         required={true}
+        onChange={updatefn}
+        value={state.lastName}
       />
 
       <Input
@@ -35,17 +51,29 @@ function AddParentForm() {
         placeholder="email "
         className="border-2 mt-1"
         type="email"
+        onChange={updatefn}
+        value={state.email}
       />
       <Input
-        name="parentTel"
+        name="phoneNumber"
         label="parent's phone  "
         placeholder="phone number "
         className="border-2 mt-1"
         type="tel"
+        onChange={updatefn}
+        value={state.phoneNumber}
       />
       <label className=" flex flex-col gap-2">
         <span className="font-semibold">gender * </span>
-        <SelectComponent options={genderOptions} placeholder="select gender" />
+        <SelectComponent
+          options={genderOptions}
+          placeholder="select gender"
+          handleSelectChange={(value: string) => {
+            if (handleSelectChange) {
+              handleSelectChange("gender", value);
+            }
+          }}
+        />
       </label>
     </div>
   );

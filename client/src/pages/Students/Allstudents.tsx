@@ -1,7 +1,23 @@
+import { fetchStudents } from "@/app/Api/student";
 import Header from "@/components/custom/Header";
-import { StudentTable } from "@/components/tables/StudentsTable";
+import {
+  Student,
+  StudentTable,
+} from "@/components/tables/student/StudentsTable";
+import { transformStudentData } from "@/utils/objects";
+import { useEffect, useState } from "react";
 
 function Allstudents() {
+  const [stateData, setStateData] = useState<Student[]>([]);
+  useEffect(() => {
+    async function getdata() {
+      const data = await fetchStudents();
+      const formattedData = transformStudentData(data);
+      setStateData(formattedData);
+    }
+    getdata();
+  }, [stateData]);
+
   return (
     <div className=" pb-3 h-[100vh]">
       <Header />
@@ -15,7 +31,7 @@ function Allstudents() {
           </p>
         </div>
         <div className="w-full bg-white mt-6  rounded py-3 px-8 flex flex-col justify-between pb ">
-          <StudentTable />
+          <StudentTable data={stateData} />
         </div>
       </div>
     </div>

@@ -5,7 +5,25 @@ const BASE_URL = "http://localhost:3000/class";
 
 export const fetchClasses = async (): Promise<IClass[]> => {
   try {
-    const response = await axios.get<IClass[]>(BASE_URL, { withCredentials: true });
+    const response = await axios.get<IClass[]>(BASE_URL, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching classes:", error);
+    throw error;
+  }
+};
+
+interface fmtclass {
+  name: string;
+  value: string;
+}
+export const fetchformattedClasses = async (): Promise<fmtclass[]> => {
+  try {
+    const response = await axios.get<fmtclass[]>(`${BASE_URL}/fmt`, {
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching classes:", error);
@@ -35,11 +53,18 @@ export const createClass = async (classData: IClass): Promise<IClass> => {
     throw error;
   }
 };
-export const updateClass = async (classId: string, classData: Partial<IClass>): Promise<IClass> => {
+export const updateClass = async (
+  classId: string,
+  classData: Partial<IClass>
+): Promise<IClass> => {
   try {
-    const response = await axios.put<IClass>(`${BASE_URL}/${classId}`, classData, {
-      withCredentials: true,
-    });
+    const response = await axios.put<IClass>(
+      `${BASE_URL}/${classId}`,
+      classData,
+      {
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.error("Error updating class:", error);

@@ -21,7 +21,6 @@ function LoginForm() {
     if (!res) {
       return;
     }
-    console.log("res", res);
 
     dispatch(fetchSchoolSuccess(res.school));
     dispatch(fetchUserSuccess(res.user));

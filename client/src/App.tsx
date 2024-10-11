@@ -15,7 +15,7 @@ import AddExpenses from "./pages/Account/AddExpenses";
 import Subjects from "./pages/Subjects";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
-import Classes from "./pages/classes/classes";
+import Classes from "./pages/classes";
 
 const routes = createBrowserRouter([
   { path: "/", Component: Login },

@@ -6,7 +6,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { useState } from "react";
 
 interface SelectOption {
   name: string;
@@ -16,7 +15,7 @@ interface SelectOption {
 
 interface SelectComponentProps {
   options: SelectOption[];
-  handleSelectChange?: (value: string) => void;
+  handleSelectChange: (value: string) => void;
   placeholder?: string;
 }
 
@@ -26,15 +25,8 @@ export function SelectComponent({
   placeholder = "Select an option",
 }: SelectComponentProps) {
 
-  const [selectedValue, setSelectedValue] = useState<string>("");
-     
   const onSelectChange = (value: string) => {
-    console.log(value)
-    setSelectedValue(value);
-
-    if (handleSelectChange) {
-      handleSelectChange(selectedValue);
-    }
+    handleSelectChange(value);
   };
 
   return (
@@ -44,8 +36,8 @@ export function SelectComponent({
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {options.map((option, idx) => (
-            <SelectItem key={idx} value={option.value}>
+          {options.map((option) => (
+            <SelectItem key={option.name} value={option.value}>
               {option.name}
             </SelectItem>
           ))}

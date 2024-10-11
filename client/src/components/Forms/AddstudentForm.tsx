@@ -2,20 +2,8 @@ import { SelectComponent } from "../custom/SelectComponent";
 import Input from "../custom/Input";
 import { ChangeEvent } from "react";
 import { IStudent } from "@/app/globals";
-export const genderOptions = [
-  {
-    name: "male",
-    value: "male",
-  },
-  {
-    name: "female",
-    value: "female",
-  },
-  {
-    name: "unknown",
-    value: "unknown",
-  },
-];
+import { genderOptions } from "@/app/Data/defaults";
+import { SelectClass } from "../custom/classSelect";
 
 export const classOptionsPlaceholder = [
   {
@@ -31,7 +19,7 @@ export const classOptionsPlaceholder = [
 interface addStudentformprops {
   updatefn(e: ChangeEvent<HTMLInputElement>): void;
   state: IStudent;
-  handleSelectChange?: (val: string, va2: string) => void;
+  handleSelectChange: (val: string, val2: string) => void;
 }
 
 function AddstudentForm({
@@ -39,6 +27,7 @@ function AddstudentForm({
   state,
   handleSelectChange,
 }: addStudentformprops) {
+
   return (
     <div className="mt-3  flex gap-10 items-center">
       <Input
@@ -74,17 +63,18 @@ function AddstudentForm({
           options={genderOptions}
           placeholder="select gender"
           handleSelectChange={(value: string) => {
-            if (handleSelectChange) {
-              handleSelectChange("classId", value);
-            }
+            handleSelectChange("gender", value);
           }}
         />
       </label>
       <label className=" flex flex-col gap-2">
         <span className="font-semibold">class * </span>
-        <SelectComponent
-          options={classOptionsPlaceholder}
-          placeholder="select class"
+        <SelectClass
+          handleSelectChange={(value: string) => {
+            if (handleSelectChange) {
+              handleSelectChange("classId", value);
+            }
+          }}
         />
       </label>
     </div>

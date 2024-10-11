@@ -6,6 +6,7 @@ const {
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const { getSchoolIdFromToken } = require("../utils/jwt");
+const { formatClassIntoNameValuePair } = require("../services/classService");
 
 const getClasses = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -20,6 +21,23 @@ const getClasses = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const getFormatedClasses = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+  try {
+    const classes = await ClassModel.find({ schoolId });
+    const resClasses = formatClassIntoNameValuePair(classes)
+    res.status(200).json(resClasses);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+
 
 const getClassById = async (req, res) => {
   const { id } = req.params;
@@ -44,7 +62,6 @@ const getClassById = async (req, res) => {
   }
 };
 
-// Create a new class
 const createClass = async (req, res) => {
 
   const schoolID = getSchoolIdFromToken(req.cookies.token);
@@ -77,8 +94,6 @@ const createClass = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Update a class by ID
 const updateClass = async (req, res) => {
   const { id } = req.params;
 
@@ -110,7 +125,6 @@ const updateClass = async (req, res) => {
   }
 };
 
-// Delete a class by ID
 const deleteClass = async (req, res) => {
   const { id } = req.params;
   const idValidator = z
@@ -142,4 +156,5 @@ module.exports = {
   createClass,
   updateClass,
   deleteClass,
+  getFormatedClasses
 };

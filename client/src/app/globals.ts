@@ -26,20 +26,20 @@ export interface UserIBase {
 }
 
 export interface IStudent {
-  id?: string; 
+  _id?: string; 
   firstName: string;
   lastName: string;
   email?: string; 
-  schoolId: string; 
+  schoolId?: string; 
   classId: string; 
   parents?: string[]; 
-  gender: "male" | "female" | "unknown"; 
+  gender: string; 
   createdAt?: string; 
   updatedAt?: string;
 }
 
 export interface ITeacher {
-  id?: string; 
+  _id?: string; 
   firstName: string;
   lastName: string;
   email: string; 
@@ -51,11 +51,46 @@ export interface ITeacher {
 }
 
 export interface IClass {
-  id?: string; 
+  _id?: string; 
   name: string; 
   students?: string[]; 
   subjects?: string[]; 
-  schoolId: string; 
+  schoolId?: string; 
   createdAt?: string; 
   updatedAt?: string; 
+}
+
+export interface IParent {
+  _id?: string; 
+  firstName: string;
+  lastName: string;
+  email: string;
+  address?: string;
+  phoneNumber?: string; 
+  child: string; 
+  gender: string;
+  schoolId?: string; 
+  createdAt?: Date; 
+  updatedAt?: Date;
+}
+
+
+export interface ITeacher {
+  _id?: string; 
+  firstName: string; 
+  lastName: string;
+  email: string; 
+  schoolId?: string;
+  subjects: string[]; 
+  classes: string[];
+  createdAt?: string;
+  updatedAt?: string; 
+}
+
+export interface ISubject {
+  _id: string; 
+  name: string; 
+  teacherId: string; 
+  classes: string[];
+  days: string[]; 
 }

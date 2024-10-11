@@ -6,6 +6,7 @@ const schoolRouter = require("./routes/schoolRoute");
 const studentRouter = require("./routes/studentRoute");
 const teacherRouter = require("./routes/teacherRoute");
 const classRouter = require("./routes/classRoute");
+const parentRouter = require("./routes/parentRoute")
 const cookieParser = require("cookie-parser");
 const { isAuth } = require("./middlewares/authentication");
 const { getAccountDetails } = require("./services/userService");
@@ -41,6 +42,7 @@ app.use("/school", schoolRouter);
 app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/class", classRouter);
+app.use("/parent",parentRouter)
 app.get("/details", isAuth, getAccountDetails);
 
 app.listen(PORT || 5000, () => console.log("server running on port 3000"));

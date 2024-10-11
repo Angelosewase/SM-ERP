@@ -14,7 +14,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { columns } from "./studentsColumns";
+import { Class, columns } from "./columns"; 
 import { Button } from "@/components/ui/Button";
 import {
   DropdownMenu,
@@ -32,112 +32,34 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// Generate dummy data matching the student schema
-const data: Student[] = [
+
+
+// Placeholder data
+const placeholderData: Class[] = [
   {
-    id: "1",
-    firstName: "Alice",
-    lastName: "Johnson",
-    email: "alice.johnson@example.com",
-    schoolId: "school1",
-    class: "class1",
-    parents: ["parent1", "parent2"],
-    gender: "female",
+    _id: "1",
+    name: "Class A",
+    studentsCount: 25,
+    subjectsCount: 5,
+    createdAt: new Date("2024-01-01"),
   },
   {
-    id: "2",
-    firstName: "Bob",
-    lastName: "Smith",
-    email: "bob.smith@example.com",
-    schoolId: "school2",
-    class: "class2",
-    parents: ["parent3"],
-    gender: "male",
+    _id: "2",
+    name: "Class B",
+    studentsCount: 30,
+    subjectsCount: 6,
+    createdAt: new Date("2024-02-01"),
   },
   {
-    id: "3",
-    firstName: "Charlie",
-    lastName: "Brown",
-    email: "charlie.brown@example.com",
-    schoolId: "school3",
-    class: "class3",
-    parents: ["parent4"],
-    gender: "male",
-  },
-  {
-    id: "4",
-    firstName: "Daisy",
-    lastName: "Green",
-    email: "daisy.green@example.com",
-    schoolId: "school4",
-    class: "class1",
-    parents: ["parent5"],
-    gender: "female",
-  },
-  {
-    id: "2",
-    firstName: "Bob",
-    lastName: "Smith",
-    email: "bob.smith@example.com",
-    schoolId: "school2",
-    class: "class2",
-    parents: ["parent3"],
-    gender: "male",
-  },
-  {
-    id: "3",
-    firstName: "Charlie",
-    lastName: "Brown",
-    email: "charlie.brown@example.com",
-    schoolId: "school3",
-    class: "class3",
-    parents: ["parent4"],
-    gender: "male",
-  },
-  {
-    id: "4",
-    firstName: "Daisy",
-    lastName: "Green",
-    email: "daisy.green@example.com",
-    schoolId: "school4",
-    class: "class1",
-    parents: ["parent5"],
-    gender: "female",
-  },
-  {
-    id: "2",
-    firstName: "Bob",
-    lastName: "Smith",
-    email: "bob.smith@example.com",
-    schoolId: "school2",
-    class: "class2",
-    parents: ["parent3"],
-    gender: "male",
-  },
-  {
-    id: "3",
-    firstName: "Charlie",
-    lastName: "Brown",
-    email: "charlie.brown@example.com",
-    schoolId: "school3",
-    class: "class3",
-    parents: ["parent4"],
-    gender: "male",
+    _id: "3",
+    name: "Class C",
+    studentsCount: 28,
+    subjectsCount: 7,
+    createdAt: new Date("2024-03-01"),
   },
 ];
 
-export type Student = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  schoolId: string;
-  class: string;
-  parents: string[];
-  gender: "male" | "female";
-};
-
-export function StudentTable() {
+export function ClassTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -151,7 +73,7 @@ export function StudentTable() {
   });
 
   const table = useReactTable({
-    data,
+    data: placeholderData,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -175,19 +97,10 @@ export function StudentTable() {
       <div className="flex items-center py-4">
         <div className="flex flex-1 gap-10">
           <Input
-            placeholder="Filter emails..."
-            value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+            placeholder="Filter classes..."
+            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
             onChange={(event) =>
-              table.getColumn("email")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
-
-          <Input
-            placeholder="Filter class..."
-            value={(table.getColumn("class")?.getFilterValue() as string) ?? ""}
-            onChange={(event) =>
-              table.getColumn("class")?.setFilterValue(event.target.value)
+              table.getColumn("name")?.setFilterValue(event.target.value)
             }
             className="max-w-sm"
           />
@@ -221,7 +134,7 @@ export function StudentTable() {
         </DropdownMenu>
       </div>
 
-      <div className="rounded-md Myblue border border-b-0">
+      <div className="rounded-md border border-b-0">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -289,7 +202,7 @@ export function StudentTable() {
             onClick={() =>
               setPageSize({
                 ...pageSize,
-                ["pageIndex"]: pageSize.pageIndex - 1,
+                pageIndex: pageSize.pageIndex - 1,
               })
             }
             disabled={!table.getCanPreviousPage()}
@@ -303,7 +216,7 @@ export function StudentTable() {
             onClick={() =>
               setPageSize({
                 ...pageSize,
-                ["pageIndex"]: pageSize.pageIndex + 1,
+                pageIndex: pageSize.pageIndex + 1,
               })
             }
             className="bg-myBlue text-white"

@@ -1,6 +1,6 @@
-const {ParentModel} = require("../models/Schemas");
+const { ParentModel, StudentModel, SchoolModel } = require("../models/Schemas");
+const { getSchoolIdFromToken } = require("../utils/jwt");
 
-// GET all parents
 const getParents = async (req, res) => {
   try {
     const parents = await ParentModel.find().populate("child");
@@ -10,18 +10,40 @@ const getParents = async (req, res) => {
   }
 };
 
-// POST a new parent
 const createParent = async (req, res) => {
-  const { firstName, lastName, email, address, phoneNumber, child } = req.body;
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+
+  const { firstName, lastName, email, address, phoneNumber, child, gender } =
+    req.body;
   try {
-    const newParent = await ParentModel.create({ firstName, lastName, email, address, phoneNumber, child });
+    const newParent = await ParentModel.create({
+      firstName,
+      lastName,
+      email,
+      address,
+      phoneNumber,
+      child,
+      gender,
+    });
+    await StudentModel.findByIdAndUpdate(child, {
+      $push: { parents: newParent._id },
+    });
+
+    await SchoolModel.findByIdAndUpdate(schoolId, {
+      $push: { Parents: newParent._id },
+    });
+
     res.status(201).json(newParent);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// DELETE a parent by ID
 const deleteParent = async (req, res) => {
   const { id } = req.params;
   try {
@@ -32,12 +54,13 @@ const deleteParent = async (req, res) => {
   }
 };
 
-// UPDATE a parent by ID
 const updateParent = async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;
   try {
-    const updatedParent = await ParentModel.findByIdAndUpdate(id, updatedData, { new: true });
+    const updatedParent = await ParentModel.findByIdAndUpdate(id, updatedData, {
+      new: true,
+    });
     res.status(200).json(updatedParent);
   } catch (error) {
     res.status(500).json({ error: error.message });

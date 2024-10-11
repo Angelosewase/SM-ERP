@@ -1,4 +1,6 @@
-import { IStudent } from "@/app/globals";
+import { createParent } from "@/app/Api/parent";
+import { createStudent } from "@/app/Api/student";
+import { IParent, IStudent } from "@/app/globals";
 import Header from "@/components/custom/Header";
 import AddParentForm from "@/components/Forms/AddParentForm";
 import AddstudentForm from "@/components/Forms/AddstudentForm";
@@ -10,21 +12,79 @@ function AddStudent() {
     firstName: "",
     lastName: "",
     gender: "unknown",
-    schoolId: "",
+    email: "",
   });
 
+  const [parenstState, setParentState] = useState<IParent>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    child: "",
+    gender: "",
+  });
 
-  function updateStateValue(e: React.ChangeEvent<HTMLInputElement>) {
+  function updateStundentStateValue(e: React.ChangeEvent<HTMLInputElement>) {
     const { value, name } = e.target;
     setStudentState({ ...studentState, [name]: value });
   }
 
-  function handleSelectChange(name: string, value: string) {
-    setStudentState((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  function updateParentStateValue(e: React.ChangeEvent<HTMLInputElement>) {
+    const { value, name } = e.target;
+    setParentState({ ...parenstState, [name]: value });
   }
+
+  function handleStudentSelectChange(name: string, value: string) {
+    setStudentState({ ...studentState, [name]: value });
+  }
+  function handleParentSelectChange(name: string, value: string) {
+    setParentState({ ...parenstState, [name]: value });
+  }
+
+  async function handleSubmit() {
+    console.log("student", studentState);
+    console.log("parent", parenstState);
+    try {
+      const createdStudent = await createStudent(studentState);
+      if (!createdStudent._id) {
+        console.log("Creation of user failed");
+        return;
+      }
+
+      const parent = await createParent({
+        ...parenstState,
+        child: createdStudent._id,
+      });
+
+      if(parent._id){
+        console.log("student created successfully")
+      }
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+    resetStates()
+  }
+
+
+  const resetStates = () => {
+    setStudentState({
+      classId: "",
+      firstName: "",
+      lastName: "",
+      gender: "unknown",
+      email: "",
+    });
+  
+    setParentState({
+      firstName: "",
+      lastName: "",
+      email: "",
+      phoneNumber: "",
+      child: "",
+      gender: "",
+    });
+  };
 
   return (
     <div className="h-[100vh]">
@@ -44,15 +104,19 @@ function AddStudent() {
             <h1 className="text-xl font-semibold ">Add new student </h1>
             <AddstudentForm
               state={studentState}
-              updatefn={updateStateValue}
-              handleSelectChange={handleSelectChange}
+              updatefn={updateStundentStateValue}
+              handleSelectChange={handleStudentSelectChange}
             />
           </div>
           <div className="">
             <h1 className="text-xl font-semibold">
               Register parent/guardian details{" "}
             </h1>
-            <AddParentForm />
+            <AddParentForm
+              state={parenstState}
+              updatefn={updateParentStateValue}
+              handleSelectChange={handleParentSelectChange}
+            />
           </div>
 
           <div className="">
@@ -67,11 +131,11 @@ function AddStudent() {
                 />
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4" onClick={handleSubmit}>
               <button className="bg-myBlue w-28 px-4 py-1 text-white font-semibold rounded">
                 save
               </button>
-              <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28">
+              <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28" onClick={resetStates}>
                 reset
               </button>
             </div>
