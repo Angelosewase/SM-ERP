@@ -1,7 +1,5 @@
-"use client";
-
 import * as React from "react";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
+
 import {
   ColumnFiltersState,
   PaginationState,
@@ -14,14 +12,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Class, columns } from "./columns"; 
+import { Class, columns } from "./columns";
 import { Button } from "@/components/ui/Button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -31,33 +24,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-
+import { fetchClasses } from "@/app/Api/classes";
+import { transformClass } from "@/utils/objects";
+import ColumnsDropDown from "@/components/custom/ColumnsDropDown";
 
 // Placeholder data
-const placeholderData: Class[] = [
-  {
-    _id: "1",
-    name: "Class A",
-    studentsCount: 25,
-    subjectsCount: 5,
-    createdAt: new Date("2024-01-01"),
-  },
-  {
-    _id: "2",
-    name: "Class B",
-    studentsCount: 30,
-    subjectsCount: 6,
-    createdAt: new Date("2024-02-01"),
-  },
-  {
-    _id: "3",
-    name: "Class C",
-    studentsCount: 28,
-    subjectsCount: 7,
-    createdAt: new Date("2024-03-01"),
-  },
-];
+// const placeholderData: Class[] = [
+//   {
+//     _id: "1",
+//     name: "Class A",
+//     studentsCount: 25,
+//     subjectsCount: 5,
+//     createdAt: new Date("2024-01-01"),
+//   },
+// ];
 
 export function ClassTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -72,8 +52,25 @@ export function ClassTable() {
     pageSize: 7,
   });
 
+  const [classesState, setClassesState] = React.useState<Class[]>([]);
+
+  React.useEffect(() => {
+    async function getClassesData() {
+      const classes = await fetchClasses();
+      if (!classes) {
+        console.log("no classes found");
+      }
+      const organizedClass = classes.map((classObject) => {
+        return transformClass(classObject);
+      });
+      setClassesState(organizedClass);
+    }
+
+    getClassesData();
+  });
+
   const table = useReactTable({
-    data: placeholderData,
+    data: classesState,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -105,33 +102,7 @@ export function ClassTable() {
             className="max-w-sm"
           />
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsDropDown table={table} />
       </div>
 
       <div className="rounded-md border border-b-0">
@@ -175,7 +146,7 @@ export function ClassTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No classes added yet
                 </TableCell>
               </TableRow>
             )}

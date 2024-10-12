@@ -1,6 +1,5 @@
 
 import * as React from "react";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnFiltersState,
   PaginationState,
@@ -15,12 +14,7 @@ import {
 } from "@tanstack/react-table";
 import { columns } from "./studentsColumns";
 import { Button } from "@/components/ui/Button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -30,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import ColumnsDropDown from "@/components/custom/ColumnsDropDown";
 
 // Generate dummy data matching the student schema
 
@@ -100,32 +95,7 @@ export function StudentTable({ data }: { data: Student[] }) {
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsDropDown table={table} />
       </div>
 
       <div className="rounded-md Myblue border border-b-0">
@@ -169,7 +139,7 @@ export function StudentTable({ data }: { data: Student[] }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No students registered yet
                 </TableCell>
               </TableRow>
             )}

@@ -13,6 +13,5 @@ UserRouter.post("/login", Login);
 UserRouter.get("/isAuth", isAuth);
 UserRouter.get("/", getLoggedInUser);
 UserRouter.get("/logOut", Logout);
-//handler functions to get user when authorised
 
 module.exports = UserRouter;

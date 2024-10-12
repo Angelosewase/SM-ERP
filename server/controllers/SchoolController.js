@@ -78,6 +78,7 @@ async function deleteSchool(req, res) {
 }
 
 const getSchools = async (req, res) => {
+
   try {
     const schools = await SchoolModel.find();
     res.status(200).json(schools);

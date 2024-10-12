@@ -1,7 +1,4 @@
-"use client";
-
 import * as React from "react";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnFiltersState,
   PaginationState,
@@ -16,12 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { columns } from "./columns"; // Ensure this path points to your teacherColumns.ts file
 import { Button } from "@/components/ui/Button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -32,41 +24,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ITeacher } from "@/app/globals";
+import ColumnsDropDown from "@/components/custom/ColumnsDropDown";
+import { fetchTeachers } from "@/app/Api/teachers";
 
 // Generate dummy data matching the teacher schema
 
-
-const dummyTeachers: ITeacher[] = [
-  {
-    _id: "1",
-    firstName: "John",
-    lastName: "Doe",
-    email: "john.doe@example.com",
-    schoolId: "school-1",
-    subjects: ["Math", "Science"],
-    classes: ["Class A", "Class B"],
-  },
-  {
-    _id: "2",
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@example.com",
-    schoolId: "school-2",
-    subjects: ["English", "History"],
-    classes: ["Class C", "Class D"],
-  },
-  {
-    _id: "3",
-    firstName: "Alice",
-    lastName: "Johnson",
-    email: "alice.johnson@example.com",
-    schoolId: "school-1",
-    subjects: ["Biology"],
-    classes: ["Class A"],
-  },
-];
+// const dummyTeachers: ITeacher[] = [
+//   {
+//     _id: "1",
+//     firstName: "John",
+//     lastName: "Doe",
+//     email: "john.doe@example.com",
+//     schoolId: "school-1",
+//     subjects: ["Math", "Science"],
+//     classes: ["Class A", "Class B"],
+//   },
+// ];
 
 export function TeacherTable() {
+  const [data, setData] = React.useState<ITeacher[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -79,8 +55,20 @@ export function TeacherTable() {
     pageSize: 7,
   });
 
+  React.useEffect(() => {
+    async function getTeachersData() {
+      const teachers = await fetchTeachers();
+      if (!teachers) {
+        console.log("no teachers found");
+      }
+      setData(teachers);
+    }
+
+    getTeachersData();
+  });
+
   const table = useReactTable({
-    data: dummyTeachers,
+    data: data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -111,35 +99,9 @@ export function TeacherTable() {
             }
             className="max-w-sm"
           />
-
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsDropDown table={table} />
       </div>
 
       <div className="rounded-md Myblue border border-b-0">
@@ -183,7 +145,7 @@ export function TeacherTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No teachers added yet
                 </TableCell>
               </TableRow>
             )}

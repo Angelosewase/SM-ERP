@@ -15,7 +15,7 @@ const parentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Financial Transaction Schema
+
 const transactionRecordSchema = new mongoose.Schema(
   {
     studentId: {
@@ -40,7 +40,7 @@ const transactionRecordSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//expenses
+
 const expenseRecordSchema = new mongoose.Schema(
   {
     name: String,
@@ -57,7 +57,7 @@ const expenseRecordSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Student Schema
+
 const studentSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -81,7 +81,7 @@ const studentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Teacher Schema
+
 const teacherSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -98,7 +98,7 @@ const teacherSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// School Schema
+
 const schoolSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -116,7 +116,7 @@ const schoolSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// User Schema
+
 const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -130,7 +130,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Subject Schema
 const subjectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -143,13 +142,14 @@ const subjectSchema = new mongoose.Schema(
     classes: [{ type: mongoose.Types.ObjectId, ref: "Class" }],
     days: {
       type: [String],
-      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], // Specify valid days
+      enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
     },
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
   },
   { timestamps: true }
 );
 
-// Class Schema
+
 const classSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -164,7 +164,7 @@ const classSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Attendance Schema
+
 const attendanceSchema = new mongoose.Schema(
   {
     studentId: {
@@ -206,7 +206,7 @@ const examResultsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Schedule Schema
+
 const scheduleSchema = new mongoose.Schema(
   {
     classId: {
@@ -242,7 +242,6 @@ const scheduleSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Message Schema
 const messageSchema = new mongoose.Schema({
   sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   receiver: {
@@ -254,7 +253,6 @@ const messageSchema = new mongoose.Schema({
   timestamp: { type: Date, default: Date.now },
 });
 
-// Notification Schema
 const notificationSchema = new mongoose.Schema(
   {
     userId: {

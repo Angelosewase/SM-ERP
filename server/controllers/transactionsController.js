@@ -21,7 +21,6 @@ const createTransaction = async (req, res) => {
   }
 };
 
-// DELETE a transaction by ID
 const deleteTransaction = async (req, res) => {
   const { id } = req.params;
   try {

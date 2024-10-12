@@ -2,8 +2,13 @@ const { ParentModel, StudentModel, SchoolModel } = require("../models/Schemas");
 const { getSchoolIdFromToken } = require("../utils/jwt");
 
 const getParents = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
   try {
-    const parents = await ParentModel.find().populate("child");
+    const parents = await ParentModel.find({schoolId:schoolId}).populate("child");
     res.status(200).json(parents);
   } catch (error) {
     res.status(500).json({ error: error.message });

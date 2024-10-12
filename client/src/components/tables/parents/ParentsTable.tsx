@@ -1,13 +1,6 @@
 import { IParent } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
@@ -29,36 +22,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Input from "@/components/custom/Input";
+import { fetchParents } from "@/app/Api/parent";
+import ColumnsDropDown from "@/components/custom/ColumnsDropDown";
 
-const generateDummyData = (): IParent[] => {
-  return [
-    {
-      _id: "1",
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@example.com",
-      phoneNumber: "123-456-7890",
-      child: "Child A",
-      gender: "male",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      _id: "2",
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane.smith@example.com",
-      phoneNumber: "098-765-4321",
-      child: "Child B",
-      gender: "female",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ];
-};
+// const generateDummyData = (): IParent[] => {
+//   return [
+//     {
+//       _id: "1",
+//       firstName: "John",
+//       lastName: "Doe",
+//       email: "john.doe@example.com",
+//       phoneNumber: "123-456-7890",
+//       child: "Child A",
+//       gender: "male",
+//       createdAt: new Date(),
+//       updatedAt: new Date(),
+//     },
+
+//   ];
+// };
 
 export function ParentTable() {
-  const [data] = React.useState<IParent[]>(generateDummyData());
+  const [data, setData] = React.useState<IParent[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState([]);
   const [columnVisibility, setColumnVisibility] =
@@ -67,6 +52,18 @@ export function ParentTable() {
   const [pageSize, setPageSize] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 7,
+  });
+
+  React.useEffect(() => {
+    async function getClassesData() {
+      const parents = await fetchParents();
+      if (!parents) {
+        console.log("no parents found");
+      }
+      setData(parents);
+    }
+
+    getClassesData();
   });
 
   const table = useReactTable({
@@ -103,7 +100,7 @@ export function ParentTable() {
             className="max-w-sm"
           />
           <Input
-          name="name"
+            name="name"
             placeholder="Filter first name..."
             value={
               (table.getColumn("firstName")?.getFilterValue() as string) ?? ""
@@ -113,8 +110,8 @@ export function ParentTable() {
             }
             className="max-w-sm"
           />
-                    <Input
-          name="name"
+          <Input
+            name="name"
             placeholder="Filter last name..."
             value={
               (table.getColumn("lastName")?.getFilterValue() as string) ?? ""
@@ -125,27 +122,7 @@ export function ParentTable() {
             className="max-w-sm"
           />
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuCheckboxItem
-                  key={column.id}
-                  checked={column.getIsVisible()}
-                  onCheckedChange={(value) => column.toggleVisibility(!!value)}
-                >
-                  {column.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsDropDown table={table} />
       </div>
 
       <Table className="border ">
@@ -182,7 +159,7 @@ export function ParentTable() {
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
+                No parents yet
               </TableCell>
             </TableRow>
           )}

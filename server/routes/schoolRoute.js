@@ -8,7 +8,6 @@ const {
   getSchools,
 } = require("../controllers/SchoolController");
 
-const isAuth = require("../middlewares/authentication");
 
 const router = express.Router();
 router.post("/register", RegisterSchool);

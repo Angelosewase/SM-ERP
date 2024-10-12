@@ -61,7 +61,6 @@ export const updateParent = async (parentId: string, parentData: Partial<IParent
   }
 };
 
-// Function to delete a parent by ID
 export const deleteParent = async (parentId: string): Promise<IParent> => {
   try {
     const response = await axios.delete<IParent>(`${BASE_URL}/${parentId}`, {

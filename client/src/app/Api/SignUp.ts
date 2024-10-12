@@ -35,7 +35,6 @@ export async function SubmitSchoolInfo(
     console.log("no user created ");
     return null;
   }
-
   try {
     const schoolData: schoolIBase = (
       await axios.post("http://localhost:3000/school/register", data)

@@ -1,5 +1,4 @@
 import * as React from "react";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import {
   ColumnFiltersState,
   PaginationState,
@@ -14,12 +13,6 @@ import {
 } from "@tanstack/react-table";
 import { columns } from "./columns"; // Import your custom column definitions
 import { Button } from "@/components/ui/Button";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -30,76 +23,25 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { IExpenseRecord } from "@/app/globals";
+import ColumnsDropDown from "@/components/custom/ColumnsDropDown";
+import { getExpenses } from "@/app/Api/expense";
 
-// Define the ExpenseRecord type for your data
-export type ExpenseRecord = {
-  id: string;
-  name: string;
-  amount: number;
-  paymentDate: string; // assuming ISO string or Date object
-  transactionType: string;
-  status: "paid" | "pending" | "overdue";
-};
 
-const expenseRecords: IExpenseRecord[] = [
-  {
-    _id: "52ac8008-acc7-4995-8d17-0279e97aaab4",
-    name: "Nancy Schroeder",
-    schoolId: "11bd581e-78b3-4fcc-988c-f5ee82a705a0",
-    amount: 1844.98,
-    paymentDate: new Date("2023-10-31"),
-    transactionType: "credit",
-    status: "paid",
-    createdAt: new Date("2024-08-25T16:49:44"),
-    updatedAt: new Date("2024-10-11T16:47:37"),
-  },
-  {
-    _id: "db1c488b-0e33-43ed-ba1f-b8069de49f30",
-    name: "Tiffany Henry",
-    schoolId: "86561218-72d7-4aca-a29d-467ccc7a3493",
-    amount: 1905.19,
-    paymentDate: new Date("2024-05-30"),
-    transactionType: "debit",
-    status: "overdue",
-    createdAt: new Date("2023-12-29T12:18:41"),
-    updatedAt: new Date("2024-10-11T16:45:18"),
-  },
-  {
-    _id: "c9677ff8-4293-4de9-9690-8496b10025c1",
-    name: "Donald Peters",
-    schoolId: "69de7f61-6ec9-4a65-a12f-e8f2921ad5df",
-    amount: 2204.34,
-    paymentDate: new Date("2024-04-10"),
-    transactionType: "credit",
-    status: "overdue",
-    createdAt: new Date("2023-11-09T23:36:39"),
-    updatedAt: new Date("2024-10-11T16:43:26"),
-  },
-  {
-    _id: "ebee9edc-01cd-420c-b9ff-18503b9e5043",
-    name: "Donna Davis",
-    schoolId: "d96427c6-04d9-428f-b9f4-04dbe7ce6ba3",
-    amount: 4829.79,
-    paymentDate: new Date("2024-01-10"),
-    transactionType: "debit",
-    status: "overdue",
-    createdAt: new Date("2024-02-10T02:14:49"),
-    updatedAt: new Date("2024-10-11T16:46:44"),
-  },
-  {
-    _id: "7c1ee54d-bc49-443d-b443-eba581d2f8b1",
-    name: "Nicholas Erickson",
-    schoolId: "77f4c9e3-f64e-4524-b394-eba8edd0dcd2",
-    amount: 2253.37,
-    paymentDate: new Date("2023-11-25"),
-    transactionType: "debit",
-    status: "overdue",
-    createdAt: new Date("2024-07-19T20:33:00"),
-    updatedAt: new Date("2024-10-11T16:45:58"),
-  },
-];
+// const expenseRecords: IExpenseRecord[] = [
+//   {
+//     _id: "52ac8008-acc7-4995-8d17-0279e97aaab4",
+//     name: "Nancy Schroeder",
+//     schoolId: "11bd581e-78b3-4fcc-988c-f5ee82a705a0",
+//     amount: 1844.98,
+//     paymentDate: new Date("2023-10-31"),
+//     transactionType: "credit",
+//     status: "paid",
+//     createdAt: new Date("2024-08-25T16:49:44"),
+//     updatedAt: new Date("2024-10-11T16:47:37"),
+//   }]
 
 export function ExpenseTable() {
+  const [data, setData] = React.useState<IExpenseRecord[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -112,8 +54,22 @@ export function ExpenseTable() {
     pageSize: 10,
   });
 
+  React.useEffect(() => {
+    async function getClassesData() {
+      const expenses = await getExpenses();
+      
+      if (Array.isArray(expenses)) {
+        setData(expenses);
+      } else {
+        console.error(expenses.error);  // Handle error if it exists
+      }
+    }
+  
+    getClassesData();
+  }, [])
+
   const table = useReactTable({
-    data: expenseRecords,
+    data: data,
     columns: columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -161,32 +117,7 @@ export function ExpenseTable() {
           />
         </div>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
-              Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {table
-              .getAllColumns()
-              .filter((column) => column.getCanHide())
-              .map((column) => {
-                return (
-                  <DropdownMenuCheckboxItem
-                    key={column.id}
-                    className="capitalize"
-                    checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
-                  >
-                    {column.id}
-                  </DropdownMenuCheckboxItem>
-                );
-              })}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ColumnsDropDown table={table} />
       </div>
 
 
@@ -231,7 +162,7 @@ export function ExpenseTable() {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  No expenses yet 
                 </TableCell>
               </TableRow>
             )}

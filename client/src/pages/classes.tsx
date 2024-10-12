@@ -18,7 +18,7 @@ function Classes() {
     subjects: [],
     students: [],
   });
-
+ //for adding classes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setClassState((prev) => ({
