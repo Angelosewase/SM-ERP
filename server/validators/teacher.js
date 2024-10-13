@@ -12,13 +12,13 @@ const createTeacherValidator = z.object({
   subjects: z
     .array(
       z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Subject ID")
-    )
-    .min(1, "At least one subject is required"),
+    ).optional(),
   classes: z
     .array(
       z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Class ID")
     )
     .min(1, "At least one class is required"),
+    gender: z.string()
 });
 
 // Validator for updating a teacher (all fields are optional)

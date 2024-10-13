@@ -1,3 +1,4 @@
+import { createClass } from "@/app/Api/classes";
 import Header from "@/components/custom/Header";
 import AddClassForm from "@/components/Forms/AddClassForm";
 import { ClassTable } from "@/components/tables/classes/table";
@@ -18,7 +19,7 @@ function Classes() {
     subjects: [],
     students: [],
   });
- //for adding classes
+  //for adding classes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setClassState((prev) => ({
@@ -33,6 +34,11 @@ function Classes() {
       [field]: value,
     }));
   };
+
+  async function handleSubmit() {
+    const createdClass = await createClass(classState);
+    console.log(createdClass);
+  }
 
   return (
     <div className="h-[100vh]">
@@ -57,7 +63,9 @@ function Classes() {
               handleSelectChange={handleSelectChange}
             />
             <div>
-              <Button className="bg-myBlue">create new class</Button>
+              <Button className="bg-myBlue" onClick={handleSubmit}>
+                create new class
+              </Button>
             </div>
           </div>
         </div>

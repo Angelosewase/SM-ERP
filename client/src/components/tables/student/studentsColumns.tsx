@@ -1,16 +1,10 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from "../..//ui/dropdown-menu";
+import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Student } from "./StudentsTable";
 import { Button } from "@/components/ui/Button";
+import ActionsMenu from "@/components/custom/DropDown";
+import StudentActions from "@/components/Actions/StudentActionsMenu";
 
 export const columns: ColumnDef<Student>[] = [
   {
@@ -92,24 +86,10 @@ export const columns: ColumnDef<Student>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const student = row.original;
-
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(student.id)}>
-              delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionsMenu>
+          <StudentActions id={student.id} setState={() => {}} />
+        </ActionsMenu>
       );
     },
   },

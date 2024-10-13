@@ -3,7 +3,7 @@ import { IExpenseRecord } from '@/app/globals';
 
 const BASE_URL = "http://localhost:3000/expenses";
 
-export const createExpense = async (data: Omit<IExpenseRecord, "_id" | "createdAt" | "updatedAt">): Promise<IExpenseRecord | { error: string }> => {
+export const createExpense = async (data: Partial<IExpenseRecord>): Promise<IExpenseRecord | { error: string }> => {
   try {
     const response = await axios.post<IExpenseRecord>(BASE_URL, data, { withCredentials: true });
     return response.data;

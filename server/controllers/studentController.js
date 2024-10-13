@@ -122,6 +122,23 @@ const updateStudent = async (req, res) => {
   }
 };
 
+async function getStudentbyStudentId(req,res) {
+  const { id } = req.params;
+
+  try {
+    const student = await StudentModel.findById(id).populate("classId","name");
+
+    if (!student) {
+      res.status(404).send({ message: "student not found" });
+      return;
+    }
+    res.status(201).json(student);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "failed fetching user" });
+  }
+}
+
 async function promoteStudentHandler(req, res) {
   const { studentId, fromClassId, toClassId } = req.body;
   try {
@@ -142,4 +159,5 @@ module.exports = {
   deleteStudent,
   updateStudent,
   promoteStudentHandler,
+  getStudentbyStudentId
 };

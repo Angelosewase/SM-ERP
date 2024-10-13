@@ -3,7 +3,7 @@ import { ISubject } from '@/app/globals';
 
 const BASE_URL = "http://localhost:3000/subjects";
 
-export const createSubject = async (data: Omit<ISubject, "_id" | "createdAt" | "updatedAt">): Promise<ISubject | { error: string }> => {
+export const createSubject = async (data: Partial<ISubject>): Promise<ISubject | { error: string }> => {
   try {
     const response = await axios.post<ISubject>(BASE_URL, data, { withCredentials: true });
     return response.data;

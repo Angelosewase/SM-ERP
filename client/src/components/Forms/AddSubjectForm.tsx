@@ -1,54 +1,70 @@
-// import { ChangeEvent } from "react";
+import { ChangeEvent} from "react";
+import { ISubject } from "@/app/globals"; // Adjust this import as needed
 import Input from "../custom/Input";
 import { SelectComponent } from "../custom/SelectComponent";
-// import { classCreationI } from "@/pages/classes";
+import { SelectTeacher } from "../custom/selectTeacher";
+import { SelectClass } from "../custom/classSelect";
 
 export const classOptionsPlaceholder = [
-  {
-    name: "teacher A",
-    value: "teaceherA_Id",
-  },
-  {
-    name: "teacher B",
-    value: "teacherb_Id",
-  },
+  { name: "Monday", value: "Monday" },
+  { name: "Tuesday", value: "Tuesday" },
+  { name: "Wednesday", value: "Wednesday" },
+  { name: "Thursday", value: "Thursday" },
+  { name: "Friday", value: "Friday" },
+  { name: "Saturday", value: "Saturday" },
+  { name: "Sunday", value: "Sunday" },
 ];
 
-// interface AddClassFormProps {
-//   updatefn(e: ChangeEvent<HTMLInputElement>): void;
-//   state?: ;
-//   handleSelectChange: (val: string, val2: string) => void;
-// }
 
-function AddSubjectForm() {
+interface addSubjectformprops {
+  updatefn(e: ChangeEvent<HTMLInputElement>): void;
+  state: ISubject;
+  handleSelectChange: (field: keyof ISubject, value: string) => void;
+}
+
+function AddSubjectForm({updatefn, state, handleSelectChange}:addSubjectformprops) {
+  
   return (
     <div className="mt-3 flex gap-10 items-center">
       <Input
         name="name"
-        label="subject Name *"
+        label="Subject Name *"
         placeholder="Enter subject name"
         className="border-2 mt-1"
         required={true}
-        // onChange={updatefn}
-        // value={state?.name}
+        value={state.name}
+        onChange={updatefn}
       />
+
+      {/* Teacher Select */}
       <label className="flex flex-col gap-2">
-        <span className="font-semibold"> select Teacher *</span>
-        <SelectComponent
-          options={classOptionsPlaceholder}
+        <span className="font-semibold">Select Teacher *</span>
+        <SelectTeacher
           placeholder="Select class teacher"
           handleSelectChange={(value: string) => {
-            console.log("teacherId", value);
+            handleSelectChange("teacherId", value);
           }}
         />
       </label>
+
+      {/* Days Select */}
       <label className="flex flex-col gap-2">
-        <span className="font-semibold">select  days</span>
+        <span className="font-semibold">Select Days</span>
         <SelectComponent
           options={classOptionsPlaceholder}
-          placeholder="Select days teacher"
+          placeholder="Select days"
           handleSelectChange={(value: string) => {
-            console.log("days", value);
+            handleSelectChange("days", value);
+          }}
+          
+        />
+      </label>
+
+      <label className="flex flex-col gap-2">
+        <span className="font-semibold">Select Class</span>
+        <SelectClass
+          handleSelectChange={(value: string) => {
+            handleSelectChange("classes", value);
           }}
         />
       </label>

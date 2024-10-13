@@ -61,7 +61,7 @@ export function ExpenseTable() {
       if (Array.isArray(expenses)) {
         setData(expenses);
       } else {
-        console.error(expenses.error);  // Handle error if it exists
+        console.error(expenses.error);
       }
     }
   

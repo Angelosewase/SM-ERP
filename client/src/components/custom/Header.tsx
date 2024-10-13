@@ -1,4 +1,5 @@
 import {  BellIcon, EnvelopeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { CommandD } from "./commandPalette";
 
 function Header() {
   return (
@@ -16,7 +17,7 @@ function HeaderSearchInput() {
     <>
       <div className=" gap-1   flex  mx-2 py-1 pl-4 pr-6  hover:cursor-pointer">
         <MagnifyingGlassIcon className="h-6 text-gray-400 " />
-        <div className="text-gray-400 ">Press Ctrk +K</div>
+        <CommandD />
       </div>
     </>
   );

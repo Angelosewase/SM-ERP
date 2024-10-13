@@ -48,6 +48,7 @@ export interface ITeacher {
   classes: string[];
   createdAt?: string;
   updatedAt?: string;
+  gender?: string;
 }
 
 export interface IClass {
@@ -87,11 +88,14 @@ export interface ITeacher {
 }
 
 export interface ISubject {
-  _id: string;
+  _id?: string;
   name: string;
   teacherId: string;
   classes: string[];
   days: string[];
+  schoolId?: string,
+  createdAt?: string,
+  updatedAt?: string,
 }
 
 export interface IExpenseRecord {

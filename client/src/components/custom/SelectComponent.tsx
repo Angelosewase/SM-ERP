@@ -30,12 +30,12 @@ export function SelectComponent({
   };
 
   return (
-    <Select onValueChange={onSelectChange}>
+    <Select onValueChange={onSelectChange}  >
       <SelectTrigger className="w-[180px] text-gray-500">
-        <SelectValue className="placeholder:text-gray-400" placeholder={placeholder} />
+        <SelectValue className="placeholder:text-gray-400" placeholder={placeholder}  />
       </SelectTrigger>
-      <SelectContent>
-        <SelectGroup>
+      <SelectContent >
+        <SelectGroup >
           {options.map((option) => (
             <SelectItem key={option.name} value={option.value}>
               {option.name}

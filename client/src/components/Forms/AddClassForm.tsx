@@ -1,18 +1,7 @@
 import { ChangeEvent } from "react";
 import Input from "../custom/Input";
-import { SelectComponent } from "../custom/SelectComponent";
 import { classCreationI } from "@/pages/classes";
-
-export const classOptionsPlaceholder = [
-  {
-    name: "teacher A",
-    value: "teaceherA_Id",
-  },
-  {
-    name: "teacher B",
-    value: "teacherb_Id",
-  },
-];
+import { SelectTeacher } from "../custom/selectTeacher";
 
 interface AddClassFormProps {
   updatefn(e: ChangeEvent<HTMLInputElement>): void;
@@ -38,9 +27,7 @@ function AddClassForm({
       />
       <label className="flex flex-col gap-2">
         <span className="font-semibold">Class Teacher *</span>
-        <SelectComponent
-          options={classOptionsPlaceholder}
-          placeholder="Select class teacher"
+        <SelectTeacher
           handleSelectChange={(value: string) => {
             handleSelectChange("teacherId", value);
           }}

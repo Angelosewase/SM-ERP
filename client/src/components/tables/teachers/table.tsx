@@ -41,6 +41,19 @@ import { fetchTeachers } from "@/app/Api/teachers";
 //   },
 // ];
 
+
+
+// interface IsubjectRespon
+
+export const transformTeachers = (teachers: ITeacher[]) => {
+  return teachers.map(teacher => {
+    return {
+      ...teacher,
+      subjects: teacher.subjects.length, // Count of subjects
+      classes: teacher.classes.length, // Count of classes
+    };
+  });
+};
 export function TeacherTable() {
   const [data, setData] = React.useState<ITeacher[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -61,7 +74,8 @@ export function TeacherTable() {
       if (!teachers) {
         console.log("no teachers found");
       }
-      setData(teachers);
+      console.log(teachers)
+      setData(transformTeachers(teachers));
     }
 
     getTeachersData();

@@ -1,14 +1,9 @@
+
+import ClassMenuActions from "@/components/Actions/ClassesActionMenu";
+import ActionsMenu from "@/components/custom/DropDown";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 
 export interface Class {
@@ -82,22 +77,9 @@ export const columns: ColumnDef<Class>[] = [
       const classObj = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(classObj._id)}>
-              Delete class
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            <ActionsMenu >
+              <ClassMenuActions id={classObj._id || ""} setState={()=>{}}/>
+            </ActionsMenu>
       );
     },
   },

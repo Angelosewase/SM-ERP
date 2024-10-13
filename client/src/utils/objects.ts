@@ -1,4 +1,5 @@
-import { IClass, IStudent, ISubject } from "@/app/globals";
+import { fmtTeacher } from "@/app/Api/teachers";
+import { IClass, IStudent, ISubject, ITeacher } from "@/app/globals";
 import { Class } from "@/components/tables/classes/columns";
 import { Student } from "@/components/tables/student/StudentsTable";
 import { Subject } from "@/components/tables/subjects/table";
@@ -29,10 +30,28 @@ export function transformClass(input: IClass): Class {
 
 export function transformSubject(input: ISubject): Subject {
   return {
-    _id: input._id,
+    _id: input._id || "",
     name: input.name,
-    teacher: input.teacherId, // Directly copy teacherId as teacher
-    days: input.days ? input.days.join(', ') : '', // Convert days array to comma-separated string
-    classes: input.classes ? input.classes.join(', ') : '', // Convert classes array to comma-separated string
+    teacher: input.teacherId.firstName, 
+    days: input.days.length,
+    classes: input.classes.length, 
   };
 }
+
+
+export  function transformTeachers(teachers: ITeacher[]): fmtTeacher[] {
+  return teachers.map((teacher) => ({
+    name: `${teacher.firstName} ${teacher.lastName}`,
+    value: teacher._id || '',
+  }));
+}
+
+export function convertSubjectsToValueNamePairs(subjects : ISubject[]) {
+  return subjects.map(function(subject) {
+    return {
+      value: subject._id, 
+      name: subject.name   
+    };
+  });
+}
+

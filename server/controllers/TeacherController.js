@@ -5,6 +5,7 @@ const {
   updateTeacherValidator,
   teacherIdValidator,
 } = require("../validators/teacher");
+const { z } = require("zod");
 
 const getTeachers = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -24,16 +25,32 @@ const getTeachers = async (req, res) => {
 };
 
 const createTeacher = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
   try {
-    const validatedData = createTeacherValidator.parse(req.body);
+    const validatedData = createTeacherValidator.parse({
+      ...req.body,
+      schoolId,
+    });
+   
+
     const schoolExists = SchoolModel.exists({ _id: validatedData.schoolId });
     if (!schoolExists) {
       res.status(404).send({ message: "school not found" });
       return;
     }
     const newTeacher = await TeacherModel.create(validatedData);
+    await SchoolModel.findByIdAndUpdate(validatedData.schoolId, {
+      $pull: {
+        teachers: newTeacher._id,
+      },
+    });
     res.status(201).json(newTeacher);
   } catch (error) {
+    console.log(error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
     }

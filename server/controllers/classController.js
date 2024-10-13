@@ -7,7 +7,10 @@ const {
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const { getSchoolIdFromToken } = require("../utils/jwt");
-const { formatClassIntoNameValuePair, promoteClass } = require("../services/classService");
+const {
+  promoteClass,
+  convertClassesToValueNamePairs,
+} = require("../services/classService");
 
 const getClasses = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -22,6 +25,9 @@ const getClasses = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
 const getFormatedClasses = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
   if (!schoolId) {
@@ -30,15 +36,13 @@ const getFormatedClasses = async (req, res) => {
   }
   try {
     const classes = await ClassModel.find({ schoolId });
-    const resClasses = formatClassIntoNameValuePair(classes)
+    const resClasses = convertClassesToValueNamePairs(classes);
     res.status(200).json(resClasses);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
-
-
-
 
 const getClassById = async (req, res) => {
   const { id } = req.params;
@@ -64,7 +68,6 @@ const getClassById = async (req, res) => {
 };
 
 const createClass = async (req, res) => {
-
   const schoolID = getSchoolIdFromToken(req.cookies.token);
   if (!schoolID) {
     res.status(401).json({ message: "invalid credentials" });
@@ -74,7 +77,7 @@ const createClass = async (req, res) => {
   try {
     const validatedData = createClassValidator.parse({
       ...req.body,
-      "schoolId": schoolID,
+      schoolId: schoolID,
     });
 
     const schoolId = validatedData.schoolId;
@@ -86,6 +89,9 @@ const createClass = async (req, res) => {
     }
 
     const newClass = await ClassModel.create(validatedData);
+    await SchoolModel.findByIdAndUpdate(schoolID, {
+      $push: { classes: newClass._id },
+    })
     res.status(201).json(newClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -150,15 +156,14 @@ const deleteClass = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-async function  promoteclassHandler(req,res) {
-   try {
-    const validData = promoteClassInofValidator(req.body)
-    promoteClass(validData.classId ,validData.newClassId)
-   } catch (error) {
-    console.log(error)
-   }
+async function promoteclassHandler(req, res) {
+  try {
+    const validData = promoteClassInofValidator(req.body);
+    promoteClass(validData.classId, validData.newClassId);
+  } catch (error) {
+    console.log(error);
+  }
 }
-
 
 module.exports = {
   getClasses,
@@ -166,5 +171,5 @@ module.exports = {
   createClass,
   updateClass,
   deleteClass,
-  getFormatedClasses
+  getFormatedClasses,
 };

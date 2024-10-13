@@ -1,7 +1,17 @@
-const { SubjectModel } = require("../models/Schemas");
+const { SubjectModel, TeacherModel, ClassModel } = require("../models/Schemas");
 const { getSchoolIdFromToken } = require("../utils/jwt");
+const mongoose = require('mongoose')
 
 const createSubject = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "invalid credentials" });
+    return;
+  }
+
   try {
     const { name, teacherId, description, classes, days } = req.body;
     const newSubject = new SubjectModel({
@@ -10,10 +20,29 @@ const createSubject = async (req, res) => {
       description,
       classes,
       days,
+      schoolId,
     });
-    await newSubject.save();
+
+    await newSubject.save({ session });
+
+    await TeacherModel.findByIdAndUpdate(
+      teacherId,
+      { $push: { subjects: newSubject._id } },
+      { new: true, session }
+    );
+
+    await ClassModel.updateMany(
+      { _id: { $in: classes } },
+      { $push: { subjects: newSubject._id } },
+      { session }
+    );
+    await session.commitTransaction();
+    session.endSession();
     res.status(201).json(newSubject);
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(error);
     res.status(500).json({ error: "Failed to create subject" });
   }
 };
@@ -26,8 +55,8 @@ const getAllSubjects = async (req, res) => {
   }
   try {
     const subjects = await SubjectModel.find({ schoolId })
-      .populate("teacherId", "name")
-      .populate("classes", "className");
+      .populate("teacherId", "firstName")
+      .populate("classes", "name");
 
     res.status(200).json(subjects);
   } catch (error) {

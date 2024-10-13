@@ -32,8 +32,8 @@ export interface Subject {
   _id: string;
   name: string;
   teacher: string;
-  days: string;
-  classes: string;
+  days: number;
+  classes: number;
 }
 
 // const dummySubjects: Subject[] = [
@@ -45,6 +45,10 @@ export interface Subject {
 //     days: "Tuesday & Thursday",
 //   },
 // ];
+
+
+
+
 export function SubjectsTable() {
   const [data, setData] = useState<Subject[]>([]);
   const [sorting, setSorting] = React.useState<SortingState>([]);

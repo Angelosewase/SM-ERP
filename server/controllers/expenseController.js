@@ -8,17 +8,19 @@ const createExpenseRecord = async (req, res) => {
     return;
   }
   try {
-    const { name, amount, transactionType, status } = req.body;
+    const { name, amount, transactionType, status ,paymentDate} = req.body;
     const newExpenseRecord = new ExpenseModel({
       name,
       schoolId,
       amount,
       transactionType,
       status,
+      paymentDate
     });
     await newExpenseRecord.save();
     res.status(201).json(newExpenseRecord);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Failed to create expense record" });
   }
 };

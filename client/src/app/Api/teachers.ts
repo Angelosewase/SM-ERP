@@ -4,10 +4,13 @@ import { ITeacher } from '../globals';
 // Base URL for the API
 const BASE_URL = "http://localhost:3000/teacher";
 
-// Define types for teacher data
+
+export interface fmtTeacher{
+  name:string ,
+  value :string
+}
 
 
-// Get all teachers
 export const fetchTeachers = async (): Promise<ITeacher[]> => {
   try {
     const response = await axios.get<ITeacher[]>(BASE_URL, { withCredentials: true });
@@ -18,7 +21,6 @@ export const fetchTeachers = async (): Promise<ITeacher[]> => {
   }
 };
 
-// Create a new teacher
 export const createTeacher = async (teacherData: ITeacher): Promise<ITeacher> => {
   try {
     const response = await axios.post<ITeacher>(BASE_URL, teacherData, { withCredentials: true });
@@ -29,7 +31,6 @@ export const createTeacher = async (teacherData: ITeacher): Promise<ITeacher> =>
   }
 };
 
-// Delete a teacher by ID
 export const deleteTeacher = async (teacherId: string): Promise<ITeacher> => {
   try {
     const response = await axios.delete<ITeacher>(`${BASE_URL}/${teacherId}`, { withCredentials: true });
@@ -40,7 +41,6 @@ export const deleteTeacher = async (teacherId: string): Promise<ITeacher> => {
   }
 };
 
-// Update a teacher by ID
 export const updateTeacher = async (teacherId: string, teacherData: Partial<ITeacher>): Promise<ITeacher> => {
   try {
     const response = await axios.put<ITeacher>(`${BASE_URL}/${teacherId}`, teacherData, { withCredentials: true });

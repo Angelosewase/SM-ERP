@@ -1,17 +1,11 @@
 // expenseColumns.ts
 import { ColumnDef } from "@tanstack/react-table";
-import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
+import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/Button";
 import { IExpenseRecord } from "@/app/globals"; // Import the interface
+import ExpenseActions from "@/components/Actions/expenseActions";
+import ActionsMenu from "@/components/custom/DropDown";
 
 export const columns: ColumnDef<IExpenseRecord>[] = [
   {
@@ -91,20 +85,9 @@ export const columns: ColumnDef<IExpenseRecord>[] = [
       const expense = row.original;
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(expense._id)}>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionsMenu>
+        <ExpenseActions id={expense._id || ""} setOpen={() => {}} />
+      </ActionsMenu>
       );
     },
   },

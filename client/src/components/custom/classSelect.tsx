@@ -51,6 +51,11 @@ import { useEffect, useState } from "react";
                 {option.name}
               </SelectItem>
             ))}
+            {
+              options.length  ===0 && <><SelectItem value="null" disabled>
+              no class found
+            </SelectItem></>
+            }
           </SelectGroup>
         </SelectContent>
       </Select>

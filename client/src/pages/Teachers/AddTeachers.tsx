@@ -1,7 +1,40 @@
+import { createTeacher } from "@/app/Api/teachers";
+import { ITeacher } from "@/app/globals";
 import Header from "@/components/custom/Header";
 import AddteacherForm from "@/components/Forms/AddteacherForm";
+import { Button } from "@/components/ui/Button";
+import { ChangeEvent, useState } from "react";
 
 function AddTeachers() {
+  const [formState, setFormState] = useState<ITeacher>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "unknown",
+    classes: [],
+    subjects: [],
+  });
+
+  function updateState(e: ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFormState({ ...formState, [name]: value });
+  }
+  function handleSelectChange(name: string, value: string) {
+    setFormState({ ...formState, [name]: value });
+  }
+
+  function handleMultipleSelectionChange(array: string[], val: string) {
+    array.push(val);
+  }
+
+  async function handleSubmit() {
+    console.log(formState)
+    const createdTeacher = await createTeacher(formState);
+    if (createdTeacher) {
+      console.log(createdTeacher);
+    }
+  }
+
   return (
     <div className="h-[100vh]">
       <Header />
@@ -18,7 +51,12 @@ function AddTeachers() {
         <div className=" w-full bg-white mt-6  rounded py-3 px-4 flex flex-col justify-between pb-10">
           <div>
             <h1 className="text-xl font-semibold ">Add new teacher </h1>
-            <AddteacherForm />
+            <AddteacherForm
+              state={formState}
+              updatefn={updateState}
+              handleSelectChange={handleSelectChange}
+              handleMultipleSelectionChange={handleMultipleSelectionChange}
+            />
           </div>
           <div className=" mt-10">
             <div className="flex gap-4 items-end mb-8">
@@ -33,9 +71,9 @@ function AddTeachers() {
               </div>
             </div>
             <div className="flex gap-4">
-              <button className="bg-myBlue w-28 px-4 py-1 text-white font-semibold rounded">
+              <Button className="bg-myBlue w-28 " onClick={handleSubmit}>
                 save
-              </button>
+              </Button>
               <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28">
                 reset
               </button>

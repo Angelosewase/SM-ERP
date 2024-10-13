@@ -1,4 +1,12 @@
 import Header from "@/components/custom/Header";
+import { PencilIcon } from "@heroicons/react/24/outline";
+import { useState } from "react"; // Import useState
+
+export function handleChange(val: string) {
+  if (val === "") {
+    return;
+  }
+}
 
 function Settings() {
   return (
@@ -39,31 +47,36 @@ function Settings() {
             </p>
 
             <div className=" pb-10 ">
-              <InfoDispay
+              <InfoDisplay
                 name="school name"
                 value="Firm Foundation Scholl -acra"
+                onChange={handleChange}
               />
-              <InfoDispay
+              <InfoDisplay
                 name="Email"
                 value="sewasejo8@gmail.com"
+                onChange={handleChange}
               />
-              <InfoDispay
+              <InfoDisplay
                 name="mobile no"
                 value="+250725541525"
+                onChange={handleChange}
               />
-              <InfoDispay
+              <InfoDisplay
                 name="Address"
                 value="Kigali rwanda"
+                onChange={handleChange}
               />
-              <InfoDispay
+              <InfoDisplay
                 name="names "
                 value="Sewase Angel"
+                onChange={handleChange}
               />
-              <InfoDispay
+              <InfoDisplay
                 name="Password "
                 value="........."
+                onChange={handleChange}
               />
-         
             </div>
           </div>
         </div>
@@ -72,19 +85,71 @@ function Settings() {
   );
 }
 
-interface infoDisplay {
+interface InfoDisplayProps {
   name: string;
   value: string;
+  onChange: (newValue: string) => void;
+  edit?: boolean;
 }
-const InfoDispay = ({ name, value }: infoDisplay) => {
+
+export const InfoDisplay = ({
+  name,
+  value,
+  onChange,
+  edit = true,
+}: InfoDisplayProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(value);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSave = () => {
+    onChange(inputValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setInputValue(value);
+    setIsEditing(false);
+  };
+
   return (
-    <div>
-      <div className="flex gap-4 items-center w-[80%] my-2">
-        <p className="font-semibold w-2/12">{name}</p>
-        <div className="px-4 py-1 border border-black font-semibold rounded flex-1">
-          {value}
+    <div className="flex gap-4 items-center w-[80%] my-2">
+      <p className=" w-2/12 capitalize">{name} :</p>
+      {isEditing ? (
+        <div className="flex items-center flex-1">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="px-4 py-1 border-2 border-myBlue rounded flex-1 outline-none"
+          />
+          <button onClick={handleSave} className="ml-2 text-green-600">
+            Save
+          </button>
+          <button onClick={handleCancel} className="ml-2 text-red-600">
+            Cancel
+          </button>
         </div>
-      </div>
+      ) : (
+        <div className="flex items-center flex-1 ">
+          <div className="px-4 py-1 border-2  border-gray-400 font-semibold rounded flex-1  ">
+            {value}
+          </div>
+          {edit ? (
+            <button onClick={handleEditClick} className="ml-2">
+              <PencilIcon className="h-4 font-semibold w-5 text-blue-500" />
+            </button>
+            
+          ):(
+            <p className="w-7"></p>
+          )
+
+          }
+        </div>
+      )}
     </div>
   );
 };

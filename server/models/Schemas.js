@@ -94,6 +94,7 @@ const teacherSchema = new mongoose.Schema(
     classes: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Class", required: true },
     ],
+    gender: { type: String, enum: ["male", "female"], required: true },
   },
   { timestamps: true }
 );

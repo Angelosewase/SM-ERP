@@ -1,9 +1,24 @@
 import { genderOptions } from "@/app/Data/defaults";
 import Input from "../custom/Input";
 import { SelectComponent } from "../custom/SelectComponent";
-import { classOptionsPlaceholder } from "./AddstudentForm";
+import { SelectClass } from "../custom/classSelect";
+import { ChangeEvent } from "react";
+import { ITeacher } from "@/app/globals";
+import { SelectSubject } from "../custom/selectSubject";
 
-function AddteacherForm() {
+interface addStudentformprops {
+  updatefn(e: ChangeEvent<HTMLInputElement>): void;
+  state: ITeacher;
+  handleSelectChange: (val: string, val2: string) => void;
+  handleMultipleSelectionChange: (array: string[], val: string) => void;
+}
+
+function AddteacherForm({
+  updatefn,
+  state,
+  handleSelectChange,
+  handleMultipleSelectionChange,
+}: addStudentformprops) {
   return (
     <div>
       {" "}
@@ -14,6 +29,8 @@ function AddteacherForm() {
           placeholder="First name  "
           className="border-2 mt-1"
           required={true}
+          value={state.firstName}
+          onChange={updatefn}
         />
         <Input
           name="lastName"
@@ -21,6 +38,8 @@ function AddteacherForm() {
           placeholder="Last name "
           className="border-2 mt-1"
           required={true}
+          value={state.lastName}
+          onChange={updatefn}
         />
 
         <Input
@@ -28,26 +47,34 @@ function AddteacherForm() {
           label="teacher's email  "
           placeholder="email "
           className="border-2 mt-1"
+          value={state.email}
+          onChange={updatefn}
         />
         <label className=" flex flex-col gap-2">
           <span className="font-semibold">gender * </span>
           <SelectComponent
             options={genderOptions}
             placeholder="select gender"
+            handleSelectChange={(value) => {
+              handleSelectChange("gender", value);
+            }}
           />
         </label>
         <label className=" flex flex-col gap-2">
           <span className="font-semibold">select classes * </span>
-          <SelectComponent
-            options={classOptionsPlaceholder}
-            placeholder="select class"
+          <SelectClass
+            handleSelectChange={(value: string) => {
+              handleMultipleSelectionChange(state.classes, value);
+            }}
           />
         </label>
         <label className=" flex flex-col gap-2">
           <span className="font-semibold">select subjects * </span>
-          <SelectComponent
-            options={classOptionsPlaceholder}
+          <SelectSubject
             placeholder="select subject"
+            handleSelectChange={(value) => {
+            handleMultipleSelectionChange(state.subjects, value);
+            }}
           />
         </label>
       </div>

@@ -11,6 +11,7 @@ const getParents = async (req, res) => {
     const parents = await ParentModel.find({schoolId:schoolId}).populate("child");
     res.status(200).json(parents);
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 };
@@ -33,6 +34,7 @@ const createParent = async (req, res) => {
       phoneNumber,
       child,
       gender,
+      schoolId
     });
     await StudentModel.findByIdAndUpdate(child, {
       $push: { parents: newParent._id },
