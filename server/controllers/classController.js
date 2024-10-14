@@ -56,8 +56,8 @@ const getClassById = async (req, res) => {
   try {
     const validatedId = idValidator.parse(id);
     const classData = await ClassModel.findById(validatedId).populate(
-      "students subjects"
-    );
+      "students"
+    ).populate("subjects", "name").populate("schoolId");
     if (!classData) {
       return res.status(404).json({ error: "Class not found" });
     }
@@ -172,4 +172,5 @@ module.exports = {
   updateClass,
   deleteClass,
   getFormatedClasses,
+  promoteclassHandler
 };

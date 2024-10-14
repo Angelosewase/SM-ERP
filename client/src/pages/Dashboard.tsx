@@ -18,9 +18,11 @@ function Dashboard() {
 
   type Value = ValuePiece | [ValuePiece, ValuePiece];
   const [value, onChange] = useState<Value>(new Date());
+
   return (
     <div className="pb-10">
       <Header />
+
       <div className="px-6">
         <div className="flex flex-col">
           <p className="font-bold    mt-4">Admin Dashboard</p>
@@ -81,7 +83,7 @@ const Fact: React.FC<FactProps> = ({ color, children, label, value }) => {
 
 const Facts: React.FC = () => {
   const school = useSelector(schoolSelector).school;
-  console.log(school)
+  console.log(school);
   if (!school) {
     console.log("invalid state");
     return (

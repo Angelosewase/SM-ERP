@@ -2,10 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import schoolReducer from "./features/schoolSlice";
 import userReducer from "./features/userSlice";
 
+import processReducer from "./features/processSlice";
+
 const store = configureStore({
   reducer: {
     school: schoolReducer,
     user: userReducer,
+    process: processReducer,
   },
 });
 

@@ -76,4 +76,20 @@ const updateParent = async (req, res) => {
   }
 };
 
-module.exports = { getParents, createParent, deleteParent, updateParent };
+const getParentById = async (req, res) => {
+  try {
+    const parentId = req.params.id;
+    const parent = await ParentModel.findById(parentId);
+
+    if (!parent) {
+      return res.status(404).json({ message: 'Parent not found' });
+    }
+
+    res.status(200).json(parent);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+module.exports = { getParents, createParent, deleteParent, updateParent ,getParentById};

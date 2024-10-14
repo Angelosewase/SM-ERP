@@ -43,7 +43,7 @@ const getAllExpenseRecords = async (req, res) => {
 const getExpenseRecordById = async (req, res) => {
   try {
     const { id } = req.params;
-    const expenseRecord = await ExpenseModel.findById(id).populate("schoolId");
+    const expenseRecord = await ExpenseModel.findById(id);
     if (!expenseRecord) {
       return res.status(404).json({ error: "Expense record not found" });
     }

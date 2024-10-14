@@ -55,8 +55,8 @@ const getAllSubjects = async (req, res) => {
   }
   try {
     const subjects = await SubjectModel.find({ schoolId })
-      .populate("teacherId", "firstName")
-      .populate("classes", "name");
+      .populate("teacherId")
+      // .populate("classes", "name");
 
     res.status(200).json(subjects);
   } catch (error) {
@@ -68,8 +68,7 @@ const getSubjectById = async (req, res) => {
   try {
     const { id } = req.params;
     const subject = await SubjectModel.findById(id)
-      .populate("teacherId", "name")
-      .populate("classes", "className");
+      .populate("classes", "name");
 
     if (!subject) {
       return res.status(404).json({ error: "Subject not found" });

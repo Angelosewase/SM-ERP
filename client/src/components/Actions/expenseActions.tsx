@@ -12,16 +12,17 @@ function ExpenseActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
-  const [expense, setExpense] = useState<IExpenseRecord | null>(null); // State to hold expense data
+  const [expense, setExpense] = useState<IExpenseRecord | null>(null); //
 
   useEffect(() => {
     const getExpenseDetails = async () => {
       try {
         const expenseData = await getExpenseById(id);
-        if ('error' in expenseData) {
+
+        if ("error" in expenseData) {
           console.error(expenseData.error);
         } else {
-        //   setExpense(expenseData);
+          setExpense(expenseData);
         }
       } catch (err) {
         console.error(err);
@@ -32,7 +33,7 @@ function ExpenseActions({
   }, [id]);
 
   return (
-    <Dialog >
+    <Dialog>
       <DialogTrigger asChild>
         <p className="px-2 hover:cursor-default hover:bg-slate-50 py-1 rounded">
           View Details
@@ -46,15 +47,9 @@ function ExpenseActions({
               Expense ID: <span className="font-mono text-black">{id}</span>
             </div>
           </div>
-
           <InfoDisplay
             name="Name"
             value={expense?.name || "N/A"}
-            onChange={handleChange}
-          />
-          <InfoDisplay
-            name="School ID"
-            value={expense?.schoolId || "N/A"}
             onChange={handleChange}
           />
           <InfoDisplay
@@ -63,8 +58,19 @@ function ExpenseActions({
             onChange={handleChange}
           />
           <InfoDisplay
-            name="Payment Date"
-            value={ "N/A"}
+            name="payment date"
+            value={
+              expense?.paymentDate
+                ? new Intl.DateTimeFormat("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  }).format(new Date(expense.paymentDate))
+                : "N/A"
+            }
             onChange={handleChange}
           />
           <InfoDisplay

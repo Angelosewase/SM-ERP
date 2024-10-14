@@ -26,12 +26,19 @@ function NavigationMenu({
       } bg-myBlue transition-all duration-300 overflow-auto fixed `}
     >
       <div>
-        <div className="bg-myBlue h-16 mb-10 flex justify-between px-4">
-          <img
-            src="/schoolLogo.png"
-            alt="school logo"
-            className={`w-10 h-auto self-center ${!maximize && "hidden"}`}
-          />
+        <div className="bg-myBlue h-16 mb-16 flex justify-between px-4">
+          <div className={`bg-white rounded-2xl w-20 h-20 flex items-center justify-center mt-4 b ${
+                !maximize && "hidden"
+              } `}>
+            <img
+              src="/schoolLogo.png"
+              alt="school logo"
+              className={`w-[70px] rounded- h-auto self-center ${
+                !maximize && "hidden"
+              }`}
+            />
+          </div>
+
           <button onClick={() => setMaximize(!maximize)}>
             <Bars3BottomRightIcon className="text-white h-10" />
           </button>

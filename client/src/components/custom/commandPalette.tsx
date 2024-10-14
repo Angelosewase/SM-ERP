@@ -35,15 +35,15 @@ export function CommandD() {
   }, [])
 
   return (
-    <>
+    <div className="w-[400px]">
       <p className="text-sm text-muted-foreground">
         Press{" "}
         <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
           <span className="text-xs">⌘</span>k
         </kbd>
       </p>
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+      <CommandDialog open={open} onOpenChange={setOpen}> 
+        <CommandInput placeholder="Type a command or search..." className="w-[400px]" />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Suggestions">
@@ -53,7 +53,7 @@ export function CommandD() {
             </CommandItem>
             <CommandItem>
               <FaceIcon className="mr-2 h-4 w-4" />
-              <span>Search Emoji</span>
+              <span>guide </span>
             </CommandItem>
             <CommandItem>
               <RocketIcon className="mr-2 h-4 w-4" />
@@ -80,6 +80,6 @@ export function CommandD() {
           </CommandGroup>
         </CommandList>
       </CommandDialog>
-    </>
+    </div>
   )
 }

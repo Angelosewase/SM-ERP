@@ -60,13 +60,8 @@ function ParentActions({
             onChange={handleChange}
           />
           <InfoDisplay
-            name="Phone Number"
+            name="Tel"
             value={parent?.phoneNumber || "N/A"}
-            onChange={handleChange}
-          />
-          <InfoDisplay
-            name="Address"
-            value={parent?.address || "N/A"}
             onChange={handleChange}
           />
           <InfoDisplay

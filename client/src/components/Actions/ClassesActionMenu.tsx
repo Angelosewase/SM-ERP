@@ -1,5 +1,6 @@
+// @ts-nocheck
 import { fetchClassById } from "@/app/Api/classes";
-import { IClass } from "@/app/globals"; // Assuming this is the correct import for your IClass interface
+import { IClass } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { handleChange, InfoDisplay } from "@/pages/Settings";
@@ -12,12 +13,12 @@ function ClassMenuActions({
   id: string;
   setState: (val: boolean) => void;
 }) {
-  const [classDetails, setClassDetails] = useState<IClass | null>(null); // State to hold class data
+  const [classDetails, setClassDetails] = useState<IClass | null>(null);
 
   useEffect(() => {
     const getClassDetails = async () => {
       try {
-        const classData = await fetchClassById(id); // Fetch class data by ID
+        const classData = await fetchClassById(id);
         setClassDetails(classData);
       } catch (err) {
         console.error(err);
@@ -25,14 +26,14 @@ function ClassMenuActions({
     };
 
     getClassDetails();
-  }, [id]);
-
+  });
+  console.log(classDetails);
   return (
     <>
       <Dialog>
         <DialogTrigger asChild>
           <p className="px-2 hover:cursor-default hover:bg-slate-50 py-1 rounded">
-            view  details
+            view details
           </p>
         </DialogTrigger>
         <DialogContent className="w-[900px] ">
@@ -48,25 +49,52 @@ function ClassMenuActions({
             <InfoDisplay
               name="Class Name"
               value={classDetails?.name || "Class Name"}
-              onChange={handleChange} // Implement your update logic here
-            />
-            
-            <InfoDisplay
-              name="Students Count"
-              value={`${classDetails?.students?.length || 0}`}
               onChange={handleChange} 
             />
 
             <InfoDisplay
+              name="Students"
+              value={`${classDetails?.students?.length || 0}`}
+              onChange={handleChange}
+              edit={false}
+            />
+
+            <InfoDisplay
               name="Subjects"
-              value={classDetails?.subjects?.join(", ") || "No Subjects"}
-              onChange={handleChange} // Implement your update logic here
+              value={
+                classDetails?.subjects?.reduce(
+                  (accumulator, value) =>
+                    (accumulator += ` ${(accumulator += value.name)}`),
+                  ""
+                ) || "No Subjects"
+              }
+              onChange={handleChange} 
+              edit={false}
             />
 
             <InfoDisplay
               name="School ID"
-              value={classDetails?.schoolId || "N/A"}
-              onChange={handleChange} // Implement your update logic here
+              value={classDetails?.schoolId.name || "N/A"}
+              onChange={handleChange}
+              edit={false}
+            />
+
+            <InfoDisplay
+              name="Created at"
+              value={
+                classDetails?.createdAt
+                  ? new Intl.DateTimeFormat("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                    }).format(new Date(classDetails.createdAt))
+                  : "N/A"
+              }
+              onChange={handleChange}
+              edit={false}
             />
           </div>
           <div className="mt-5 flex gap-5">

@@ -68,7 +68,7 @@ export function ClassTable() {
 
     getClassesData();
   });
-
+   
   const table = useReactTable({
     data: classesState,
     columns,

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-// Adjust the import based on your file structure
-import { ISubject } from "@/app/globals"; // Adjust the import based on your file structure
-import { Button } from "@/components/ui/Button"; // Adjust the import based on your file structure
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; // Adjust the import based on your file structure
-import { handleChange, InfoDisplay } from "@/pages/Settings"; // Adjust the import based on your file structure
+import { ISubject } from "@/app/globals"; 
+import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; 
+import { handleChange, InfoDisplay } from "@/pages/Settings";
 import { getSubjectById } from "@/app/Api/subjects";
 
 function SubjectActions({
@@ -22,7 +21,8 @@ function SubjectActions({
         if ("error" in subjectData) {
           console.error(subjectData.error);
         } else {
-        //   setSubject(subjectData);
+          console.log(subjectData)
+          setSubject(subjectData);
         }
       } catch (err) {
         console.error(err);
@@ -57,21 +57,27 @@ function SubjectActions({
             name="Teacher ID"
             value={subject?.teacherId || "N/A"}
             onChange={handleChange}
+            edit={false}
           />
           <InfoDisplay
             name="Classes"
-            value={subject?.classes.join(", ") || "N/A"}
+            value={subject?.classes.reduce(
+              (accumulator, value) =>
+                (accumulator += ` ${(accumulator += value.name)}`),
+              ""
+            ) || "N/A"}
             onChange={handleChange}
+            edit={false}
           />
           <InfoDisplay
             name="Days"
-            value={subject?.days.join(", ") || "N/A"}
+            value={subject?.days.reduce(
+              (accumulator, value) =>
+                (accumulator += ` ${(accumulator += value)}`),
+              ""
+            ) || "N/A"}
             onChange={handleChange}
-          />
-          <InfoDisplay
-            name="School ID"
-            value={subject?.schoolId || "N/A"}
-            onChange={handleChange}
+            edit={false}
           />
         </div>
         <div className="mt-5 flex gap-5">

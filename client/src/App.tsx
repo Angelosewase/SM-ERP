@@ -16,6 +16,7 @@ import Subjects from "./pages/Subjects";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import Classes from "./pages/classes";
+import { CustomAlert } from "./components/custom/Alert";
 
 const routes = createBrowserRouter([
   { path: "/", Component: Login },
@@ -91,6 +92,7 @@ function App() {
   return (
     <>
       <RouterProvider router={routes} />
+      <CustomAlert />
     </>
   );
 }
