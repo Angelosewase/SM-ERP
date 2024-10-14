@@ -2,6 +2,9 @@ import { SelectComponent } from "../custom/SelectComponent";
 import Input from "../custom/Input";
 import { useState } from "react";
 import { createExpense } from "@/app/Api/expense";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 const statusOptions = [
   { name: "pending", value: "pending" },
@@ -19,6 +22,7 @@ interface IExpenseRecordFormState {
 }
 
 function AddExpenseForm() {
+  const dispatch = useDispatch<AppDispatch>()
   const [formState, setFormState] = useState<Partial<IExpenseRecordFormState>>({
     name: "",
     amount: 0,
@@ -53,7 +57,11 @@ function AddExpenseForm() {
     const result = await createExpense(formState);
     if (!result) {
       console.log("error  recording expense");
+      dispatch(runFailProcess("failed to register expense"))
+    }else{
+      dispatch(runCompleteProcess("expense successfully"))
     }
+ 
     resetForm()
   };
 

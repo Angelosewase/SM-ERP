@@ -36,8 +36,17 @@ function Classes() {
   };
 
   async function handleSubmit() {
-    const createdClass = await createClass(classState);
-    console.log(createdClass);
+    try {
+      await createClass(classState);
+    } catch (error) {
+      console.log(error);
+    }
+    setClassState({
+       name:"",
+       teacherId:"",
+       students:[],
+       subjects:[]
+    })
   }
 
   return (

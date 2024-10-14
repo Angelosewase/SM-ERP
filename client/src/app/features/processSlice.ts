@@ -22,9 +22,9 @@ const processSlice = createSlice({
       state.message = "Operation started successfully.";
       state.showNotification = true;
     },
-    completeProcess: (state) => {
+    completeProcess: (state, action: PayloadAction<string>) => {
       state.status = "completed";
-      state.message = "Operation completed successfully.";
+      state.message =action.payload || "Operation completed successfully.";
       state.showNotification = true;
     },
     failProcess: (state, action: PayloadAction<string>) => {

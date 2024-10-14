@@ -5,6 +5,8 @@ import { Student } from "./StudentsTable";
 import { Button } from "@/components/ui/Button";
 import ActionsMenu from "@/components/custom/DropDown";
 import StudentActions from "@/components/Actions/StudentActionsMenu";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { deleteStudent } from "@/app/Api/student";
 
 export const columns: ColumnDef<Student>[] = [
   {
@@ -86,9 +88,20 @@ export const columns: ColumnDef<Student>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const student = row.original;
+      const handleDelete = async (studentId: string) => {
+        try {
+          await deleteStudent(studentId); 
+              } catch (err) {
+          console.log("Failed to delete student");
+          console.error(err);
+        } 
+      };
       return (
         <ActionsMenu>
-          <StudentActions id={student.id} setState={() => {}} />
+          <>
+            <StudentActions id={student.id} setState={() => {}} />
+            <DropdownMenuItem onClick={()=>handleDelete(student.id)}>delete</DropdownMenuItem>
+          </>
         </ActionsMenu>
       );
     },

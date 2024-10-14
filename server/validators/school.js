@@ -13,4 +13,17 @@ const schoolValidationSchema = z.object({
     ),
 });
 
-module.exports = {schoolValidationSchema}
+
+const schoolUpdateSchema = z.object({
+  name: z.string().min(1, "School name is required").optional(),
+  address: z.string().min(1, "Address is required").optional(),
+  email: z.string().email("Invalid email address").optional(),
+  establishedYear: z.number().optional(), 
+  admin: z.array(z.string()).optional(),
+  teachers: z.array(z.string()).optional(), 
+  students: z.array(z.string()).optional(),
+  Parents: z.array(z.string()).optional(),
+  classes: z.array(z.string()).optional(), 
+});
+
+module.exports = {schoolValidationSchema, schoolUpdateSchema}

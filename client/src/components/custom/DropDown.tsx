@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { Button } from "../ui/Button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 
@@ -21,9 +21,6 @@ const ActionsMenu = ({ children }: { children: React.ReactNode }) => {
         {React.Children.map(children, (child) => {
           return React.cloneElement(child as React.ReactElement, { open, setOpen });
         })}
-    <DropdownMenuItem>
-         delete
-    </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

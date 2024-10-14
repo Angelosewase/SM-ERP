@@ -1,28 +1,34 @@
 import { createParent } from "@/app/Api/parent";
 import { createStudent } from "@/app/Api/student";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 import { IParent, IStudent } from "@/app/globals";
+import { AppDispatch } from "@/app/store";
 import Header from "@/components/custom/Header";
 import AddParentForm from "@/components/Forms/AddParentForm";
 import AddstudentForm from "@/components/Forms/AddstudentForm";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+
+const initialstate ={
+  classId: "",
+  firstName: "",
+  lastName: "",
+  gender: "unknown",
+  email: "",
+}
+const parentInitialState = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phoneNumber: "",
+  child: "",
+  gender: "",
+}
 
 function AddStudent() {
-  const [studentState, setStudentState] = useState<IStudent>({
-    classId: "",
-    firstName: "",
-    lastName: "",
-    gender: "unknown",
-    email: "",
-  });
-
-  const [parenstState, setParentState] = useState<IParent>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    child: "",
-    gender: "",
-  });
+  const [studentState, setStudentState] = useState<IStudent>(initialstate);
+  const dispatch = useDispatch<AppDispatch>()
+  const [parenstState, setParentState] = useState<IParent>(parentInitialState);
 
   function updateStundentStateValue(e: React.ChangeEvent<HTMLInputElement>) {
     const { value, name } = e.target;
@@ -47,9 +53,10 @@ function AddStudent() {
     try {
       const createdStudent = await createStudent(studentState);
       if (!createdStudent._id) {
-        console.log("Creation of user failed");
+        dispatch(runFailProcess("Creation of student failed"))
         return;
       }
+    dispatch(runCompleteProcess("student created successfully"))
 
       const parent = await createParent({
         ...parenstState,
@@ -57,10 +64,10 @@ function AddStudent() {
       });
 
       if(parent._id){
-        console.log("student created successfully")
+        dispatch(runCompleteProcess("parent created successfully"))
       }
     } catch (error) {
-      console.log(error);
+      dispatch(runFailProcess("failed"))
       throw error;
     }
     resetStates()

@@ -1,10 +1,9 @@
-// @ts-nocheck
-import { fetchClassById } from "@/app/Api/classes";
+import { fetchClassById, updateClass } from "@/app/Api/classes";
 import { IClass } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { handleChange, InfoDisplay } from "@/pages/Settings";
 import { useEffect, useState } from "react";
+import InfoDisplay from "../custom/InfoDisplay";
 
 function ClassMenuActions({
   id,
@@ -14,20 +13,46 @@ function ClassMenuActions({
   setState: (val: boolean) => void;
 }) {
   const [classDetails, setClassDetails] = useState<IClass | null>(null);
+  const [updateState, setUpdateState] = useState<Partial<IClass>>({
+    name: "",
+  });
+
+  const isUpdateStudentStateEmpty = (state: Partial<IClass>): boolean => {
+    return Object.values(state).every((value) => value === "");
+  };
+  const getClassDetails = async () => {
+    try {
+      const classData = await fetchClassById(id);
+      setClassDetails(classData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    const getClassDetails = async () => {
-      try {
-        const classData = await fetchClassById(id);
-        setClassDetails(classData);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
     getClassDetails();
   });
-  console.log(classDetails);
+
+  function handleChange(val: string, name: string) {
+    if (val === "") return;
+    setUpdateState((prev) => ({ ...prev, [name]: val }));
+  }
+
+  const handleSave = async () => {
+    if (isUpdateStudentStateEmpty(updateState)) {
+      console.error("All fields are empty. Cannot update the student.");
+      return;
+    }
+    try {
+      if (!classDetails?._id) return;
+      await updateClass(classDetails._id, updateState);
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
+    getClassDetails();
+    setState(false);
+  };
+
   return (
     <>
       <Dialog>
@@ -47,13 +72,15 @@ function ClassMenuActions({
             </div>
 
             <InfoDisplay
-              name="Class Name"
+              name="name"
+              label="Class Name"
               value={classDetails?.name || "Class Name"}
-              onChange={handleChange} 
+              onChange={handleChange}
             />
 
             <InfoDisplay
               name="Students"
+              label="Students"
               value={`${classDetails?.students?.length || 0}`}
               onChange={handleChange}
               edit={false}
@@ -61,6 +88,7 @@ function ClassMenuActions({
 
             <InfoDisplay
               name="Subjects"
+              label="Subjects"
               value={
                 classDetails?.subjects?.reduce(
                   (accumulator, value) =>
@@ -68,11 +96,12 @@ function ClassMenuActions({
                   ""
                 ) || "No Subjects"
               }
-              onChange={handleChange} 
+              onChange={handleChange}
               edit={false}
             />
 
             <InfoDisplay
+              label="School ID"
               name="School ID"
               value={classDetails?.schoolId.name || "N/A"}
               onChange={handleChange}
@@ -80,6 +109,7 @@ function ClassMenuActions({
             />
 
             <InfoDisplay
+              label="label"
               name="Created at"
               value={
                 classDetails?.createdAt
@@ -98,14 +128,10 @@ function ClassMenuActions({
             />
           </div>
           <div className="mt-5 flex gap-5">
-            <Button className="bg-myBlue" onClick={() => setState(false)}>
-              Edit
+            <Button className="bg-myBlue" onClick={() => handleSave()}>
+              save
             </Button>
-            <Button
-              className="w-20"
-              onClick={() => setState(false)}
-              variant={"destructive"}
-            >
+            <Button className="w-20" onClick={() => setState(false)}>
               Exit
             </Button>
           </div>

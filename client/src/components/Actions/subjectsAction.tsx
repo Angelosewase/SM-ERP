@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ISubject } from "@/app/globals"; 
+import { ISubject } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; 
-import { handleChange, InfoDisplay } from "@/pages/Settings";
-import { getSubjectById } from "@/app/Api/subjects";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { getSubjectById, updateSubject } from "@/app/Api/subjects";
+import InfoDisplay from "../custom/InfoDisplay";
 
 function SubjectActions({
   id,
@@ -12,7 +12,15 @@ function SubjectActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
-  const [subject, setSubject] = useState<ISubject | null>(null); // State to hold subject data
+  const [subject, setSubject] = useState<ISubject | null>(null);
+  const [updatstate, setUpdateState] = useState<Partial<ISubject>>({
+    name: "",
+  });
+
+  function handleChange(val: string | Date, name: string) {
+    if (val === "") return;
+    setUpdateState((prev) => ({ ...prev, [name]: val }));
+  }
 
   useEffect(() => {
     const getSubjectDetails = async () => {
@@ -21,7 +29,7 @@ function SubjectActions({
         if ("error" in subjectData) {
           console.error(subjectData.error);
         } else {
-          console.log(subjectData)
+          console.log(subjectData);
           setSubject(subjectData);
         }
       } catch (err) {
@@ -31,6 +39,17 @@ function SubjectActions({
 
     getSubjectDetails();
   }, [id]);
+
+  const handleSave = async () => {
+    if (!subject?._id) return;
+
+    try {
+      const updatedStudent = await updateSubject(subject?._id, updatstate);
+      console.log("Student updated successfully:", updatedStudent);
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
+  };
 
   return (
     <Dialog>
@@ -49,40 +68,52 @@ function SubjectActions({
           </div>
 
           <InfoDisplay
-            name="Name"
+            label="name"
+            name="name"
             value={subject?.name || "N/A"}
             onChange={handleChange}
           />
           <InfoDisplay
-            name="Teacher ID"
-            value={subject?.teacherId || "N/A"}
+            name="teacherId"
+            value={
+              subject?.teacherId.firstName +
+                " " +
+                subject?.teacherId.lastName || "N/A"
+            }
+            label="teacher id "
             onChange={handleChange}
             edit={false}
           />
           <InfoDisplay
             name="Classes"
-            value={subject?.classes.reduce(
-              (accumulator, value) =>
-                (accumulator += ` ${(accumulator += value.name)}`),
-              ""
-            ) || "N/A"}
+            label="class"
+            value={
+              subject?.classes.reduce(
+                (accumulator, value) =>
+                  (accumulator += ` ${(accumulator += value.name)}`),
+                ""
+              ) || "N/A"
+            }
             onChange={handleChange}
             edit={false}
           />
           <InfoDisplay
+            label="Days"
             name="Days"
-            value={subject?.days.reduce(
-              (accumulator, value) =>
-                (accumulator += ` ${(accumulator += value)}`),
-              ""
-            ) || "N/A"}
+            value={
+              subject?.days.reduce(
+                (accumulator, value) =>
+                  (accumulator += ` ${(accumulator += value)}`),
+                ""
+              ) || "N/A"
+            }
             onChange={handleChange}
             edit={false}
           />
         </div>
         <div className="mt-5 flex gap-5">
-          <Button className="bg-myBlue" onClick={() => setOpen(false)}>
-            Edit
+          <Button className="bg-myBlue" onClick={() =>handleSave()}>
+            save
           </Button>
           <Button
             className="w-20"

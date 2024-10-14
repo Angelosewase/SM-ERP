@@ -1,4 +1,13 @@
-const { StudentModel, ClassModel, SchoolModel } = require("../models/Schemas");
+const {
+  StudentModel,
+  ClassModel,
+  SchoolModel,
+  ParentModel,
+  FinancialTransactionModel,
+  AttendanceModel,
+  ExamResultsModel,
+  PaymentModel,
+} = require("../models/Schemas");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const {
@@ -21,12 +30,12 @@ const getStudents = async (req, res) => {
       .populate("classId")
       .lean();
 
-    const studentResponse = students.map((studentObj) => {
-      return {
-        ...studentObj,
-        classId: studentObj.classId.name,
-      };
-    });
+      const studentResponse = students.map((studentObj) => {
+        return {
+          ...studentObj,
+          classId: studentObj.classId ? studentObj.classId.name || "" : "",
+        };
+      });
     res.status(200).json(studentResponse);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -64,15 +73,7 @@ const createStudent = async (req, res) => {
       res.status(404).send({ message: "class not found" });
       return;
     }
-    const newStudent = await StudentModel.create({
-      firstName: validateData.firstName,
-      lastName: validateData.lastName,
-      email: validateData.email,
-      schoolId: validateData.schoolId,
-      classId: validateData.classId,
-      parents: validateData.parents,
-      gender: validateData.gender,
-    });
+    const newStudent = await StudentModel.create(validateData);
 
     await SchoolModel.findByIdAndUpdate(validateData.schoolId, {
       $push: { students: newStudent._id },
@@ -83,6 +84,9 @@ const createStudent = async (req, res) => {
 
     res.status(201).json(newStudent);
   } catch (error) {
+    console.log(error);
+    console.log(req.body)
+    
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
     }
@@ -92,10 +96,33 @@ const createStudent = async (req, res) => {
 
 const deleteStudent = async (req, res) => {
   const { id } = req.params;
+
   try {
     const validatedId = objectIdValidator.parse(id);
+    const student = await StudentModel.findById(validatedId);
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+    await ParentModel.deleteMany({ _id: { $in: student.parents } });
+    await FinancialTransactionModel.deleteMany({ studentId: student._id });
+    await AttendanceModel.deleteMany({ studentId: student._id });
+    await ExamResultsModel.deleteMany({ studentId: student._id });
+    await PaymentModel.deleteMany({ studentId: student._id });
+
+    await ClassModel.updateMany(
+      { students: student._id },
+      { $pull: { students: student._id } }
+    );
+    await SchoolModel.findByIdAndUpdate(student.schoolId, {
+      $pull: {
+        students: student._id,
+        Parents: { $in: student.parents },
+      },
+    });
 
     const deletedStudent = await StudentModel.findByIdAndDelete(validatedId);
+
     res.status(200).json(deletedStudent);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -122,11 +149,11 @@ const updateStudent = async (req, res) => {
   }
 };
 
-async function getStudentbyStudentId(req,res) {
+async function getStudentbyStudentId(req, res) {
   const { id } = req.params;
 
   try {
-    const student = await StudentModel.findById(id).populate("classId","name");
+    const student = await StudentModel.findById(id).populate("classId", "name");
 
     if (!student) {
       res.status(404).send({ message: "student not found" });
@@ -159,5 +186,5 @@ module.exports = {
   deleteStudent,
   updateStudent,
   promoteStudentHandler,
-  getStudentbyStudentId
+  getStudentbyStudentId,
 };

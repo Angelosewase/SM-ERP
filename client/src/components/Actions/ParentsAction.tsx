@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { fetchParentById } from "@/app/Api/parent"; 
-import { IParent } from "@/app/globals"; 
-import { Button } from "@/components/ui/Button"; 
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; 
-import { handleChange, InfoDisplay } from "@/pages/Settings"; 
+import { fetchParentById, updateParent } from "@/app/Api/parent";
+import { IParent } from "@/app/globals";
+import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import InfoDisplay from "../custom/InfoDisplay";
 
 function ParentActions({
   id,
@@ -12,7 +12,35 @@ function ParentActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
-  const [parent, setParent] = useState<IParent | null>(null); // State to hold parent data
+  const [parent, setParent] = useState<IParent | null>(null);
+  const [editParent, setEditParent] = useState<Partial<IParent>>({
+    firstName: "",
+    lastName: "",
+    email: "",
+    gender: "",
+    phoneNumber: "",
+  });
+  const isUpdateStateEmpty = (state: Partial<IParent>): boolean => {
+    return Object.values(state).every((value) => value === "");
+  };
+
+  const handleSave = async () => {
+    if (isUpdateStateEmpty(editParent)) {
+      console.error("All fields are empty. Cannot update the student.");
+      return;
+    }
+    try {
+      if (!parent?._id) return;
+      await updateParent(parent?._id, editParent);
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
+  };
+
+  const handleEditChange = (val: string, value: string) => {
+    if (val === "") return;
+    setEditParent((prev) => ({ ...prev, [value]: val }));
+  };
 
   useEffect(() => {
     const getParentDetails = async () => {
@@ -45,33 +73,44 @@ function ParentActions({
           </div>
 
           <InfoDisplay
-            name="First Name"
+            name="firstName"
+            label="First name"
             value={parent?.firstName || "N/A"}
-            onChange={handleChange}
+            onChange={handleEditChange}
           />
           <InfoDisplay
-            name="Last Name"
+            label=" Last name"
+            name="lastName"
             value={parent?.lastName || "N/A"}
-            onChange={handleChange}
+            onChange={handleEditChange}
           />
           <InfoDisplay
-            name="Email"
+            label="Email"
+            name="email"
             value={parent?.email || "N/A"}
-            onChange={handleChange}
+            onChange={handleEditChange}
           />
           <InfoDisplay
-            name="Tel"
+            label="Tel"
+            name="phoneNumber"
             value={parent?.phoneNumber || "N/A"}
-            onChange={handleChange}
+            onChange={handleEditChange}
           />
           <InfoDisplay
-            name="Gender"
+            label="gender"
+            name="gender"
             value={parent?.gender || "N/A"}
-            onChange={handleChange}
+            onChange={handleEditChange}
           />
         </div>
         <div className="mt-5 flex gap-5">
-          <Button className="bg-myBlue" onClick={() => setOpen(false)}>
+          <Button
+            className="bg-myBlue"
+            onClick={() => {
+              handleSave();
+              setOpen(false);
+            }}
+          >
             Edit
           </Button>
           <Button

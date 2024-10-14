@@ -1,5 +1,5 @@
 const express = require('express');
-const { getTeachers, createTeacher, deleteTeacher, updateTeacher } = require('../controllers/TeacherController');
+const { getTeachers, createTeacher, deleteTeacher, updateTeacher, getTeacherById } = require('../controllers/TeacherController');
 
 const {isAuth}= require("../middlewares/authentication")
 
@@ -11,5 +11,6 @@ router.get('/', getTeachers);
 router.post('/', createTeacher);
 router.delete('/:id', deleteTeacher);
 router.put('/:id', updateTeacher);
+router.get('/:id', getTeacherById);
 
 module.exports = router;

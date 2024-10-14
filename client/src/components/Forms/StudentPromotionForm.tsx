@@ -12,6 +12,7 @@ function StudentPromotionForm() {
           <SelectComponent
             options={classOptionsPlaceholder}
             placeholder="select class"
+            handleSelectChange={(val)=> {if(val) return}}
           />
         </label>
 
@@ -20,6 +21,7 @@ function StudentPromotionForm() {
           <SelectComponent
             options={classOptionsPlaceholder}
             placeholder="select student"
+            handleSelectChange={(val)=> {if(val) return}}
           />
         </label>
 
@@ -28,6 +30,7 @@ function StudentPromotionForm() {
           <SelectComponent
             options={classOptionsPlaceholder}
             placeholder="Promotion class"
+            handleSelectChange={(val)=> {if(val) return}}
           />
         </label>
 

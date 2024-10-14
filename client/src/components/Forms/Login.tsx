@@ -57,7 +57,7 @@ function LoginForm() {
       </a>
       <button
         type="button" // Change this to "submit"
-        className="flex text-sm font-semibold items-center justify-center py-1.5 text-white bg-red-600 rounded-md hover:cursor-pointer hover:scale-105 transition-all"
+        className="flex text-sm font-semibold items-center justify-center py-1.5 text-white bg-myBlue rounded-md hover:cursor-pointer hover:scale-105 transition-all"
         onClick={handleSubmission}
       >
         SIGN IN

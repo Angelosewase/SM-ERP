@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { getExpenseById } from "@/app/Api/expense"; // Adjust the import based on your file structure
-import { IExpenseRecord } from "@/app/globals"; // Adjust the import based on your file structure
-import { Button } from "@/components/ui/Button"; // Adjust the import based on your file structure
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"; // Adjust the import based on your file structure
-import { handleChange, InfoDisplay } from "@/pages/Settings"; // Adjust the import based on your file structure
+import { getExpenseById, updateExpense } from "@/app/Api/expense";
+import { IExpenseRecord } from "@/app/globals";
+import { Button } from "@/components/ui/Button";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import InfoDisplay from "../custom/InfoDisplay";
 
 function ExpenseActions({
   id,
@@ -13,6 +13,34 @@ function ExpenseActions({
   setOpen: (val: boolean) => void;
 }) {
   const [expense, setExpense] = useState<IExpenseRecord | null>(null); //
+
+  const [updatedExpensestate, setUpdatedExpense] = useState<
+    Partial<IExpenseRecord>
+  >({
+    name: "",
+    paymentDate: new Date(),
+    amount: 0,
+    transactionType: "",
+    status: "pending",
+  });
+
+  function handleChange(val: string | Date, name: string) {
+    if (val === "") return;
+    setUpdatedExpense((prev) => ({ ...prev, [name]: val }));
+  }
+
+  const handleSave = async () => {
+    try {
+      if (!expense?._id) return;
+      const updatedStudent = await updateExpense(
+        expense?._id,
+        updatedExpensestate
+      );
+      console.log("Student updated successfully:", updatedStudent);
+    } catch (error) {
+      console.error("Error updating student:", error);
+    }
+  };
 
   useEffect(() => {
     const getExpenseDetails = async () => {
@@ -48,17 +76,22 @@ function ExpenseActions({
             </div>
           </div>
           <InfoDisplay
-            name="Name"
+            name="name"
+            label="name"
             value={expense?.name || "N/A"}
             onChange={handleChange}
           />
           <InfoDisplay
-            name="Amount"
+            label="amount"
+            name="amount"
             value={expense ? `$${expense.amount}` : "N/A"}
             onChange={handleChange}
+            inputType="number"
           />
           <InfoDisplay
-            name="payment date"
+            label="paymentDate"
+            name="paymentDate"
+            inputType="date"
             value={
               expense?.paymentDate
                 ? new Intl.DateTimeFormat("en-US", {
@@ -74,18 +107,20 @@ function ExpenseActions({
             onChange={handleChange}
           />
           <InfoDisplay
-            name="Transaction Type"
+            label="Transaction Type"
+            name="transactionType"
             value={expense?.transactionType || "N/A"}
             onChange={handleChange}
           />
           <InfoDisplay
+            label="status"
             name="Status"
             value={expense?.status || "N/A"}
             onChange={handleChange}
           />
         </div>
         <div className="mt-5 flex gap-5">
-          <Button className="bg-myBlue" onClick={() => setOpen(false)}>
+          <Button className="bg-myBlue" onClick={() => handleSave()}>
             Edit
           </Button>
           <Button

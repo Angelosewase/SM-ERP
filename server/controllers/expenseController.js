@@ -75,12 +75,13 @@ const updateExpenseRecord = async (req, res) => {
   const deleteExpenseRecord = async (req, res) => {
     try {
       const { id } = req.params;
-      const deletedExpenseRecord = await ExpenseRecord.findByIdAndDelete(id);
+      const deletedExpenseRecord = await ExpenseModel.findByIdAndDelete(id);
       if (!deletedExpenseRecord) {
         return res.status(404).json({ error: "Expense record not found" });
       }
       res.status(200).json({ message: "Expense record deleted successfully" });
     } catch (error) {
+      console.log(error)
       res.status(500).json({ error: "Failed to delete expense record" });
     }
   };

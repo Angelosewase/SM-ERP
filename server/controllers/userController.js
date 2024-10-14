@@ -6,6 +6,7 @@ require("dotenv").config();
 const {
   registerUserInfoValidator,
   loginInfoValidator,
+  userUpdateSchema,
 } = require("../validators/user.js");
 
 const {
@@ -142,11 +143,39 @@ async function Logout(req, res) {
       path: "/",
     });
 
-    res.status(400).send({ message: "logged out successfully" });
+    res.status(200).send({ message: "logged out successfully" });
   } catch (error) {
-    console.log(erro);
+    console.log(error);
     res.status(500).send({ message: "request failed" });
   }
 }
 
-module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser, Logout };
+
+async function updateUser(req,res){
+  const { id } = req.params;
+
+  try {
+ 
+    const validatedData = userUpdateSchema.parse(req.body);
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      validatedData,
+      { new: true, runValidators: true } 
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+  console.log(error)
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ errors: error.errors });
+    }
+
+    res.status(500).json({ message: 'Server error', error });
+  }
+}
+
+module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser, Logout,updateUser };

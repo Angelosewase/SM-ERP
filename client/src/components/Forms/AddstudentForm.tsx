@@ -27,7 +27,7 @@ function AddstudentForm({
   state,
   handleSelectChange,
 }: addStudentformprops) {
-
+ 
   return (
     <div className="mt-3  flex gap-10 items-center">
       <Input

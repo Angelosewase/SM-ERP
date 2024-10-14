@@ -6,6 +6,9 @@ import PasswordInput from "@/components/custom/PasswordInput";
 import { SubmitSchoolInfo, SubmitUserInfo } from "@/app/Api/SignUp";
 import { useNavigate } from "react-router-dom";
 import { IsAuth } from "@/app/Api/auth";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
 
 interface FormData {
   adminFirstName: string;
@@ -21,6 +24,7 @@ interface FormData {
 
 function SignUp() {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>()
 
   useLayoutEffect(() => {
     async function isAuth() {
@@ -62,7 +66,7 @@ function SignUp() {
       setStep(step + 1);
     } else if (step === 2) {
       if (formData.password !== formData.confirmPassword) {
-        console.error("Passwords do not match.");
+        dispatch(runFailProcess("password does not match"))
         return;
       }
 
@@ -76,8 +80,9 @@ function SignUp() {
       const userId = await SubmitUserInfo(userData);
       if (userId) {
         setFormData({ ...formData, adminUserId: userId });
+        dispatch(runCompleteProcess("user created successfully"))
       } else {
-        console.error("Failed to register user.");
+        dispatch(runFailProcess("failed to create user"))
         return;
       }
 
@@ -91,14 +96,14 @@ function SignUp() {
       };
 
       if (!schoolData.admin) {
-        console.log("no user account created");
+        dispatch(runFailProcess("school  created"))
         return;
       }
       console.log(formData);
       const schoolResponse = await SubmitSchoolInfo(schoolData);
 
       if (schoolResponse) {
-        console.log("School registered successfully:", schoolResponse);
+        dispatch(runCompleteProcess("school account created succesfully"))
         window.location.href = "/";
       } else {
         console.error("Failed to register school.");

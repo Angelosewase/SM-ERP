@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { IParent } from "@/app/globals"; // Adjust the import based on your file structure
 import ActionsMenu from "@/components/custom/DropDown";
 import ParentActions from "@/components/Actions/ParentsAction";
+import { deleteParent } from "@/app/Api/parent";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export const columns: ColumnDef<IParent>[] = [
   {
@@ -74,10 +76,24 @@ export const columns: ColumnDef<IParent>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const parent = row.original;
+      const handleDelete = async (studentId: string | undefined) => {
+        if (!studentId) return;
+        try {
+          await deleteParent(studentId);
+        } catch (err) {
+          console.log("Failed to delete student");
+          console.error(err);
+        }
+      };
 
       return (
         <ActionsMenu>
-          <ParentActions id={parent._id || ""} setOpen={() => {}} />
+          <>
+            <ParentActions id={parent._id || ""} setOpen={() => {}} />
+            <DropdownMenuItem onClick={() => handleDelete(parent._id)}>
+              delete
+            </DropdownMenuItem>
+          </>
         </ActionsMenu>
       );
     },

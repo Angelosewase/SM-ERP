@@ -1,8 +1,8 @@
 import { AppDispatch } from "../store";
 import { completeProcess, failProcess, hideNotification } from "./processSlice";
 
-export const runCompleteProcess = () => (dispatch: AppDispatch) => {
-  dispatch(completeProcess());
+export const runCompleteProcess = (msg:string) => (dispatch: AppDispatch) => {
+  dispatch(completeProcess(msg));
   setTimeout(() => {
     dispatch(hideNotification());
   }, 3000);

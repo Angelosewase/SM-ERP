@@ -1,8 +1,9 @@
-
+import { deleteClass } from "@/app/Api/classes";
 import ClassMenuActions from "@/components/Actions/ClassesActionMenu";
 import ActionsMenu from "@/components/custom/DropDown";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ColumnDef } from "@tanstack/react-table";
 
@@ -59,9 +60,7 @@ export const columns: ColumnDef<Class>[] = [
         <CaretSortIcon className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div>{row.getValue("subjectsCount")}</div>
-    ),
+    cell: ({ row }) => <div>{row.getValue("subjectsCount")}</div>,
   },
   {
     accessorKey: "createdAt",
@@ -75,11 +74,25 @@ export const columns: ColumnDef<Class>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const classObj = row.original;
+      const handleDelete = async (classId: string | undefined) => {
+        if (!classId) return;
+        try {
+          await deleteClass(classId);
+        } catch (err) {
+          console.log("Failed to delete student");
+          console.error(err);
+        }
+      };
 
       return (
-            <ActionsMenu >
-              <ClassMenuActions id={classObj._id || ""} setState={()=>{}}/>
-            </ActionsMenu>
+        <ActionsMenu>
+          <>
+            <ClassMenuActions id={classObj._id || ""} setState={() => {}} />
+            <DropdownMenuItem onClick={() => handleDelete(classObj._id)}>
+              delete
+            </DropdownMenuItem>
+          </>
+        </ActionsMenu>
       );
     },
   },

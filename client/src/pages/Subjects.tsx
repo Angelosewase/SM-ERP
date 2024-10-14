@@ -1,12 +1,19 @@
 import { createSubject } from "@/app/Api/subjects";
+import {
+  runCompleteProcess,
+  runFailProcess,
+} from "@/app/features/proccesThunk";
 import { ISubject } from "@/app/globals";
+import { AppDispatch } from "@/app/store";
 import Header from "@/components/custom/Header";
 import AddSubjectForm from "@/components/Forms/AddSubjectForm";
 import { SubjectsTable } from "@/components/tables/subjects/table";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
 function Subjects() {
+  const dispatch = useDispatch<AppDispatch>();
   const [formState, setFormState] = useState<ISubject>({
     name: "",
     teacherId: "",
@@ -35,13 +42,21 @@ function Subjects() {
     try {
       const newSubject = await createSubject(formState);
       if ("error" in newSubject) {
-        console.error("Error creating subject:", newSubject.error);
+        dispatch(runFailProcess("error creating subject"));
       } else {
-        console.log("Subject created successfully:", newSubject);
+        dispatch(runCompleteProcess("subject created successfully"));
       }
     } catch (error) {
       console.error("An unexpected error occurred:", error);
+      dispatch(runFailProcess("error creating subject"));
     }
+
+    setFormState({
+      name: "",
+      teacherId: "",
+      classes: [],
+      days: [],
+    });
   };
   return (
     <div className="h-[100vh]">

@@ -1,24 +1,23 @@
 // teacherColumns.ts
 import { ColumnDef } from "@tanstack/react-table";
-import { CaretSortIcon, DotsHorizontalIcon } from "@radix-ui/react-icons";
-import {
-  DropdownMenu,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from "@/components/ui/dropdown-menu";
+import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/Button";
 import { ITeacher } from "@/app/globals"; // Adjust the import path based on your file structure
+import ActionsMenu from "@/components/custom/DropDown";
+import TeacherActions from "@/components/Actions/TeachersActions";
+import { deleteTeacher } from "@/app/Api/teachers";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 export const columns: ColumnDef<ITeacher>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -36,12 +35,16 @@ export const columns: ColumnDef<ITeacher>[] = [
   {
     accessorKey: "firstName",
     header: "First Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("firstName")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("firstName")}</div>
+    ),
   },
   {
     accessorKey: "lastName",
     header: "Last Name",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("lastName")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("lastName")}</div>
+    ),
   },
   {
     accessorKey: "email",
@@ -72,22 +75,24 @@ export const columns: ColumnDef<ITeacher>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const teacher = row.original;
+      const handleDelete = async (teacherId: string) => {
+        try {
+          await deleteTeacher(teacherId); 
+              } catch (err) {
+          console.log("Failed to delete student");
+          console.error(err);
+        } 
+      };
 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <DotsHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log(teacher._id)}>Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ActionsMenu>
+          <>
+            <TeacherActions id={teacher._id ||"no teacher"} setState={() => {}} />
+            <DropdownMenuItem onClick={() => handleDelete(teacher._id || " no teacher")}>
+              delete
+            </DropdownMenuItem>
+          </>
+        </ActionsMenu>
       );
     },
   },

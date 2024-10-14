@@ -8,10 +8,12 @@ const getParents = async (req, res) => {
     return;
   }
   try {
-    const parents = await ParentModel.find({schoolId:schoolId}).populate("child");
+    const parents = await ParentModel.find({ schoolId: schoolId }).populate(
+      "child"
+    );
     res.status(200).json(parents);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -34,14 +36,13 @@ const createParent = async (req, res) => {
       phoneNumber,
       child,
       gender,
-      schoolId
+      schoolId,
     });
     await StudentModel.findByIdAndUpdate(child, {
       $push: { parents: newParent._id },
     });
-   
 
-    console.log(schoolId)
+    console.log(schoolId);
     await SchoolModel.findByIdAndUpdate(schoolId, {
       $push: { Parents: newParent._id },
     });
@@ -55,8 +56,29 @@ const createParent = async (req, res) => {
 
 const deleteParent = async (req, res) => {
   const { id } = req.params;
+
   try {
+    const parent = await ParentModel.findById(id).populate("child");
+
+    if (!parent) {
+      return res.status(404).json({ error: "Parent not found" });
+    }
+    await StudentModel.updateMany(
+      { _id: { $in: parent.child } },
+      { $pull: { parents: parent._id } }
+    );
+    await SchoolModel.findByIdAndUpdate(parent.schoolId, {
+      $pull: {
+        Parents: parent._id,
+      },
+    });
+
     const deletedParent = await ParentModel.findByIdAndDelete(id);
+
+    // Optionally,  delete related attendance or transactions if needed
+    // await AttendanceModel.deleteMany({ parentId: parent._id });
+    // await FinancialTransactionModel.deleteMany({ parentId: parent._id });
+
     res.status(200).json(deletedParent);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -69,6 +91,7 @@ const updateParent = async (req, res) => {
   try {
     const updatedParent = await ParentModel.findByIdAndUpdate(id, updatedData, {
       new: true,
+      runValidators: true,
     });
     res.status(200).json(updatedParent);
   } catch (error) {
@@ -82,14 +105,20 @@ const getParentById = async (req, res) => {
     const parent = await ParentModel.findById(parentId);
 
     if (!parent) {
-      return res.status(404).json({ message: 'Parent not found' });
+      return res.status(404).json({ message: "Parent not found" });
     }
 
     res.status(200).json(parent);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 };
 
-module.exports = { getParents, createParent, deleteParent, updateParent ,getParentById};
+module.exports = {
+  getParents,
+  createParent,
+  deleteParent,
+  updateParent,
+  getParentById,
+};

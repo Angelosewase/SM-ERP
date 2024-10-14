@@ -1,18 +1,22 @@
-// expenseColumns.ts
 import { ColumnDef } from "@tanstack/react-table";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/Button";
-import { IExpenseRecord } from "@/app/globals"; // Import the interface
+import { IExpenseRecord } from "@/app/globals";
 import ExpenseActions from "@/components/Actions/expenseActions";
 import ActionsMenu from "@/components/custom/DropDown";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { deleteExpense } from "@/app/Api/expense";
 
 export const columns: ColumnDef<IExpenseRecord>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -83,11 +87,24 @@ export const columns: ColumnDef<IExpenseRecord>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const expense = row.original;
+      const handleDelete = async (expenseID: string) => {
+        try {
+          await deleteExpense(expenseID);
+        } catch (err) {
+          console.log("Failed to delete expense");
+          console.error(err);
+        }
+      };
 
       return (
         <ActionsMenu>
-        <ExpenseActions id={expense._id || ""} setOpen={() => {}} />
-      </ActionsMenu>
+          <>
+            <ExpenseActions id={expense._id || ""} setOpen={() => {}} />
+            <DropdownMenuItem onClick={() => handleDelete(expense._id)}>
+              delete
+            </DropdownMenuItem>
+          </>
+        </ActionsMenu>
       );
     },
   },

@@ -74,7 +74,6 @@ export function TeacherTable() {
       if (!teachers) {
         console.log("no teachers found");
       }
-      console.log(teachers)
       setData(transformTeachers(teachers));
     }
 

@@ -1,4 +1,4 @@
-const { ClassModel, SchoolModel } = require("../models/Schemas");
+const { ClassModel, SchoolModel, ScheduleModel, StudentModel, SubjectModel, TeacherModel } = require("../models/Schemas");
 const {
   createClassValidator,
   updateClassValidator,
@@ -144,10 +144,34 @@ const deleteClass = async (req, res) => {
   try {
     const validatedId = idValidator.parse(id);
 
-    const deletedClass = await ClassModel.findByIdAndDelete(validatedId);
-    if (!deletedClass) {
+    // Check if the class exists
+    const classToDelete = await ClassModel.findById(validatedId);
+    if (!classToDelete) {
       return res.status(404).json({ error: "Class not found" });
     }
+
+    await ScheduleModel.deleteMany({ classId: classToDelete._id });
+
+    await StudentModel.updateMany(
+      { classId: classToDelete._id },
+      { $unset: { classId: "" } }
+    );
+    await SubjectModel.updateMany(
+      { classes: classToDelete._id },
+      { $pull: { classes: classToDelete._id } }
+    );
+
+    await TeacherModel.updateMany(
+      { classes: classToDelete._id },
+      { $pull: { classes: classToDelete._id } }
+    );
+
+    await SchoolModel.findByIdAndUpdate(classToDelete.schoolId, {
+      $pull: { classes: classToDelete._id },
+    });
+
+    const deletedClass = await ClassModel.findByIdAndDelete(validatedId);
+
     res.status(200).json(deletedClass);
   } catch (error) {
     if (error instanceof z.ZodError) {

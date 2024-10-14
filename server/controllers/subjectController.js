@@ -1,6 +1,6 @@
 const { SubjectModel, TeacherModel, ClassModel } = require("../models/Schemas");
 const { getSchoolIdFromToken } = require("../utils/jwt");
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const createSubject = async (req, res) => {
   const session = await mongoose.startSession();
@@ -54,9 +54,10 @@ const getAllSubjects = async (req, res) => {
     return;
   }
   try {
-    const subjects = await SubjectModel.find({ schoolId })
-      .populate("teacherId")
-      // .populate("classes", "name");
+    const subjects = await SubjectModel.find({ schoolId }).populate(
+      "teacherId"
+    );
+    // .populate("classes", "name");
 
     res.status(200).json(subjects);
   } catch (error) {
@@ -67,8 +68,7 @@ const getAllSubjects = async (req, res) => {
 const getSubjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    const subject = await SubjectModel.findById(id)
-      .populate("classes", "name");
+    const subject = await SubjectModel.findById(id).populate("classes", "name").populate("teacherId");
 
     if (!subject) {
       return res.status(404).json({ error: "Subject not found" });
@@ -93,7 +93,7 @@ const updateSubject = async (req, res) => {
         runValidators: true,
       }
     )
-      .populate("teacherId", "name")
+      .populate("teacherId")
       .populate("classes", "className");
 
     if (!updatedSubject) {
@@ -109,6 +109,18 @@ const updateSubject = async (req, res) => {
 const deleteSubject = async (req, res) => {
   try {
     const { id } = req.params;
+    const subjectTodelete = SubjectModel.findById(id);
+    if (!id) {
+      res.status(404).send({ message: "subject not found" });
+      return;
+    }
+
+    await TeacherModel.findByIdAndUpdate(subjectTodelete.teacherId, {
+      $pull: {
+        subjects: subjectTodelete._id,
+      },
+    });
+
     const deletedSubject = await SubjectModel.findByIdAndDelete(id);
     if (!deletedSubject) {
       return res.status(404).json({ error: "Subject not found" });
