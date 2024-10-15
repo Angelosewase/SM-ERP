@@ -4,6 +4,9 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import InfoDisplay from "../custom/InfoDisplay";
 import { fetchTeacherById, updateTeacher } from "@/app/Api/teachers";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
 
 function TeacherActions({
   id,
@@ -12,6 +15,7 @@ function TeacherActions({
   id: string;
   setState: (val: boolean) => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>()
   const [teacher, setTeacher] = useState<ITeacher | null>(null);
   const [updateTeacherState, setUpdateTeacherState] = useState<
     Partial<ITeacher>
@@ -33,13 +37,14 @@ function TeacherActions({
     }
     try {
       if (!teacher?._id) return;
-      const updatedTeacher = await updateTeacher(
+       await updateTeacher(
         teacher._id,
         updateTeacherState
       );
-      console.log("Teacher updated successfully:", updatedTeacher);
+      dispatch(runCompleteProcess("teacher updated successfully"))
     } catch (error) {
       console.error("Error updating teacher:", error);
+      dispatch(runFailProcess("failed to updated teacher"))
     }
   };
 

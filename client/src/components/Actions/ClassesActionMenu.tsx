@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import InfoDisplay from "../custom/InfoDisplay";
+import { AppDispatch } from "@/app/store";
+import { useDispatch } from "react-redux";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 function ClassMenuActions({
   id,
@@ -17,12 +20,15 @@ function ClassMenuActions({
     name: "",
   });
 
+  const dispatch = useDispatch<AppDispatch>()
+
   const isUpdateStudentStateEmpty = (state: Partial<IClass>): boolean => {
     return Object.values(state).every((value) => value === "");
   };
   const getClassDetails = async () => {
     try {
       const classData = await fetchClassById(id);
+  
       setClassDetails(classData);
     } catch (err) {
       console.error(err);
@@ -33,7 +39,7 @@ function ClassMenuActions({
     getClassDetails();
   });
 
-  function handleChange(val: string, name: string) {
+  function handleChange(val: string | Date, name: string) {
     if (val === "") return;
     setUpdateState((prev) => ({ ...prev, [name]: val }));
   }
@@ -46,8 +52,10 @@ function ClassMenuActions({
     try {
       if (!classDetails?._id) return;
       await updateClass(classDetails._id, updateState);
+      dispatch(runCompleteProcess("updated successfully"))
     } catch (error) {
       console.error("Error updating student:", error);
+      dispatch(runFailProcess("failed updating user"))
     }
     getClassDetails();
     setState(false);

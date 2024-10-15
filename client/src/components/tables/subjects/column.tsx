@@ -3,17 +3,22 @@ import { ColumnDef } from "@tanstack/react-table";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/Button";
-// import { ISubject } from "@/app/globals"; 
+// import { ISubject } from "@/app/globals";
 import { Subject } from "./table";
 import SubjectActions from "@/components/Actions/subjectsAction";
 import ActionsMenu from "@/components/custom/DropDown";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { deleteSubject } from "@/app/Api/subjects";
 
 export const columns: ColumnDef<Subject>[] = [
   {
     id: "select",
     header: ({ table }) => (
       <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
       />
@@ -62,11 +67,22 @@ export const columns: ColumnDef<Subject>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       const subject = row.original;
+      const handleDelete = async (subjectId: string) => {
+        try {
+          await deleteSubject(subjectId);
+        } catch (err) {
+          console.log("Failed to delete student");
+          console.error(err);
+        }
+      };
 
       return (
         <ActionsMenu>
-        <SubjectActions id={subject._id || ""} setOpen={() => {}} />
-      </ActionsMenu>
+          <SubjectActions id={subject._id || ""} setOpen={() => {}} />
+          <DropdownMenuItem onClick={() => handleDelete(subject._id)}>
+            delete
+          </DropdownMenuItem>
+        </ActionsMenu>
       );
     },
   },

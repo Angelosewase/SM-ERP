@@ -4,6 +4,9 @@ import { IParent } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import InfoDisplay from "../custom/InfoDisplay";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/app/store";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 function ParentActions({
   id,
@@ -12,6 +15,7 @@ function ParentActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>()
   const [parent, setParent] = useState<IParent | null>(null);
   const [editParent, setEditParent] = useState<Partial<IParent>>({
     firstName: "",
@@ -27,17 +31,20 @@ function ParentActions({
   const handleSave = async () => {
     if (isUpdateStateEmpty(editParent)) {
       console.error("All fields are empty. Cannot update the student.");
+      dispatch(runFailProcess("invalid input"))
       return;
     }
     try {
       if (!parent?._id) return;
       await updateParent(parent?._id, editParent);
+      dispatch(runCompleteProcess("updated successfully"))
     } catch (error) {
       console.error("Error updating student:", error);
+      dispatch(runFailProcess("failed to update"))
     }
   };
 
-  const handleEditChange = (val: string, value: string) => {
+  const handleEditChange = (val: string | Date, value: string) => {
     if (val === "") return;
     setEditParent((prev) => ({ ...prev, [value]: val }));
   };

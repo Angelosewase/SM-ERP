@@ -2,15 +2,18 @@ import { schoolSelector } from "@/app/features/schoolSlice";
 import { userSelector } from "@/app/features/userSlice";
 import Header from "@/components/custom/Header";
 import InfoDisplay from "@/components/custom/InfoDisplay";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { updateSchool } from "@/app/Api/school";
 import { updateUser } from "@/app/Api/user";
 import LogoutComponent from "@/components/custom/logoutComponent";
+import { AppDispatch } from "@/app/store";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 function Settings() {
   const school = useSelector(schoolSelector);
   const user = useSelector(userSelector);
+  const dispatch = useDispatch<AppDispatch>()
 
   const [formData, setFormData] = useState({
     schoolName: school.school?.name || "",
@@ -43,8 +46,10 @@ function Settings() {
         address: formData.address,
         name: formData.schoolName,
       });
+      dispatch(runCompleteProcess("updated successfully"))
     } catch (error) {
       console.error("Error updating data:", error);
+      dispatch(runFailProcess(" failed to update"))
     }
   };
 

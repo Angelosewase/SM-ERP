@@ -4,6 +4,9 @@ import { IExpenseRecord } from "@/app/globals";
 import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import InfoDisplay from "../custom/InfoDisplay";
+import { AppDispatch } from "@/app/store";
+import { useDispatch } from "react-redux";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 function ExpenseActions({
   id,
@@ -12,7 +15,8 @@ function ExpenseActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
-  const [expense, setExpense] = useState<IExpenseRecord | null>(null); //
+  const [expense, setExpense] = useState<IExpenseRecord | null>(null); 
+  const dispatch = useDispatch<AppDispatch>()
 
   const [updatedExpensestate, setUpdatedExpense] = useState<
     Partial<IExpenseRecord>
@@ -32,13 +36,15 @@ function ExpenseActions({
   const handleSave = async () => {
     try {
       if (!expense?._id) return;
-      const updatedStudent = await updateExpense(
+      await updateExpense(
         expense?._id,
         updatedExpensestate
       );
-      console.log("Student updated successfully:", updatedStudent);
+      dispatch(runCompleteProcess("student update successfully"))
+      // console.log("Student updated successfully:", updatedStudent);
     } catch (error) {
       console.error("Error updating student:", error);
+      dispatch(runFailProcess("updating user failed"))
     }
   };
 

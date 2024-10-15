@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { getSubjectById, updateSubject } from "@/app/Api/subjects";
 import InfoDisplay from "../custom/InfoDisplay";
+import { AppDispatch } from "@/app/store";
+import { useDispatch } from "react-redux";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 
 function SubjectActions({
   id,
@@ -12,6 +15,7 @@ function SubjectActions({
   id: string;
   setOpen: (val: boolean) => void;
 }) {
+  const dispatch = useDispatch<AppDispatch>()
   const [subject, setSubject] = useState<ISubject | null>(null);
   const [updatstate, setUpdateState] = useState<Partial<ISubject>>({
     name: "",
@@ -44,10 +48,11 @@ function SubjectActions({
     if (!subject?._id) return;
 
     try {
-      const updatedStudent = await updateSubject(subject?._id, updatstate);
-      console.log("Student updated successfully:", updatedStudent);
+     await updateSubject(subject?._id, updatstate);
+     dispatch(runCompleteProcess("subject updated successfully"))
     } catch (error) {
       console.error("Error updating student:", error);
+      dispatch(runFailProcess("failed to update subject"))
     }
   };
 
