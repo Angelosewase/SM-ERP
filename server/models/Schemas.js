@@ -188,7 +188,6 @@ const attendanceSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Exam Results Schema
 const examResultsSchema = new mongoose.Schema(
   {
     studentId: {
@@ -277,7 +276,6 @@ const feeSchema = new mongoose.Schema({
   classId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Class",
-    required: true,
   },
   feeType: { type: String, required: true },  
   amount: { type: Number, required: true },
@@ -300,9 +298,26 @@ const paymentSchema = new mongoose.Schema({
   paymentMethod: { type: String }, 
 }, { timestamps: true });
 
+const feeGroupSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  schoolId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "School",
+    required: true,
+  },
+}, { timestamps: true });
 
 
-// Models
+
+//models
+
+const FeeGroupModel = mongoose.model("FeeGroup", feeGroupSchema);
 const UserModel = mongoose.model("User", userSchema);
 const SchoolModel = mongoose.model("School", schoolSchema);
 const FinancialTransactionModel = mongoose.model(
@@ -340,5 +355,6 @@ module.exports = {
   MessageModel,
   NotificationModel,
   FeeModel,
-  PaymentModel
+  PaymentModel, 
+  FeeGroupModel
 };

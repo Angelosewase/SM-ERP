@@ -119,6 +119,7 @@ function StudentActions({
           <InfoDisplay
             label="Class"
             name="class"
+            //@ts-expect-error name 
             value={student?.classId?.name || "N/A"}
             onChange={handleChange}
             edit={false}

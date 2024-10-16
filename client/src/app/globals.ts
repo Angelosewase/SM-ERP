@@ -109,3 +109,24 @@ export interface IExpenseRecord {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface IFeeGroup {
+  _id?: string; 
+  name: string;
+  description?: string; 
+  schoolId: string;
+  createdAt?: Date | string; 
+  updatedAt?: Date | string ;
+}
+
+
+export interface IFee {
+  _id?: string; 
+  schoolId: string;
+  classId?: string; 
+  feeType: string;
+  amount: number;
+  dueDate: Date;
+  createdAt?: Date | string ; 
+  updatedAt?: Date | string ;
+}

@@ -6,8 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchSchoolSuccess } from "@/app/features/schoolSlice";
 import { fetchUserSuccess } from "@/app/features/userSlice";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import { AppDispatch } from "@/app/store";
 function LoginForm() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [loginInfo, setLoginInfo] = useState({
     email: "",
     password: "",
@@ -19,12 +21,13 @@ function LoginForm() {
     const res = await Login(loginInfo);
 
     if (!res) {
+      dispatch(runFailProcess("login failed , try again later"))
       return;
     }
 
     dispatch(fetchSchoolSuccess(res.school));
     dispatch(fetchUserSuccess(res.user));
-
+    dispatch(runCompleteProcess("login successfully"))
     navigate("/sys");
   }
 
