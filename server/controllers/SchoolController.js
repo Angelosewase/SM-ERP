@@ -62,8 +62,8 @@ async function getSchoolById(req, res) {
 }
 
 async function deleteSchool(req, res) {
+  const schoolId= getSchoolIdFromToken(req.cookies.token);
   try {
-    const schoolId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(schoolId)) {
       return res.status(400).json({ error: "Invalid school ID" });

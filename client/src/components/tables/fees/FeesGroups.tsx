@@ -71,16 +71,6 @@ import { IFeeGroup } from "@/app/globals";
             className="max-w-sm"
           />
 
-          <Input
-            placeholder="Filter by school ID..."
-            value={
-              (table.getColumn("schoolId")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("schoolId")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
-          />
         </div>
 
         <ColumnsDropDown table={table} />

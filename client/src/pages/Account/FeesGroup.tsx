@@ -1,7 +1,8 @@
 import { IFeeGroup } from "@/app/globals";
 import Header from "@/components/custom/Header"
+import AddFeesGroupDialog from "@/components/custom/AddFeesGroup";
 import FeesGroups from "@/components/tables/fees/FeesGroups"
-import { Bars3BottomLeftIcon, PencilSquareIcon } from "@heroicons/react/24/outline"
+import { Bars3BottomLeftIcon } from "@heroicons/react/24/outline"
 
 
 const feesGroupData: IFeeGroup[] = [
@@ -42,14 +43,11 @@ function FeesGroup() {
 
       <div className="bg-white flex-1 min-h-[300px]  m-4 p-4">
         <div className="flex  mb-4">
-        <button className="flex  font-semibold text-sm gap-1  mr-3 items-center  hover:underline ">
+        <button className="flex  font-semibold text-sm gap-1  mr-3 items-center   border-r   pr-3 border-black">
           <Bars3BottomLeftIcon className="h-6 " />
           Fees Group list
         </button>
-        <button className="flex font-semibold text-sm gap-1  mr-3 items-center  hover:underline">
-          <PencilSquareIcon className="h-6" />
-          Add fees group
-        </button>
+        <AddFeesGroupDialog />
         </div>
       
       <FeesGroups  data={feesGroupData}/>

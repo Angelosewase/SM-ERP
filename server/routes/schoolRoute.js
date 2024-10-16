@@ -14,5 +14,6 @@ router.post("/register", RegisterSchool);
 router.get("/:id", getSchoolById);
 router.get("/", getSchools);
 router.put("/", updateSchool);
+router.delete("/", deleteSchool);
 
 module.exports = router;

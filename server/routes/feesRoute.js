@@ -15,7 +15,7 @@ const {
 const router = express.Router();
 
 router.post("/", createFee);
-router.get("/",   getFeesBySchool);
+router.get("/", getFeesBySchool);
 router.get("/:id", getFeeById);
 router.put("/:id", updateFee);
 router.delete("/:id", deleteFee);
