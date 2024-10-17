@@ -7,8 +7,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/Button";
 import { Table } from "@tanstack/react-table";
+import { IFeeGroup } from "@/app/globals";
 
-function ColumnsDropDown({ table }: { table: Table<any> }) {
+
+
+
+
+function ColumnsDropDown({ table }:{ table: Table<IFeeGroup> }) {
   return (
     <div>
       <DropdownMenu>

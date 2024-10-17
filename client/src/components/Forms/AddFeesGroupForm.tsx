@@ -1,47 +1,63 @@
-import React, { useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { IFeeGroup } from "@/app/globals";
 import Input from "../custom/Input";
-import { runFailProcess } from "@/app/features/proccesThunk";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
 import { AppDispatch } from "@/app/store";
 import { useDispatch } from "react-redux";
+import { createFeeGroup } from "@/app/Api/FeesGroup";
 type FeesGroupFormProps = {
   onSubmit?: (data: Omit<IFeeGroup, "id">) => void;
 };
 
 const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState<number | "">("");
+  const [formstate, setfomstate] = useState<Partial<IFeeGroup>>({
+    name: "",
+    description: "",
+    amount: undefined,
+  });
+
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
+    const { name, value } = e.target;
+    if (name === "amount") {
+      setfomstate({ ...formstate, [name]: parseFloat(value) });
+      return;
+    }
+    setfomstate({ ...formstate, [name]: value });
+  }
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Ensure all fields are valid
-    if (!name || !amount) {
+    if (!formstate.name) {
       dispatch(runFailProcess("all fields are required"));
       return;
     }
 
-    // Call onSubmit with the form data
-    // onSubmit({
-    //   name,
-    //   description, // optional
-    //   schoolId,
-    //   amount: Number(amount),
-    // });
+    try {
+      const createfeesgroup = await createFeeGroup(formstate);
+      if (!createfeesgroup) {
+        dispatch(runFailProcess("failed to create fees group"));
+        return;
+      }
 
-    // Clear form after submission
-    setName("");
-    setDescription("");
-    setAmount("");
+      dispatch(runCompleteProcess("fees group created successfully"));
+    } catch (error) {
+      console.log(error);
+      dispatch(runFailProcess("failed to create fees group"));
+    }
+
+    setfomstate({
+      amount: 0,
+      name: "",
+      description: "",
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Fees Group Name */}
       <div>
         <label
           htmlFor="name"
@@ -52,15 +68,14 @@ const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
         <Input
           name="name"
           id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={formstate.name}
+          onChange={handleChange}
           placeholder="Enter fees group name"
           className="mt-1 block w-full"
           required
         />
       </div>
 
-      {/* Fees Group Description */}
       <div>
         <label
           htmlFor="description"
@@ -71,16 +86,13 @@ const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
         <Input
           name="description"
           id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={formstate.description}
+          onChange={handleChange}
           placeholder="Enter a description"
           className="mt-1 block w-full"
         />
       </div>
 
-      {/* School ID */}
-
-      {/* Fees Group Amount */}
       <div>
         <label
           htmlFor="amount"
@@ -92,16 +104,14 @@ const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
           name="amount"
           id="amount"
           type="number"
-          value={amount}
-          //@ts-expect-error ts-migrate(2322) FIXME: Type 'string' is not assignable to type 'number'.
-          onChange={(e) => setAmount(`${e.target.value}`)}
+          value={formstate.amount}
+          onChange={handleChange}
           placeholder="Enter the amount"
           className="mt-1 block w-full"
           required
+          min={1}
         />
       </div>
-
-      {/* Submit Button */}
       <div>
         <Button type="submit" className="bg-blue-600 text-white">
           Create Fees Group

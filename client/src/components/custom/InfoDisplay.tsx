@@ -3,7 +3,7 @@ import React, { HTMLInputTypeAttribute, useState } from "react";
 
 interface InfoDisplayProps {
   name: string;
-  value: string;
+  value: string | number ;
   onChange: (newValue: string | Date, name: string) => void;
   edit?: boolean;
   label: string;

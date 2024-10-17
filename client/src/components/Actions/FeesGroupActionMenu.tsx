@@ -4,9 +4,13 @@ import { Button } from "@/components/ui/Button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import InfoDisplay from "../custom/InfoDisplay";
-// import { AppDispatch } from "@/app/store";
-// import { useDispatch } from "react-redux";
-// import { runCompleteProcess, runFailProcess } from "@/app/features/processThunk";
+import { getFeeGroupById, updateFeeGroup } from "@/app/Api/FeesGroup";
+import { AppDispatch } from "@/app/store";
+import { useDispatch } from "react-redux";
+import {
+  runCompleteProcess,
+  runFailProcess,
+} from "@/app/features/proccesThunk";
 
 function FeeGroupsActions({
   id,
@@ -15,49 +19,58 @@ function FeeGroupsActions({
   id: string;
   setState: (val: boolean) => void;
 }) {
-  const [feeGroup] = useState<IFeeGroup | null>(null);
-  const [updateFeeGroupState, setUpdateFeeGroupState] = useState<Partial<IFeeGroup>>({
+  const [feeGroup, setFeeGroup] = useState<IFeeGroup | null>(null);
+  const [updateFeeGroupState, setUpdateFeeGroupState] = useState<
+    Partial<IFeeGroup>
+  >({
     name: "",
     description: "",
   });
 
-//   const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const isUpdateFeeGroupStateEmpty = (state: Partial<IFeeGroup>): boolean => {
     return Object.values(state).every((value) => value === "");
   };
 
   const handleSave = async () => {
-//     if (isUpdateFeeGroupStateEmpty(updateFeeGroupState)) {
-//       dispatch(runFailProcess("Please enter some data to update"));
-//       return;
-//     }
-//     try {
-//       if (!feeGroup?._id) return;
-//       await updateFeeGroup(feeGroup._id, updateFeeGroupState);
-//       dispatch(runCompleteProcess("Fee group updated successfully"));
-//     } catch (error) {
-//       console.error("Error updating fee group:", error);
-//       dispatch(runFailProcess("Error updating fee group"));
-//     }
+    if (isUpdateFeeGroupStateEmpty(updateFeeGroupState)) {
+      dispatch(runFailProcess("Please enter some data to update"));
+      return;
+    }
+    try {
+      if (!feeGroup?._id) return;
+      await updateFeeGroup(feeGroup._id, updateFeeGroupState);
+      dispatch(runCompleteProcess("Fee group updated successfully"));
+    } catch (error) {
+      console.error("Error updating fee group:", error);
+      dispatch(runFailProcess("Error updating fee group"));
+    }
   };
 
   function handleChange(val: string | Date, name: string) {
+    if (name === "amount") {
+      if (val === "") return;
+     // @ts-expect-error value is a number
+      setUpdateFeeGroupState((prev) => ({ ...prev, [name]: parseInt(val) }));
+    }
     if (val === "") return;
     setUpdateFeeGroupState((prev) => ({ ...prev, [name]: val }));
   }
 
   const getFeeGroupDetails = async () => {
-    // try {
-    //   const feeGroupData = await fetchFeeGroupById(id);
-    //   setFeeGroup(feeGroupData);
-    //   setUpdateFeeGroupState({
-    //     name: feeGroupData.name,
-    //     description: feeGroupData.description,
-    //   });
-    // } catch (err) {
-    //   console.error(err);
-    // }
+    try {
+      const feeGroupData: IFeeGroup = await getFeeGroupById(id);
+      setFeeGroup(feeGroupData);
+      setUpdateFeeGroupState({
+        name: feeGroupData.name,
+        description: feeGroupData.description,
+        amount: feeGroupData.amount,
+      });
+      console.log(feeGroup);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   useEffect(() => {
@@ -97,15 +110,19 @@ function FeeGroupsActions({
           <InfoDisplay
             name="amount"
             label="Amount"
-            value={feeGroup?.schoolId || "N/A"}
+            value={ feeGroup?.amount || "N/A"}
             onChange={handleChange}
-            edit={false}
+            inputType="number"
           />
 
           <InfoDisplay
             name="createdAt"
             label="Created At"
-            value={feeGroup?.createdAt ? new Date(feeGroup.createdAt).toLocaleString() : "N/A"}
+            value={
+              feeGroup?.createdAt
+                ? new Date(feeGroup.createdAt).toLocaleString()
+                : "N/A"
+            }
             onChange={handleChange}
             edit={false}
           />

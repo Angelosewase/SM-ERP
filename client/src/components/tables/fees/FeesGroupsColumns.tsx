@@ -7,6 +7,7 @@ import ActionsMenu from "@/components/custom/DropDown";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 // import { deleteFeesGroup } from "@/app/Api/feesGroup"; // 
 import { IFeeGroup } from "@/app/globals";
+import { deleteFeeGroup } from "@/app/Api/FeesGroup";
 export const columns: ColumnDef<IFeeGroup>[] = [ 
   {
     id: "select",
@@ -69,9 +70,7 @@ export const columns: ColumnDef<IFeeGroup>[] = [
       const feesGroup = row.original;
       const handleDelete = async (feesGroupId: string) => {
         try {
-        //   await deleteFeesGroup(feesGroupId);
-        console.log(feesGroupId)
-          // Optionally, refresh the table or provide feedback
+          await deleteFeeGroup(feesGroupId);
         } catch (err) {
           console.log("Failed to delete fees group");
           console.error(err);

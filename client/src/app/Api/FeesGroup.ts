@@ -2,37 +2,51 @@
 import { IFeeGroup } from '@/app/globals'; 
 import axios from 'axios';
 
-const BASE_URL = '/fees/fee-groups';
+const BASE_URL = 'http://localhost:3000/fees-groups';
 
-export const createFeeGroup = async (feeGroupData: Omit<IFeeGroup, '_id'>) => {
+export const createFeeGroup = async (feeGroupData: Partial<IFeeGroup>) => {
   try {
-
-  const response = await axios.post<IFeeGroup>(`${BASE_URL}`, feeGroupData);
+  const response = await axios.post<IFeeGroup>(`${BASE_URL}`, feeGroupData,{withCredentials:true});
   return response.data; 
   } catch (error) {
     console.log(error)
   }
 
-  // const response = await axios.post('/fee-groups', feeGroupData);
-  // return response.data;
 };
 
-export const getFeeGroupsBySchool = async (schoolId: string) => {
-  const response = await axios.get(`/fee-groups/${schoolId}`);
+export const getFeeGroups = async () => {
+  try {
+  const response = await axios.get(`${BASE_URL}`, {
+    withCredentials:true
+  });
   return response.data;
+} catch (error) {
+  console.error(error);
+}
 };
-
 export const getFeeGroupById = async (id: string) => {
-  const response = await axios.get(`/fee-groups/${id}`);
-  return response.data;
+  try {
+    const response = await axios.get(`${BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const updateFeeGroup = async (id: string, feeGroupData: Partial<IFeeGroup>) => {
-  const response = await axios.put(`/fee-groups/${id}`, feeGroupData);
-  return response.data;
+  try {
+    const response = await axios.put(`${BASE_URL}/${id}`, feeGroupData);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const deleteFeeGroup = async (id: string) => {
-  const response = await axios.delete(`/fee-groups/${id}`);
-  return response.data;
+  try {
+    const response = await axios.delete(`${BASE_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };

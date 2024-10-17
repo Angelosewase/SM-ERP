@@ -140,8 +140,12 @@ const createFeeGroup = async (req, res) => {
 };
 
 const getFeeGroupsBySchool = async (req, res) => {
+  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  if (!schoolId) {
+    res.status(401).json({ message: "Invalid credentials" });
+    return;
+  }
   try {
-    const { schoolId } = req.params;
     const feeGroups = await FeeGroupModel.find({ schoolId });
     return res.status(200).json(feeGroups);
   } catch (error) {
