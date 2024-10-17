@@ -11,18 +11,23 @@ const {
   updateFeeGroup,
   deleteFeeGroup,
 } = require("../controllers/feesController");
+const { isAuth } = require("../middlewares/authentication");
 
-const router = express.Router();
+const FeesRouter = express.Router();
+FeesRouter.use(isAuth);
+const feesGroupRouter = express.Router()
 
-router.post("/", createFee);
-router.get("/", getFeesBySchool);
-router.get("/:id", getFeeById);
-router.put("/:id", updateFee);
-router.delete("/:id", deleteFee);
-router.post("/groups", createFeeGroup);
-router.get("/groups", getFeeGroupsBySchool);
-router.get("/groups/:id",getFeeGroupById );
-router.put("/groups/:id", updateFeeGroup);
-router.delete("/fgroups/:id", deleteFeeGroup);
+FeesRouter.post("/", createFee);
+FeesRouter.get("/", getFeesBySchool);
+FeesRouter.get("/:id", getFeeById);
+FeesRouter.put("/:id", updateFee);
+FeesRouter.delete("/:id", deleteFee);
 
-module.exports = router;
+//
+feesGroupRouter.post("/", createFeeGroup);
+feesGroupRouter.get("/", getFeeGroupsBySchool);
+feesGroupRouter.get("/:id", getFeeGroupById);
+feesGroupRouter.put("/:id", updateFeeGroup);
+feesGroupRouter.delete("/:id", deleteFeeGroup);
+
+module.exports = {FeesRouter, feesGroupRouter};

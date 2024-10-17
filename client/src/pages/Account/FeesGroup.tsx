@@ -10,21 +10,21 @@ const feesGroupData: IFeeGroup[] = [
     _id: "1",
     name: "Primary School Fees",
     description: "Fees for primary school students",
-    schoolId: "SCH123",
+    amount: "SCH123",
 
   },
   {
     _id: "2",
     name: "High School Fees",
     description: "Fees for high school students",
-    schoolId: "SCH456",
+    amount: "SCH456",
 
   },
   {
     _id: "3",
     name: "Boarding Fees",
     description: "Boarding fees for residential students",
-    schoolId: "SCH789",
+    amount: "SCH789",
   },
 ];
 

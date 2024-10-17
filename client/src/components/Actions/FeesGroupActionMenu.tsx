@@ -75,7 +75,6 @@ function FeeGroupsActions({
         <h1 className="font-semibold text-lg">Fee Group Details</h1>
         <div className="mt-auto">
           <div className="flex gap-10 items-center">
-            <div className="w-32 h-32 bg-gray-50 rounded-full"></div>
             <div className="text-gray-500 font-semibold">
               Fee Group ID: <span className="font-mono text-black">{id}</span>
             </div>
@@ -96,8 +95,8 @@ function FeeGroupsActions({
           />
 
           <InfoDisplay
-            name="schoolId"
-            label="School ID"
+            name="amount"
+            label="Amount"
             value={feeGroup?.schoolId || "N/A"}
             onChange={handleChange}
             edit={false}
@@ -107,14 +106,6 @@ function FeeGroupsActions({
             name="createdAt"
             label="Created At"
             value={feeGroup?.createdAt ? new Date(feeGroup.createdAt).toLocaleString() : "N/A"}
-            onChange={handleChange}
-            edit={false}
-          />
-
-          <InfoDisplay
-            name="updatedAt"
-            label="Updated At"
-            value={feeGroup?.updatedAt ? new Date(feeGroup.updatedAt).toLocaleString() : "N/A"}
             onChange={handleChange}
             edit={false}
           />

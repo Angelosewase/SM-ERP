@@ -9,7 +9,7 @@ const classRouter = require("./routes/classRoute");
 const parentRouter = require("./routes/parentRoute");
 const expenseRouter = require("./routes/expenseRoute");
 const subjectRouter = require("./routes/subjectRoute");
-const feesRouter = require("./routes/feesRoute");
+const {feesGroupRouter,FeesRouter} = require("./routes/feesRoute");
 const cookieParser = require("cookie-parser");
 const { isAuth } = require("./middlewares/authentication");
 const { getAccountDetails } = require("./services/userService");
@@ -20,7 +20,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", /^https:\/\/.*/],
+    origin: ["http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Content-Type", "Authorization"],
@@ -49,6 +49,7 @@ app.use("/parent", parentRouter);
 app.get("/details", isAuth, getAccountDetails);
 app.use("/expenses", expenseRouter);
 app.use("/subjects", subjectRouter);
-app.use("/fees", feesRouter);
+app.use("/fees",FeesRouter);
+app.use("/fees-groups",feesGroupRouter);
 
 app.listen(PORT || 5000, () => console.log("server running on port 3000"));

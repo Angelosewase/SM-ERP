@@ -11,48 +11,35 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+// Sample data for expenses
 const data = [
   {
-    name: "Page A",
-    uv: 4000,
-    pv: 2400,
-    amt: 2400,
+    name: "Rent",
+    amount: 1200,
   },
   {
-    name: "Page B",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210,
+    name: "Utilities",
+    amount: 300,
   },
   {
-    name: "Page C",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
+    name: "Groceries",
+    amount: 450,
   },
   {
-    name: "Page D",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000,
+    name: "Transportation",
+    amount: 150,
   },
   {
-    name: "Page E",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181,
+    name: "Entertainment",
+    amount: 200,
   },
   {
-    name: "Page F",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500,
+    name: "Insurance",
+    amount: 250,
   },
   {
-    name: "Page G",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100,
+    name: "Miscellaneous",
+    amount: 100,
   },
 ];
 
@@ -60,13 +47,11 @@ const BarChartExample: React.FC = () => {
   return (
     <ResponsiveContainer width="100%" height="70%">
       <BarChart
-        width={500}
-        height={300}
         data={data}
         margin={{
           top: 5,
-          right: 30,
-          left: 20,
+          right: 5,
+          left: 0,
           bottom: 5,
         }}
       >
@@ -75,9 +60,9 @@ const BarChartExample: React.FC = () => {
         <YAxis />
         <Tooltip />
         <Bar
-          dataKey="pv"
-          fill="#0052B4"
-          activeBar={<Rectangle fill="#8884d8" stroke="#8884d8" />}
+          dataKey="amount"
+          fill="#0052B4" // Your original color for expenses
+          activeBar={<Rectangle fill="#8884d8" stroke="#8884d8" />} 
         />
       </BarChart>
     </ResponsiveContainer>
@@ -104,23 +89,21 @@ export default ExpensesBarGraph;
 export const LegendItem: React.FC<{
   label: string;
   value: string;
-}> = ({ label,  value }) => {
+}> = ({ label, value }) => {
   return (
-    <div className="flex flex-col items-center my-3 ">
-      <p className="text-xs  text-gray-500 font-semibold">{label}</p>
+    <div className="flex flex-col items-center my-3">
+      <p className="text-xs text-gray-500 font-semibold">{label}</p>
       <p className="font-semibold text-lg">{value}</p>
-
     </div>
   );
 };
 
 export const Legend = () => {
   return (
-    <div className="flex  justify-evenly">
-    
-      <LegendItem  label="April 2021" value="$3000" />
-      <LegendItem  label="May 2021" value="$5000" />
-      <LegendItem  label="June 2023" value="$5000" />
+    <div className="flex justify-evenly">
+      <LegendItem label="Total Expenses" value="$3,000" />
+      <LegendItem label="Total Budget" value="$5,000" />
+      <LegendItem label="Remaining Budget" value="$2,000" />
     </div>
   );
 };

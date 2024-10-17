@@ -2,9 +2,19 @@
 import { IFeeGroup } from '@/app/globals'; 
 import axios from 'axios';
 
+const BASE_URL = '/fees/fee-groups';
+
 export const createFeeGroup = async (feeGroupData: Omit<IFeeGroup, '_id'>) => {
-  const response = await axios.post('/fee-groups', feeGroupData);
-  return response.data;
+  try {
+
+  const response = await axios.post<IFeeGroup>(`${BASE_URL}`, feeGroupData);
+  return response.data; 
+  } catch (error) {
+    console.log(error)
+  }
+
+  // const response = await axios.post('/fee-groups', feeGroupData);
+  // return response.data;
 };
 
 export const getFeeGroupsBySchool = async (schoolId: string) => {

@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { IFeeGroup } from "@/app/globals";
 import Input from "../custom/Input";
+import { runFailProcess } from "@/app/features/proccesThunk";
+import { AppDispatch } from "@/app/store";
+import { useDispatch } from "react-redux";
 type FeesGroupFormProps = {
   onSubmit?: (data: Omit<IFeeGroup, "id">) => void;
 };
@@ -9,15 +12,16 @@ type FeesGroupFormProps = {
 const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [schoolId, setSchoolId] = useState("");
   const [amount, setAmount] = useState<number | "">("");
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Ensure all fields are valid
-    if (!name || !schoolId || !amount) {
-      alert("Please fill in all required fields.");
+    if (!name || !amount) {
+      dispatch(runFailProcess("all fields are required"));
       return;
     }
 
@@ -32,7 +36,6 @@ const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
     // Clear form after submission
     setName("");
     setDescription("");
-    setSchoolId("");
     setAmount("");
   };
 
@@ -76,23 +79,6 @@ const FeesGroupForm: React.FC<FeesGroupFormProps> = () => {
       </div>
 
       {/* School ID */}
-      <div>
-        <label
-          htmlFor="schoolId"
-          className="block text-sm font-medium text-gray-700"
-        >
-          School ID <span className="text-red-500">*</span>
-        </label>
-        <Input
-          name="schoolId"
-          id="schoolId"
-          value={schoolId}
-          onChange={(e) => setSchoolId(e.target.value)}
-          placeholder="Enter school ID"
-          className="mt-1 block w-full"
-          required
-        />
-      </div>
 
       {/* Fees Group Amount */}
       <div>

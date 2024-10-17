@@ -311,6 +311,10 @@ const feeGroupSchema = new mongoose.Schema({
     ref: "School",
     required: true,
   },
+  amount:{
+    type:Number,
+    required:true
+  }
 }, { timestamps: true });
 
 

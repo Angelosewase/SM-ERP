@@ -93,9 +93,9 @@ export interface ISubject {
   teacherId: string;
   classes: string[];
   days: string[];
-  schoolId?: string,
-  createdAt?: string,
-  updatedAt?: string,
+  schoolId?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface IExpenseRecord {
@@ -111,22 +111,22 @@ export interface IExpenseRecord {
 }
 
 export interface IFeeGroup {
-  _id?: string; 
+  _id?: string;
   name: string;
-  description?: string; 
-  schoolId: string;
-  createdAt?: Date | string; 
-  updatedAt?: Date | string ;
+  description?: string;
+  schoolId?: string;
+  amount?: number | string ;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
-
 export interface IFee {
-  _id?: string; 
+  _id?: string;
   schoolId: string;
-  classId?: string; 
+  classId?: string;
   feeType: string;
   amount: number;
   dueDate: Date;
-  createdAt?: Date | string ; 
-  updatedAt?: Date | string ;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }

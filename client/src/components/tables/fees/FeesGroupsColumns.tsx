@@ -55,10 +55,10 @@ export const columns: ColumnDef<IFeeGroup>[] = [
   },
   
   {
-    accessorKey: "schoolId",
-    header: "School ID",
+    accessorKey: "amount",
+    header: "Amount",
     cell: ({ row }) => (
-      <div>{row.getValue("schoolId")}</div>
+      <div>{row.getValue("amount")}</div>
     ),
   },
   
