@@ -1,6 +1,5 @@
 const {FinancialTransactionModel} = require("../models/Schemas");
 
-// GET all transactions
 const getTransactions = async (req, res) => {
   try {
     const transactions = await FinancialTransactionModel.find().populate("studentId");
@@ -9,8 +8,6 @@ const getTransactions = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// POST a new transaction
 const createTransaction = async (req, res) => {
   const { studentId, amount, transactionType, status } = req.body;
   try {
@@ -30,8 +27,6 @@ const deleteTransaction = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// UPDATE a transaction by ID
 const updateTransaction = async (req, res) => {
   const { id } = req.params;
   const updatedData = req.body;

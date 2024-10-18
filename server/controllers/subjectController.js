@@ -13,7 +13,8 @@ const createSubject = async (req, res) => {
   }
 
   try {
-    const { name, teacherId, description, classes, days } = req.body;
+    const validatedData = createSubjectValidator.parse(req.body);
+    const { name, teacherId, description, classes, days } = validatedData;
     const newSubject = new SubjectModel({
       name,
       teacherId,
@@ -83,11 +84,11 @@ const getSubjectById = async (req, res) => {
 const updateSubject = async (req, res) => {
   try {
     const { id } = req.params;
-    const updatedData = req.body;
+    const validatedData = updateSubjectValidator.parse(req.body);
 
     const updatedSubject = await SubjectModel.findByIdAndUpdate(
       id,
-      updatedData,
+      validatedData,
       {
         new: true,
         runValidators: true,

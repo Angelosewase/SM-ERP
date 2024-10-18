@@ -1,4 +1,4 @@
-const { TeacherModel, SchoolModel, ClassModel, SubjectModel } = require("../models/Schemas");
+const { TeacherModel, SchoolModel, ClassModel, SubjectModel, ProfilePicModel } = require("../models/Schemas");
 const { getSchoolIdFromToken } = require("../utils/jwt");
 const {
   createTeacherValidator,
@@ -130,4 +130,39 @@ const getTeacherById = async (req,res) => {
   }
 };
 
-module.exports = { getTeachers, createTeacher, deleteTeacher, updateTeacher ,getTeacherById};
+
+async function uploadTeaherImage(req, res) {
+  if (!req.file) {
+    res.status(400).send({ message: "No file uploaded" });
+    return;
+  }
+  profileImage = req.file.path;
+
+  const { id } = req.params;
+  if(!id){
+    res.status(400).send({message: "no teacher id provided"})
+  return;
+  }
+  const teacher = await TeacherModel.findById(id);
+  if (!teacher) {
+    res.status(404).send({ message: "teacher not found" });
+    return
+  }
+  try {
+    const result = await uploadToCloudinary(profileImage);
+    const profilepic = new ProfilePicModel({
+      userId: id,
+      url: result.url,
+      secure_url: result.secure_url,
+    });
+    await profilepic.save();
+
+    res.status(201).json({
+      message: "uploaded successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = { getTeachers, createTeacher, deleteTeacher, updateTeacher ,getTeacherById, uploadTeaherImage};

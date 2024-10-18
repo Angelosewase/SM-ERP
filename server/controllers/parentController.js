@@ -1,5 +1,6 @@
 const { ParentModel, StudentModel, SchoolModel } = require("../models/Schemas");
 const { getSchoolIdFromToken } = require("../utils/jwt");
+const { createParentValidator, updateParentValidator } = require("../validators/parent");
 
 const getParents = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -23,6 +24,16 @@ const createParent = async (req, res) => {
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
+  }
+
+
+
+  try {
+    createParentValidator.parse(req.body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ errors: error.errors });
+    }
   }
 
   const { firstName, lastName, email, address, phoneNumber, child, gender } =
@@ -75,7 +86,6 @@ const deleteParent = async (req, res) => {
 
     const deletedParent = await ParentModel.findByIdAndDelete(id);
 
-    // Optionally,  delete related attendance or transactions if needed
     // await AttendanceModel.deleteMany({ parentId: parent._id });
     // await FinancialTransactionModel.deleteMany({ parentId: parent._id });
 
@@ -87,9 +97,10 @@ const deleteParent = async (req, res) => {
 
 const updateParent = async (req, res) => {
   const { id } = req.params;
-  const updatedData = req.body;
+
   try {
-    const updatedParent = await ParentModel.findByIdAndUpdate(id, updatedData, {
+    const validData = updateParentValidator.parse(req.body);
+    const updatedParent = await ParentModel.findByIdAndUpdate(id, validData, {
       new: true,
       runValidators: true,
     });

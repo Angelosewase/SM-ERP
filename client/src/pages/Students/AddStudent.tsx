@@ -1,21 +1,25 @@
 import { createParent } from "@/app/Api/parent";
 import { createStudent } from "@/app/Api/student";
-import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import { uploadProfileImage } from "@/app/Api/uploads";
+import {
+  runCompleteProcess,
+  runFailProcess,
+} from "@/app/features/proccesThunk";
 import { IParent, IStudent } from "@/app/globals";
 import { AppDispatch } from "@/app/store";
 import Header from "@/components/custom/Header";
 import AddParentForm from "@/components/Forms/AddParentForm";
 import AddstudentForm from "@/components/Forms/AddstudentForm";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useDispatch } from "react-redux";
 
-const initialstate ={
+const initialstate = {
   classId: "",
   firstName: "",
   lastName: "",
   gender: "unknown",
   email: "",
-}
+};
 const parentInitialState = {
   firstName: "",
   lastName: "",
@@ -23,12 +27,14 @@ const parentInitialState = {
   phoneNumber: "",
   child: "",
   gender: "",
-}
+};
 
 function AddStudent() {
   const [studentState, setStudentState] = useState<IStudent>(initialstate);
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const [parenstState, setParentState] = useState<IParent>(parentInitialState);
+  const [imageState, setImageState] = useState<File>();
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   function updateStundentStateValue(e: React.ChangeEvent<HTMLInputElement>) {
     const { value, name } = e.target;
@@ -48,31 +54,55 @@ function AddStudent() {
   }
 
   async function handleSubmit() {
-    console.log("student", studentState);
-    console.log("parent", parenstState);
     try {
       const createdStudent = await createStudent(studentState);
       if (!createdStudent._id) {
-        dispatch(runFailProcess("Creation of student failed"))
+        dispatch(runFailProcess("Creation of student failed"));
         return;
       }
-    dispatch(runCompleteProcess("student created successfully"))
+      dispatch(runCompleteProcess("student created successfully"));
 
       const parent = await createParent({
         ...parenstState,
         child: createdStudent._id,
       });
 
-      if(parent._id){
-        dispatch(runCompleteProcess("parent created successfully"))
+      if (parent._id) {
+        dispatch(runCompleteProcess("parent created successfully"));
       }
     } catch (error) {
-      dispatch(runFailProcess("failed"))
+      dispatch(runFailProcess("failed"));
       throw error;
     }
-    resetStates()
+
+    try {
+      if (!imageState) return;
+      await uploadProfileImage(imageState, "student");
+      dispatch(runCompleteProcess("profile image uploaded successfully"))
+    } catch (error) {
+      console.log(error);
+      dispatch(runFailProcess("failed upload student's picture "))
+    }
+
+    resetStates();
   }
 
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+ 
+    const file = event.target.files?.[0];
+    if (file) {
+      setImageState(file);
+      const reader = new FileReader();
+
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        if (e.target?.result) {
+          setPreviewImage(e.target.result as string);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
 
   const resetStates = () => {
     setStudentState({
@@ -82,7 +112,7 @@ function AddStudent() {
       gender: "unknown",
       email: "",
     });
-  
+
     setParentState({
       firstName: "",
       lastName: "",
@@ -128,13 +158,16 @@ function AddStudent() {
 
           <div className="">
             <div className="flex gap-4 items-end mb-8">
-              <div className=" w-40 h-40 rounded-full bg-gray-200"></div>
+              <div className=" w-40 h-40 rounded-full bg-gray-200">
+              <img src={previewImage || ""} alt="" className="w-full h-full rounded-full"/>
+              </div>
               <div>
                 <p>upload student photo (150px by 150px)</p>
                 <input
                   type="file"
-                  name="studentPhoto"
+                  name="image"
                   className="text-sm mb-6 "
+                  onChange={handleFileChange}
                 />
               </div>
             </div>
@@ -142,7 +175,10 @@ function AddStudent() {
               <button className="bg-myBlue w-28 px-4 py-1 text-white font-semibold rounded">
                 save
               </button>
-              <button className="bg-black px-4 py-1 text-white font-semibold rounded w-28" onClick={resetStates}>
+              <button
+                className="bg-black px-4 py-1 text-white font-semibold rounded w-28"
+                onClick={resetStates}
+              >
                 reset
               </button>
             </div>

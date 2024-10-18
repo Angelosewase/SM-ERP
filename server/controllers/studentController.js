@@ -7,6 +7,7 @@ const {
   AttendanceModel,
   ExamResultsModel,
   PaymentModel,
+  ProfilePicModel,
 } = require("../models/Schemas");
 const { z } = require("zod");
 const mongoose = require("mongoose");
@@ -18,6 +19,7 @@ const {
 const { objectIdValidator } = require("../validators/user");
 const { getSchoolIdFromToken } = require("../utils/jwt");
 const { promoteStudent } = require("../services/studentService");
+const { uploadToCloudinary } = require("../config/cloudinaryConfig");
 
 const getStudents = async (req, res) => {
   const schoolId = getSchoolIdFromToken(req.cookies.token);
@@ -30,12 +32,12 @@ const getStudents = async (req, res) => {
       .populate("classId")
       .lean();
 
-      const studentResponse = students.map((studentObj) => {
-        return {
-          ...studentObj,
-          classId: studentObj.classId ? studentObj.classId.name || "" : "",
-        };
-      });
+    const studentResponse = students.map((studentObj) => {
+      return {
+        ...studentObj,
+        classId: studentObj.classId ? studentObj.classId.name || "" : "",
+      };
+    });
     res.status(200).json(studentResponse);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -85,8 +87,8 @@ const createStudent = async (req, res) => {
     res.status(201).json(newStudent);
   } catch (error) {
     console.log(error);
-    console.log(req.body)
-    
+    console.log(req.body);
+
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
     }
@@ -167,7 +169,6 @@ async function getStudentbyStudentId(req, res) {
 }
 
 async function promoteStudentHandler(req, res) {
-  const { studentId, fromClassId, toClassId } = req.body;
   try {
     const validateData = promoteStudentValidator.parse(req.body);
     await promoteStudent(
@@ -180,6 +181,40 @@ async function promoteStudentHandler(req, res) {
   }
 }
 
+async function uploadStudentImage(req, res) {
+  if (!req.file) {
+    res.status(400).send({ message: "No file uploaded" });
+    return;
+  }
+  profileImage = req.file.path;
+
+  const { id } = req.params;
+  if(!id){
+    res.status(400).send({message: "no student id provided"})
+  return;
+  }
+  const student = await StudentModel.findById(id);
+  if (!student) {
+    res.status(404).send({ message: "student not found" });
+    return
+  }
+  try {
+    const result = await uploadToCloudinary(profileImage);
+    const profilepic = new ProfilePicModel({
+      userId: id,
+      url: result.url,
+      secure_url: result.secure_url,
+    });
+    await profilepic.save();
+
+    res.status(201).json({
+      message: "uploaded successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 module.exports = {
   getStudents,
   createStudent,
@@ -187,4 +222,5 @@ module.exports = {
   updateStudent,
   promoteStudentHandler,
   getStudentbyStudentId,
+  uploadStudentImage
 };

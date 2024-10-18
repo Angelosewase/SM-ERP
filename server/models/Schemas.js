@@ -5,7 +5,7 @@ const parentSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
-    email: { type: String, required: true, },
+    email: { type: String, required: true },
     address: String,
     phoneNumber: String,
     child: { type: mongoose.Schema.Types.ObjectId, ref: "Student" },
@@ -14,7 +14,6 @@ const parentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 const transactionRecordSchema = new mongoose.Schema(
   {
@@ -40,7 +39,6 @@ const transactionRecordSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 const expenseRecordSchema = new mongoose.Schema(
   {
     name: String,
@@ -56,7 +54,6 @@ const expenseRecordSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 const studentSchema = new mongoose.Schema(
   {
@@ -75,12 +72,11 @@ const studentSchema = new mongoose.Schema(
     },
     parents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent" }],
     gender: { type: String, enum: ["male", "female"], required: true },
-    balance: { type: Number, default: 0 },  
+    balance: { type: Number, default: 0 },
     fees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fee" }],
   },
   { timestamps: true }
 );
-
 
 const teacherSchema = new mongoose.Schema(
   {
@@ -99,7 +95,6 @@ const teacherSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 const schoolSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -116,7 +111,6 @@ const schoolSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 const userSchema = new mongoose.Schema(
   {
@@ -150,7 +144,6 @@ const subjectSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-
 const classSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -164,7 +157,6 @@ const classSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 const attendanceSchema = new mongoose.Schema(
   {
@@ -205,7 +197,6 @@ const examResultsSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
 
 const scheduleSchema = new mongoose.Schema(
   {
@@ -267,57 +258,80 @@ const notificationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const feeSchema = new mongoose.Schema({
-  schoolId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "School",
-    required: true,
+const feeSchema = new mongoose.Schema(
+  {
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+    },
+    feeType: { type: String, required: true },
+    amount: { type: Number, required: true },
+    dueDate: { type: Date, required: true },
   },
-  classId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Class",
-  },
-  feeType: { type: String, required: true },  
-  amount: { type: Number, required: true },
-  dueDate: { type: Date, required: true },   
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const paymentSchema = new mongoose.Schema({
-  studentId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",
-    required: true,
+const paymentSchema = new mongoose.Schema(
+  {
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    feeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Fee",
+      required: true,
+    },
+    amountPaid: { type: Number, required: true },
+    paymentDate: { type: Date, default: Date.now },
+    paymentMethod: { type: String },
   },
-  feeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Fee",
-    required: true,
-  },
-  amountPaid: { type: Number, required: true },
-  paymentDate: { type: Date, default: Date.now },  
-  paymentMethod: { type: String }, 
-}, { timestamps: true });
+  { timestamps: true }
+);
 
-const feeGroupSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const feeGroupSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
+    amount: {
+      type: Number,
+      required: true,
+    },
   },
-  description: {
-    type: String,
-  },
-  schoolId: {
+  { timestamps: true }
+);
+
+const ProfilePicsSchema = new mongoose.Schema({
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "School",
+    ref: "User",
     required: true,
   },
-  amount:{
-    type:Number,
-    required:true
+  url: {
+    type: String ,
+    required: true,
+  },
+  secure_url :{
+    type : String, 
+    required : true
   }
-}, { timestamps: true });
-
-
+});
 
 //models
 
@@ -341,7 +355,7 @@ const MessageModel = mongoose.model("Message", messageSchema);
 const NotificationModel = mongoose.model("Notification", notificationSchema);
 const FeeModel = mongoose.model("Fee", feeSchema);
 const PaymentModel = mongoose.model("Payment", paymentSchema);
-
+const ProfilePicModel = mongoose.model("ProfilePics", ProfilePicsSchema);
 
 module.exports = {
   UserModel,
@@ -359,6 +373,7 @@ module.exports = {
   MessageModel,
   NotificationModel,
   FeeModel,
-  PaymentModel, 
-  FeeGroupModel
+  PaymentModel,
+  FeeGroupModel,
+  ProfilePicModel,
 };

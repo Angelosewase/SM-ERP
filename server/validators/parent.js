@@ -1,25 +1,25 @@
-import { z } from "zod";
+const mongoose = require("mongoose");
+const  { z }  = require("zod") 
 
-// Define Zod validators for each field in the Parent schema
-export const firstNameValidator = z.string().min(1, "First name is required");
+ const firstNameValidator = z.string().min(1, "First name is required");
 
-export const lastNameValidator = z.string().min(1, "Last name is required");
+ const lastNameValidator = z.string().min(1, "Last name is required");
 
-export const emailValidator = z
+ const emailValidator = z
   .string()
   .email("Invalid email address");
 
-export const addressValidator = z.string().optional();
+ const addressValidator = z.string().optional();
 
-export const phoneNumberValidator = z.string().optional();
+ const phoneNumberValidator = z.string().optional();
 
-export const childValidator = z.string().optional();
+ const childValidator = z.string().optional();
 
-export const genderValidator = z.enum(["male", "female"]);
+ const genderValidator = z.enum(["male", "female"]);
 
-export const schoolIdValidator = z.string().optional();
+ const schoolIdValidator = z.string().refine((val)=>mongoose.Types.ObjectId.isValid(val), "Invalid school ID")
 
-export const createParentValidator = z.object({
+ const createParentValidator = z.object({
   firstName: firstNameValidator,
   lastName: lastNameValidator,
   email: emailValidator,
@@ -30,4 +30,17 @@ export const createParentValidator = z.object({
   schoolId: schoolIdValidator,
 });
 
-export const updateParentValidator = createParentValidator.partial();
+ const updateParentValidator = createParentValidator.partial();
+
+module.exports = {
+  createParentValidator,
+  updateParentValidator,
+  firstNameValidator,
+  lastNameValidator,
+  emailValidator,
+  addressValidator,
+  phoneNumberValidator,
+  childValidator,
+  genderValidator,
+  schoolIdValidator
+}

@@ -8,12 +8,16 @@ import { updateSchool } from "@/app/Api/school";
 import { updateUser } from "@/app/Api/user";
 import LogoutComponent from "@/components/custom/logoutComponent";
 import { AppDispatch } from "@/app/store";
-import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import {
+  runCompleteProcess,
+  runFailProcess,
+} from "@/app/features/proccesThunk";
+import { PencilIcon } from "@heroicons/react/24/outline";
 
 function Settings() {
   const school = useSelector(schoolSelector);
   const user = useSelector(userSelector);
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
   const [formData, setFormData] = useState({
     schoolName: school.school?.name || "",
@@ -46,10 +50,10 @@ function Settings() {
         address: formData.address,
         name: formData.schoolName,
       });
-      dispatch(runCompleteProcess("updated successfully"))
+      dispatch(runCompleteProcess("updated successfully"));
     } catch (error) {
       console.error("Error updating data:", error);
-      dispatch(runFailProcess(" failed to update"))
+      dispatch(runFailProcess(" failed to update"));
     }
   };
 
@@ -73,15 +77,7 @@ function Settings() {
             alt="profile img"
             className="w-full h-[250px]"
           />
-
-          <div className="absolute top-24 left-10 p-1 bg-white rounded-full">
-            <img
-              src="/profileLarge.png"
-              alt=" profile sample pic "
-              className="w-52 rounded-full"
-            />
-          </div>
-
+          <ProfileComponent />
           <div className="mt-16 z-50 px-10">
             <p className="text-lg font-semibold mb-10">
               {`${user.user?.firstName} ${user.user?.lastName}`}{" "}
@@ -143,3 +139,17 @@ function Settings() {
 }
 
 export default Settings;
+
+const ProfileComponent = () => {
+  return (
+    <div className="absolute top-24 left-10 p-1 bg-white rounded-full">
+      <img
+        src="/profileLarge.png"
+        alt=" profile sample pic "
+        className="w-52 rounded-full"
+      />
+
+      <PencilIcon className=" h-5 absolute right-0 bottom-5 " />
+    </div>
+  );
+};

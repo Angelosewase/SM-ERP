@@ -1,4 +1,8 @@
-const { UserModel, SchoolModel } = require("../models/Schemas.js");
+const {
+  UserModel,
+  SchoolModel,
+  ProfilePicModel,
+} = require("../models/Schemas.js");
 const bcrypt = require("bcrypt");
 const z = require("zod");
 const jwt = require("jsonwebtoken");
@@ -15,7 +19,11 @@ const {
   getUserIdFromToken,
 } = require("../utils/jwt.js");
 const mongooose = require("mongoose");
-const { generateTheuserResponse, generateTheSchoolRespose } = require("../services/userService.js");
+const {
+  generateTheuserResponse,
+  generateTheSchoolRespose,
+} = require("../services/userService.js");
+const { uploadToCloudinary } = require("../config/cloudinaryConfig.js");
 
 async function Login(req, res) {
   try {
@@ -40,10 +48,13 @@ async function Login(req, res) {
       return;
     }
 
-    const userResponse = generateTheuserResponse(user)
+    const userResponse = generateTheuserResponse(user);
     const schoolResponse = generateTheSchoolRespose(associatedSchool);
 
-    const token = generateJwtToken({ id: user._id , schoolId: associatedSchool._id});
+    const token = generateJwtToken({
+      id: user._id,
+      schoolId: associatedSchool._id,
+    });
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
@@ -150,32 +161,71 @@ async function Logout(req, res) {
   }
 }
 
-
-async function updateUser(req,res){
+async function updateUser(req, res) {
   const { id } = req.params;
 
   try {
- 
     const validatedData = userUpdateSchema.parse(req.body);
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      id,
-      validatedData,
-      { new: true, runValidators: true } 
-    );
+    const updatedUser = await UserModel.findByIdAndUpdate(id, validatedData, {
+      new: true,
+      runValidators: true,
+    });
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.status(200).json(updatedUser);
   } catch (error) {
-  console.log(error)
+    console.log(error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
 
-    res.status(500).json({ message: 'Server error', error });
+    res.status(500).json({ message: "Server error", error });
   }
 }
 
-module.exports = { SignUpAdmin, Login, isAuth, getLoggedInUser, Logout,updateUser };
+async function uploadProfileImage(req, res) {
+  const userId = getUserIdFromToken(req.cookies.token);
+  if (!userId) {
+    res.status(401).send({ message: "unauthorised" });
+    return;
+  }
+  const user = await UserModel.findById(userId);
+  if (!user) {
+    res.status(404).send({ message: "user not found" });
+    return;
+  }
+  if (!req.file) {
+    res.status(400).send({ message: "No file uploaded" });
+    return;
+  }
+  profileImage = req.file.path;
+
+  try {
+    const result = await uploadToCloudinary(profileImage);
+    const profilepic = new ProfilePicModel({
+      userId: userId,
+      url: result.url,
+      secure_url: result.secure_url,
+    });
+    await profilepic.save();
+
+    res.status(201).json({
+      message: "uploaded successfully",
+    });
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+module.exports = {
+  SignUpAdmin,
+  Login,
+  isAuth,
+  getLoggedInUser,
+  Logout,
+  updateUser,
+  uploadProfileImage,
+};
