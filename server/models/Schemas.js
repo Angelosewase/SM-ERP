@@ -324,13 +324,29 @@ const ProfilePicsSchema = new mongoose.Schema({
     required: true,
   },
   url: {
-    type: String ,
+    type: String,
     required: true,
   },
-  secure_url :{
-    type : String, 
-    required : true
-  }
+  secure_url: {
+    type: String,
+    required: true,
+  },
+});
+
+const OtpSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  otpValue: {
+    type: String,
+    required: true,
+  },
+  expiresAt: {
+    type: Date,
+    required: true,
+  },
 });
 
 //models
@@ -356,6 +372,7 @@ const NotificationModel = mongoose.model("Notification", notificationSchema);
 const FeeModel = mongoose.model("Fee", feeSchema);
 const PaymentModel = mongoose.model("Payment", paymentSchema);
 const ProfilePicModel = mongoose.model("ProfilePics", ProfilePicsSchema);
+const OtpModel = mongoose.model("Otp", OtpSchema);
 
 module.exports = {
   UserModel,
@@ -376,4 +393,5 @@ module.exports = {
   PaymentModel,
   FeeGroupModel,
   ProfilePicModel,
+  OtpModel, 
 };
