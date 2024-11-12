@@ -43,4 +43,6 @@ async function verifyOtp(userId, otpVal) {
 }
 
 
+
+
 module.exports ={generateSignUpOtp, verifyOtp}

@@ -121,6 +121,7 @@ const userSchema = new mongoose.Schema(
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     role: { type: String, enum: ["admin", "teacher"], default: "teacher" },
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
+    active :{type:Boolean , required:true , default:false}
   },
   { timestamps: true }
 );

@@ -9,6 +9,7 @@ const classRouter = require("./routes/classRoute");
 const parentRouter = require("./routes/parentRoute");
 const expenseRouter = require("./routes/expenseRoute");
 const subjectRouter = require("./routes/subjectRoute");
+const authRouter = require("./routes/auth")
 const {feesGroupRouter,FeesRouter} = require("./routes/feesRoute");
 const cookieParser = require("cookie-parser");
 const { isAuth } = require("./middlewares/authentication");
@@ -51,5 +52,7 @@ app.use("/expenses", expenseRouter);
 app.use("/subjects", subjectRouter);
 app.use("/fees",FeesRouter);
 app.use("/fees-groups",feesGroupRouter);
+app.use("/auth", authRouter)
+
 
 app.listen(PORT || 5000, () => console.log("server running on port 3000"));
