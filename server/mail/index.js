@@ -7,6 +7,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  tls:{
+    rejectUnauthorized:false
+  }
 });
 
 async function sendEmail(recipientEmail, subject, message) {
@@ -28,7 +31,7 @@ async function sendEmail(recipientEmail, subject, message) {
 
 async function sendOtp(email, userId) {
   try {
-    const otp = generateSignUpOtp(userId);
+    const otp =  await generateSignUpOtp(userId);
     sendEmail(
       email,
       "Brainiacs account verification",

@@ -12,7 +12,7 @@ const subjectRouter = require("./routes/subjectRoute");
 const authRouter = require("./routes/auth")
 const {feesGroupRouter,FeesRouter} = require("./routes/feesRoute");
 const cookieParser = require("cookie-parser");
-const { isAuth } = require("./middlewares/authentication");
+// const { isAuth } = require("./middlewares/authentication");
 const { getAccountDetails } = require("./services/userService");
 const app = express();
 
@@ -47,7 +47,7 @@ app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/class", classRouter);
 app.use("/parent", parentRouter);
-app.get("/details", isAuth, getAccountDetails);
+app.get("/details", getAccountDetails);
 app.use("/expenses", expenseRouter);
 app.use("/subjects", subjectRouter);
 app.use("/fees",FeesRouter);

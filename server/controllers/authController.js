@@ -3,7 +3,7 @@ const { UserModel, SchoolModel } = require("../models/Schemas");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { loginInfoValidator } = require("../validators/user");
+const { loginInfoValidator, registerUserInfoValidator } = require("../validators/user");
 const {
   validateAccessToken,
   validateRefreshToken,
@@ -18,8 +18,8 @@ const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../auth/signTokens");
-const UserModel = require("./models/UserModel"); 
 const { verifyOtp } = require("../auth/otp");
+const { sendOtp } = require("../mail");
 
 const Login = async (req, res) => {
   const { token, accessToken } = req.cookies;
@@ -138,10 +138,12 @@ const signUpAdmin = async (req, res) => {
       email: validatedData.email,
       password: hashedPassword,
       role: "admin",
+      active: false,
     });
-    await user.save();
+    const savedUser = await user.save();
+    sendOtp(email, savedUser._id);
 
-    res
+   res
       .status(200)
       .json({ message: "Admin user created successfully", id: user._id });
   } catch (error) {
@@ -199,10 +201,9 @@ async function authenticate(req, res, next) {
   }
 }
 
-
-
 async function OtpAccountVerification(req, res) {
   const { userId } = req.params;
+
   try {
     const { otpCode } = req.body;
     const user = await UserModel.findById(userId);
@@ -212,7 +213,8 @@ async function OtpAccountVerification(req, res) {
     if (user.active) {
       return res.status(400).json({ message: "Account is already activated" });
     }
-    result = verifyOtp(userId, otpCode);
+    const  result =  await  verifyOtp(userId, otpCode);
+    console.log(result)
     if (!result.success) {
       return res.json({ message: result.message });
     }
@@ -227,4 +229,11 @@ async function OtpAccountVerification(req, res) {
   }
 }
 
-module.exports = { Login, Logout, refreshToken, signUpAdmin, authenticate , OtpAccountVerification };
+module.exports = {
+  Login,
+  Logout,
+  refreshToken,
+  signUpAdmin,
+  authenticate,
+  OtpAccountVerification,
+};

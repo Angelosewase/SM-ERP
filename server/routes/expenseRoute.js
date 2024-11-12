@@ -7,8 +7,8 @@ const {
   deleteExpenseRecord,
 } = require("../controllers/expenseController");
 const router = express.Router();
-const {isAuth} = require("../middlewares/authentication");
-router.use(isAuth)
+// const {isAuth} = require("../middlewares/authentication");
+// router.use(isAuth)
 
 
 router.post("", createExpenseRecord);

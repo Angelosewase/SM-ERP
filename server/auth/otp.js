@@ -14,7 +14,7 @@ async function generateSignUpOtp(userId) {
     const otpHash = await bcrypt.hash(otp, 10);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await OtpModel.create({ userId, otpValue: otpHash, expiresAt });
-
+    // console.log(otp)
     return otp;
   } catch (error) {
     console.error("Error generating OTP:", error);
@@ -26,7 +26,7 @@ async function generateSignUpOtp(userId) {
 async function verifyOtp(userId, otpVal) {
   try {
     const otpRecord = await OtpModel.findOne({ userId });
-    if (!otpRecord || otpRecord.expiresAt < Date.now()) {
+    if (!otpRecord || Date(otpRecord.expiresAt) < Date.now()) {
       return { success: false, message: "OTP has expired or is invalid." };
     }
     const isMatch = await bcrypt.compare(otpVal, otpRecord.otpValue);
@@ -34,8 +34,9 @@ async function verifyOtp(userId, otpVal) {
       return { success: false, message: "Invalid OTP." };
     }
     await OtpModel.deleteOne({ userId });
-
+    console.log("done verifying")
     return { success: true, message: "OTP verified successfully." };
+  
   } catch (error) {
     console.error("Error verifying OTP:", error);
     throw new Error("Failed to verify OTP.");
