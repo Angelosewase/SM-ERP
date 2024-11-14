@@ -7,10 +7,10 @@ const {
   updateSubject,
   deleteSubject,
 } = require("../controllers/subjectController");
-// const { isAuth } = require("../middlewares/authentication");
+const {authenticate} = require("../controllers/authController")
 
 const router = express.Router();
-// router.use(isAuth);
+router.use(authenticate)
 
 router.post("/", createSubject);
 router.get("/", getAllSubjects);

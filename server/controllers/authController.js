@@ -1,9 +1,12 @@
-const mongoose = require("mongoose");
+// const mongoose = require("mongoose");
 const { UserModel, SchoolModel } = require("../models/Schemas");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
-const { loginInfoValidator, registerUserInfoValidator } = require("../validators/user");
+const {
+  loginInfoValidator,
+  registerUserInfoValidator,
+} = require("../validators/user");
 const {
   validateAccessToken,
   validateRefreshToken,
@@ -143,7 +146,7 @@ const signUpAdmin = async (req, res) => {
     const savedUser = await user.save();
     sendOtp(email, savedUser._id);
 
-   res
+    res
       .status(200)
       .json({ message: "Admin user created successfully", id: user._id });
   } catch (error) {
@@ -213,8 +216,8 @@ async function OtpAccountVerification(req, res) {
     if (user.active) {
       return res.status(400).json({ message: "Account is already activated" });
     }
-    const  result =  await  verifyOtp(userId, otpCode);
-    console.log(result)
+    const result = await verifyOtp(userId, otpCode);
+    console.log(result);
     if (!result.success) {
       return res.json({ message: result.message });
     }
@@ -229,6 +232,40 @@ async function OtpAccountVerification(req, res) {
   }
 }
 
+async function ChangePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Update password
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error in ChangePassword:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 module.exports = {
   Login,
   Logout,
@@ -236,4 +273,5 @@ module.exports = {
   signUpAdmin,
   authenticate,
   OtpAccountVerification,
+  ChangePassword
 };

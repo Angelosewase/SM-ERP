@@ -8,12 +8,12 @@ const {
   getSchools,
   updateSchool,
 } = require("../controllers/SchoolController");
-
+const {authenticate} = require("../controllers/authController")
 const router = express.Router();
 router.post("/register", RegisterSchool);
-router.get("/:id", getSchoolById);
-router.get("/", getSchools);
-router.put("/", updateSchool);
-router.delete("/", deleteSchool);
+router.get("/:id",authenticate, getSchoolById);
+router.get("/",authenticate, getSchools);
+router.put("/",authenticate, updateSchool);
+router.delete("/",authenticate, deleteSchool);
 
 module.exports = router;

@@ -11,10 +11,10 @@ const {
   updateFeeGroup,
   deleteFeeGroup,
 } = require("../controllers/feesController");
-// const { isAuth } = require("../middlewares/authentication");
+const {authenticate} = require("../controllers/authController")
 
 const FeesRouter = express.Router();
-// FeesRouter.use(isAuth);
+FeesRouter.use(authenticate)
 const feesGroupRouter = express.Router()
 
 FeesRouter.post("/", createFee);

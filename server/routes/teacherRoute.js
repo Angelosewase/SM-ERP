@@ -1,12 +1,11 @@
 const express = require('express');
 const { getTeachers, createTeacher, deleteTeacher, updateTeacher, getTeacherById, uploadTeaherImage } = require('../controllers/TeacherController');
-
-// const {isAuth}= require("../middlewares/authentication");
+const {authenticate} = require("../controllers/authController")
 const { uploadSingle } = require('../middlewares/multer');
 
 
 const router = express.Router();
-// router.use(isAuth)
+router.use(authenticate)
 
 router.get('/', getTeachers);
 router.post('/', createTeacher);

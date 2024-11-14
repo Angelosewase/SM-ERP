@@ -9,7 +9,10 @@ const {
   uploadStudentImage,
 } = require("../controllers/studentController");
 const { uploadSingle } = require("../middlewares/multer");
+const {authenticate} = require("../controllers/authController")
 const router = express.Router();
+router.use(authenticate)
+
 router.get("/", getStudents);
 router.post("/", createStudent);
 router.delete("/:id", deleteStudent);

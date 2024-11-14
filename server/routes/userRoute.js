@@ -6,11 +6,12 @@ const {
   uploadProfileImage,
 } = require("../controllers/userController");
 const { uploadSingle } = require("../middlewares/multer");
+const { authenticate } = require("../controllers/authController");
 const UserRouter = express.Router();
 
 UserRouter.get("/isAuth", isAuth);
-UserRouter.get("/", getLoggedInUser);
-UserRouter.put("/:id", updateUser);
-UserRouter.post("/upload", uploadSingle, uploadProfileImage);
+UserRouter.get("/",authenticate, getLoggedInUser);
+UserRouter.put("/:id",authenticate,  updateUser);
+UserRouter.post("/upload",authenticate,  uploadSingle, uploadProfileImage);
 
 module.exports = UserRouter;
