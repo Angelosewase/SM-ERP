@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 const z = require("zod");
-const { schoolValidationSchema, schoolUpdateSchema } = require("../validators/school");
+const {
+  schoolValidationSchema,
+  schoolUpdateSchema,
+} = require("../validators/school");
 const { UserModel, SchoolModel } = require("../models/Schemas");
-const { getSchoolIdFromToken } = require("../utils/jwt");
+const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
 
 async function RegisterSchool(req, res) {
   try {
@@ -62,9 +65,8 @@ async function getSchoolById(req, res) {
 }
 
 async function deleteSchool(req, res) {
-  const schoolId= getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   try {
-
     if (!mongoose.Types.ObjectId.isValid(schoolId)) {
       return res.status(400).json({ error: "Invalid school ID" });
     }
@@ -74,7 +76,7 @@ async function deleteSchool(req, res) {
     if (!deletedSchool) {
       return res.status(404).json({ error: "School not found" });
     }
-
+    await invalidateSchoolCache(schoolId, ["/school", `/school/${schoolId}`]);
     res.status(200).json({ message: "School deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
@@ -91,7 +93,7 @@ const getSchools = async (req, res) => {
 };
 
 const updateSchool = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -111,10 +113,13 @@ const updateSchool = async (req, res) => {
     if (!updatedSchool) {
       return res.status(404).json({ message: "School not found" });
     }
-
+    await invalidateSchoolCache(schoolId, [
+      "/school",
+      `/school/${schoolId}`,
+    ]);
     res.status(200).json(updatedSchool);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }

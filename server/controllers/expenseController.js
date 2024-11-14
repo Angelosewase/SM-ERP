@@ -1,9 +1,9 @@
 const { ExpenseModel } = require("../models/Schemas");
-const {getSchoolIdFromToken} = require('../utils/jwt');
 const { createExpenseRecordValidator, getExpenseRecordByIdValidator, updateExpenseRecordValidator, deleteExpenseRecordValidator } = require("../validators/Expense");
+const {invalidateSchoolCache} = require("../cache/services/cacheInvalidation")
 
 const createExpenseRecord = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "Invalid credentials" });
     return;
@@ -11,7 +11,6 @@ const createExpenseRecord = async (req, res) => {
 
   try {
     createExpenseRecordValidator.parse({ ...req.body, schoolId });
-
     const { name, amount, transactionType, status, paymentDate } = req.body;
     const newExpenseRecord = new ExpenseModel({
       name,
@@ -22,6 +21,10 @@ const createExpenseRecord = async (req, res) => {
       paymentDate
     });
     await newExpenseRecord.save();
+    await invalidateSchoolCache(schoolId, [
+      "/expense",
+      `/expense/${newExpenseRecord._id}`,
+    ]);
     res.status(201).json(newExpenseRecord);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -34,7 +37,7 @@ const createExpenseRecord = async (req, res) => {
 };
 
 const getAllExpenseRecords = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -85,6 +88,10 @@ const updateExpenseRecord = async (req, res) => {
       if (!updatedExpenseRecord) {
         return res.status(404).json({ error: "Expense record not found" });
       }
+      await invalidateSchoolCache(req.user.schoolId, [
+        "/expense",
+        `/expense/${id}`,
+      ]);
       res.status(200).json(updatedExpenseRecord);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -106,6 +113,10 @@ const updateExpenseRecord = async (req, res) => {
       if (!deletedExpenseRecord) {
         return res.status(404).json({ error: "Expense record not found" });
       }
+      await invalidateSchoolCache(req.user.schoolId, [
+        "/expense",
+        `/expense/${id}`,
+      ]);
       res.status(200).json({ message: "Expense record deleted successfully" });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -115,8 +126,13 @@ const updateExpenseRecord = async (req, res) => {
         res.status(500).json({ error: "Failed to delete expense record" });
       }
 
-    }
-  };
-  
+  }
+};
 
-  module.exports = {getExpenseRecordById,updateExpenseRecord,getAllExpenseRecords,createExpenseRecord,deleteExpenseRecord}
+module.exports = {
+  getExpenseRecordById,
+  updateExpenseRecord,
+  getAllExpenseRecords,
+  createExpenseRecord,
+  deleteExpenseRecord,
+};

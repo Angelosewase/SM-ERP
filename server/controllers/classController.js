@@ -6,14 +6,14 @@ const {
 } = require("../validators/class");
 const { z } = require("zod");
 const mongoose = require("mongoose");
-const { getSchoolIdFromToken } = require("../utils/jwt");
 const {
   promoteClass,
   convertClassesToValueNamePairs,
 } = require("../services/classService");
+const { invalidateSchoolCache } = require('../cache/services/cacheInvalidation');
 
 const getClasses = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -29,7 +29,7 @@ const getClasses = async (req, res) => {
 
 
 const getFormatedClasses = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -68,7 +68,7 @@ const getClassById = async (req, res) => {
 };
 
 const createClass = async (req, res) => {
-  const schoolID = getSchoolIdFromToken(req.cookies.token);
+  const schoolID = req.user.schoolId;
   if (!schoolID) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -92,6 +92,8 @@ const createClass = async (req, res) => {
     await SchoolModel.findByIdAndUpdate(schoolID, {
       $push: { classes: newClass._id },
     })
+    await invalidateSchoolCache(req.user.schoolId, ['/class']);
+
     res.status(201).json(newClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -123,6 +125,7 @@ const updateClass = async (req, res) => {
     if (!updatedClass) {
       return res.status(404).json({ error: "Class not found" });
     }
+    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
     res.status(200).json(updatedClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -144,7 +147,6 @@ const deleteClass = async (req, res) => {
   try {
     const validatedId = idValidator.parse(id);
 
-    // Check if the class exists
     const classToDelete = await ClassModel.findById(validatedId);
     if (!classToDelete) {
       return res.status(404).json({ error: "Class not found" });
@@ -171,7 +173,7 @@ const deleteClass = async (req, res) => {
     });
 
     const deletedClass = await ClassModel.findByIdAndDelete(validatedId);
-
+    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
     res.status(200).json(deletedClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -180,10 +182,13 @@ const deleteClass = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 async function promoteclassHandler(req, res) {
   try {
     const validData = promoteClassInofValidator(req.body);
     promoteClass(validData.classId, validData.newClassId);
+    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
   } catch (error) {
     console.log(error);
   }

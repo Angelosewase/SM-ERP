@@ -1,14 +1,14 @@
 const { TeacherModel, SchoolModel, ClassModel, SubjectModel, ProfilePicModel } = require("../models/Schemas");
-const { getSchoolIdFromToken } = require("../utils/jwt");
 const {
   createTeacherValidator,
   updateTeacherValidator,
   teacherIdValidator,
 } = require("../validators/teacher");
 const { z } = require("zod");
+const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
 
 const getTeachers = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -25,7 +25,7 @@ const getTeachers = async (req, res) => {
 };
 
 const createTeacher = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -48,6 +48,7 @@ const createTeacher = async (req, res) => {
         teachers: newTeacher._id,
       },
     });
+    await invalidateSchoolCache(req.user.schoolId, ['/teacher', `/teacher/${newTeacher._id}`]);
     res.status(201).json(newTeacher);
   } catch (error) {
     console.log(error);
@@ -80,7 +81,7 @@ const deleteTeacher = async (req, res) => {
       associatedUser.teacher = null;
       await associatedUser.save();
     }
-
+      await invalidateSchoolCache(req.user.schoolId, ['/teacher', `/teacher/${validatedId}`]);
     res.status(200).json(deletedTeacher);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -106,7 +107,7 @@ const updateTeacher = async (req, res) => {
     if (!updatedTeacher) {
       return res.status(404).json({ error: "Teacher not found" });
     }
-
+    await invalidateSchoolCache(req.user.schoolId, ['/teacher', `/teacher/${validatedId}`]);
     res.status(200).json(updatedTeacher);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -163,6 +164,7 @@ async function uploadTeaherImage(req, res) {
   } catch (error) {
     console.log(error);
   }
+  await invalidateSchoolCache(req.user.schoolId, ['/teacher', `/teacher/${id}`]);
 }
 
 module.exports = { getTeachers, createTeacher, deleteTeacher, updateTeacher ,getTeacherById, uploadTeaherImage};

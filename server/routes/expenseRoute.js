@@ -8,12 +8,12 @@ const {
 } = require("../controllers/expenseController");
 const router = express.Router();
 const {authenticate} = require("../controllers/authController")
-router.use(authenticate)
-
+router.use(authenticate);
+const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 
 router.post("", createExpenseRecord);
-router.get("", getAllExpenseRecords);
-router.get("/:id", getExpenseRecordById);
+router.get("", cacheMiddleware(300), getAllExpenseRecords);
+router.get("/:id", cacheMiddleware(300), getExpenseRecordById);
 router.put("/:id", updateExpenseRecord);
 router.delete("/:id", deleteExpenseRecord);
 

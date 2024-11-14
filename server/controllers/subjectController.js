@@ -1,12 +1,14 @@
 const { SubjectModel, TeacherModel, ClassModel } = require("../models/Schemas");
-const { getSchoolIdFromToken } = require("../utils/jwt");
 const mongoose = require("mongoose");
+const {
+  invalidateSchoolCache,
+} = require("../cache/services/cacheInvalidation");
 
 const createSubject = async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -39,6 +41,10 @@ const createSubject = async (req, res) => {
     );
     await session.commitTransaction();
     session.endSession();
+    await invalidateSchoolCache(schoolId, [
+      "/subject",
+      `/subject/${newSubject._id}`,
+    ]);
     res.status(201).json(newSubject);
   } catch (error) {
     await session.abortTransaction();
@@ -49,7 +55,7 @@ const createSubject = async (req, res) => {
 };
 
 const getAllSubjects = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -69,7 +75,9 @@ const getAllSubjects = async (req, res) => {
 const getSubjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    const subject = await SubjectModel.findById(id).populate("classes", "name").populate("teacherId");
+    const subject = await SubjectModel.findById(id)
+      .populate("classes", "name")
+      .populate("teacherId");
 
     if (!subject) {
       return res.status(404).json({ error: "Subject not found" });
@@ -100,7 +108,10 @@ const updateSubject = async (req, res) => {
     if (!updatedSubject) {
       return res.status(404).json({ error: "Subject not found" });
     }
-
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/subject",
+      `/subject/${updateSubject._id}`,
+    ]);
     res.status(200).json(updatedSubject);
   } catch (error) {
     res.status(500).json({ error: "Failed to update subject" });
@@ -128,6 +139,10 @@ const deleteSubject = async (req, res) => {
     }
 
     res.status(200).json({ message: "Subject deleted successfully" });
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/subject",
+      `/subject/${deleteSubject._id}`,
+    ]);
   } catch (error) {
     res.status(500).json({ error: "Failed to delete subject" });
   }

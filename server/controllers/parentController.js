@@ -1,9 +1,14 @@
+const { z } = require("zod");
 const { ParentModel, StudentModel, SchoolModel } = require("../models/Schemas");
-const { getSchoolIdFromToken } = require("../utils/jwt");
-const { createParentValidator, updateParentValidator } = require("../validators/parent");
-
+const {
+  createParentValidator,
+  updateParentValidator,
+} = require("../validators/parent");
+const {
+  invalidateSchoolCache,
+} = require("../cache/services/cacheInvalidation");
 const getParents = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -20,13 +25,11 @@ const getParents = async (req, res) => {
 };
 
 const createParent = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
   }
-
-
 
   try {
     createParentValidator.parse(req.body);
@@ -57,6 +60,10 @@ const createParent = async (req, res) => {
     await SchoolModel.findByIdAndUpdate(schoolId, {
       $push: { Parents: newParent._id },
     });
+    await invalidateSchoolCache(schoolId, [
+      "/parent",
+      `/parent/${newParent._id}`,
+    ]);
 
     res.status(201).json(newParent);
   } catch (error) {
@@ -88,6 +95,10 @@ const deleteParent = async (req, res) => {
 
     // await AttendanceModel.deleteMany({ parentId: parent._id });
     // await FinancialTransactionModel.deleteMany({ parentId: parent._id });
+    await invalidateSchoolCache(parent.schoolId, [
+      "/parent",
+      `/parent/${id}`,
+    ]);
 
     res.status(200).json(deletedParent);
   } catch (error) {
@@ -105,6 +116,10 @@ const updateParent = async (req, res) => {
       runValidators: true,
     });
     res.status(200).json(updatedParent);
+    await invalidateSchoolCache(updatedParent.schoolId, [
+      "/parent",
+      `/parent/${id}`,
+    ]);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

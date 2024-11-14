@@ -25,10 +25,9 @@ const objectIdValidator = z
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
     email: z.string().email("Invalid email address").optional(),
-    password: z.string().min(6, "Password must be at least 6 characters long").optional(),
-    school: z.string().optional(), // Assuming school is a string ID
-    role: z.enum(["admin", "teacher"]).optional(), // Ensure only valid roles are allowed
-    teacher: z.string().optional(), // Assuming teacher is a string ID
+    school: z.string().optional(), 
+    role: z.enum(["admin", "teacher"]).optional(), 
+    teacher: z.string().optional(), 
   });
 
 module.exports = {

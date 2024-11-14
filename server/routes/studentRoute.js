@@ -7,18 +7,21 @@ const {
   promoteStudentHandler,
   getStudentbyStudentId,
   uploadStudentImage,
+  getStudentsByClass,
 } = require("../controllers/studentController");
 const { uploadSingle } = require("../middlewares/multer");
-const {authenticate} = require("../controllers/authController")
+const {authenticate} = require("../controllers/authController");
+const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 const router = express.Router();
 router.use(authenticate)
 
-router.get("/", getStudents);
+router.get("/", cacheMiddleware(300), getStudents);
 router.post("/", createStudent);
 router.delete("/:id", deleteStudent);
-router.get("/:id", getStudentbyStudentId);
+router.get("/:id", cacheMiddleware(300), getStudentbyStudentId);
 router.put("/:id", updateStudent);
 router.post("/promoteStudent", promoteStudentHandler);
 router.post("/upload/:id", uploadSingle, uploadStudentImage);
+router.get("/class/:classId", cacheMiddleware(300),getStudentsByClass);
 
 module.exports = router;

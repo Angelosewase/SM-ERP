@@ -8,6 +8,7 @@ const getTransactions = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 const createTransaction = async (req, res) => {
   const { studentId, amount, transactionType, status } = req.body;
   try {

@@ -242,7 +242,6 @@ async function ChangePassword(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Verify current password
     const isPasswordValid = await bcrypt.compare(
       currentPassword,
       user.password
@@ -251,11 +250,9 @@ async function ChangePassword(req, res) {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password
     user.password = hashedPassword;
     await user.save();
 

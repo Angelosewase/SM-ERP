@@ -10,19 +10,18 @@ const {
   ProfilePicModel,
 } = require("../models/Schemas");
 const { z } = require("zod");
-const mongoose = require("mongoose");
 const {
   registerStudentValidator,
   updateStudentValidator,
   promoteStudentValidator,
 } = require("../validators/student");
 const { objectIdValidator } = require("../validators/user");
-const { getSchoolIdFromToken } = require("../utils/jwt");
 const { promoteStudent } = require("../services/studentService");
 const { uploadToCloudinary } = require("../config/cloudinaryConfig");
+const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
 
 const getStudents = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -45,7 +44,7 @@ const getStudents = async (req, res) => {
 };
 
 const createStudent = async (req, res) => {
-  const schoolId = getSchoolIdFromToken(req.cookies.token);
+  const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
     return;
@@ -83,7 +82,10 @@ const createStudent = async (req, res) => {
     await ClassModel.findByIdAndUpdate(validateData.classId, {
       $push: { students: newStudent._id },
     });
-
+    await invalidateSchoolCache(schoolId, [
+      "/student",
+      `/student/${newStudent._id}`,
+    ]);
     res.status(201).json(newStudent);
   } catch (error) {
     console.log(error);
@@ -124,6 +126,10 @@ const deleteStudent = async (req, res) => {
     });
 
     const deletedStudent = await StudentModel.findByIdAndDelete(validatedId);
+    await invalidateSchoolCache(schoolId, [
+      "/student",
+      `/student/${validatedId}`,
+    ]);
 
     res.status(200).json(deletedStudent);
   } catch (error) {
@@ -142,6 +148,10 @@ const updateStudent = async (req, res) => {
       validatedData,
       { new: true }
     );
+    await invalidateSchoolCache(schoolId, [
+      "/student",
+      `/student/${validID}`,
+    ]);
     res.status(200).json(updatedStudent);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -176,6 +186,12 @@ async function promoteStudentHandler(req, res) {
       validateData.fromClassId,
       validateData.toClassId
     );
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/student",
+      `/student/${validateData.studentId}`,
+      `/student/class/${validateData.fromClassId}`,
+      `/student/class/${validateData.toClassId} `,
+    ]);
   } catch (error) {
     res.status(400).send({ message: "error promoting student" });
   }
@@ -206,6 +222,10 @@ async function uploadStudentImage(req, res) {
       secure_url: result.secure_url,
     });
     await profilepic.save();
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/student",
+      `/student/${id}`,
+    ]);
 
     res.status(201).json({
       message: "uploaded successfully",
@@ -215,6 +235,23 @@ async function uploadStudentImage(req, res) {
   }
 }
 
+const getStudentsByClass = async (req, res) => {
+  const { classId } = req.params;
+  try {
+    const students = await StudentModel.find({ classId });
+
+    if (!students) {
+      return res.status(404).json({ message: "No students found for this class" });
+    }
+
+    res.status(200).json(students);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching students by class" });
+  }
+};
+
+
 module.exports = {
   getStudents,
   createStudent,
@@ -222,5 +259,6 @@ module.exports = {
   updateStudent,
   promoteStudentHandler,
   getStudentbyStudentId,
-  uploadStudentImage
+  uploadStudentImage,
+  getStudentsByClass,
 };

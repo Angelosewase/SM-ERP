@@ -8,8 +8,6 @@ const z = require("zod");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const {
-  registerUserInfoValidator,
-  loginInfoValidator,
   userUpdateSchema,
 } = require("../validators/user.js");
 
@@ -18,11 +16,6 @@ const {
   validateJwtToken,
   getUserIdFromToken,
 } = require("../utils/jwt.js");
-const mongooose = require("mongoose");
-const {
-  generateTheuserResponse,
-  generateTheSchoolRespose,
-} = require("../services/userService.js");
 const { uploadToCloudinary } = require("../config/cloudinaryConfig.js");
 
 async function isAuth(req, res) {
@@ -78,7 +71,6 @@ async function updateUser(req, res) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
-
     res.status(500).json({ message: "Server error", error });
   }
 }

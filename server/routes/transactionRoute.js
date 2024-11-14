@@ -1,11 +1,12 @@
 const express = require('express');
 const { getTransactions, createTransaction, deleteTransaction, updateTransaction } = require('../controllers/transactionsController');
 const {authenticate} = require("../controllers/authController")
+const cacheMiddleware = require('../cache/middleware/cacheMiddleware');
 
 const router = express.Router();
 router.use(authenticate)
 
-router.get('/', getTransactions);
+router.get('/', cacheMiddleware(300),getTransactions);
 router.post('/', createTransaction);
 router.delete('/:id', deleteTransaction);
 router.put('/:id', updateTransaction);
