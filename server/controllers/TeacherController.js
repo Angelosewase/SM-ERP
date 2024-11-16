@@ -1,4 +1,4 @@
-const { TeacherModel, SchoolModel, ClassModel, SubjectModel, ProfilePicModel } = require("../models/Schemas");
+const { TeacherModel, SchoolModel, ClassModel, SubjectModel, ProfilePicModel, UserModel } = require("../models/Schemas");
 const {
   createTeacherValidator,
   updateTeacherValidator,
@@ -62,27 +62,42 @@ const createTeacher = async (req, res) => {
 const deleteTeacher = async (req, res) => {
   const { id } = req.params;
   try {
-
     const validatedId = teacherIdValidator.parse(id);
 
-    const deletedTeacher = await TeacherModel.findByIdAndDelete(validatedId);
-    if (!deletedTeacher) {
-      return res.status(404).json({ error: "Teacher not found" });
-    }
+    const session = await mongoose.startSession();
+    await session.startTransaction();
 
+    try {
+      const deletedTeacher = await TeacherModel.findByIdAndDelete(validatedId, { session });
+      if (!deletedTeacher) {
+        await session.abortTransaction();
+        return res.status(404).json({ error: "Teacher not found" });
+      }
 
-    await SchoolModel.updateOne(
-      { teachers: validatedId },
-      { $pull: { teachers: validatedId } }
-    );
+      await SchoolModel.updateOne(
+        { teachers: validatedId },
+        { $pull: { teachers: validatedId } },
+        { session }
+      );
 
-    const associatedUser = await UserModel.findOne({ teacher: validatedId });
-    if (associatedUser) {
-      associatedUser.teacher = null;
-      await associatedUser.save();
-    }
+      const associatedUser = await UserModel.findOne({ teacher: validatedId }).session(session);
+      if (associatedUser) {
+        associatedUser.teacher = null;
+        await associatedUser.save({ session });
+      }
+
       await invalidateSchoolCache(req.user.schoolId, ['/teacher', `/teacher/${validatedId}`]);
-    res.status(200).json(deletedTeacher);
+
+      await session.commitTransaction();
+      res.status(200).json(deletedTeacher);
+
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      session.endSession();
+    }
+
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
@@ -122,12 +137,13 @@ const getTeacherById = async (req,res) => {
   try {
     const teacher = await TeacherModel.findById(id).populate("subjects classes");
     if(!teacher){
-      res.status(404).send({message :"teacher not found"})
+      res.status(404).json({message :"teacher not found"})
+      return
     }
      res.status(200).json(teacher);
   } catch (error) {
     console.error(error);
-     res.status(500).send({message:"internal server error"})
+     res.status(500).json({message:"internal server error"})
   }
 };
 

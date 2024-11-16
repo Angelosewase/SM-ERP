@@ -17,6 +17,14 @@ async function RegisterSchool(req, res) {
       admin,
     });
 
+    const Admin = await UserModel.findById(admin);
+    if(!Admin || Admin.role !== "admin"){
+      res.status(400).json({message :"Admin not found , create the admin first"})
+      return
+    }
+
+   
+
     const newSchool = new SchoolModel({
       name: validatedData.schoolName,
       address: validatedData.address,

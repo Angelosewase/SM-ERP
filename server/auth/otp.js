@@ -2,7 +2,6 @@ const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const { OtpModel } = require("../models/Schemas");
 
-
 async function generateSignUpOtp(userId) {
   try {
     const otp = otpGenerator.generate(6, {
@@ -22,28 +21,25 @@ async function generateSignUpOtp(userId) {
   }
 }
 
-
 async function verifyOtp(userId, otpVal) {
   try {
     const otpRecord = await OtpModel.findOne({ userId });
     if (!otpRecord || Date(otpRecord.expiresAt) < Date.now()) {
+      console.log("OTP has expired or is invalid.");
       return { success: false, message: "OTP has expired or is invalid." };
     }
     const isMatch = await bcrypt.compare(otpVal, otpRecord.otpValue);
     if (!isMatch) {
+      console.log("Invalid OTP.");
       return { success: false, message: "Invalid OTP." };
     }
     await OtpModel.deleteOne({ userId });
-    console.log("done verifying")
+    console.log("done verifying");
     return { success: true, message: "OTP verified successfully." };
-  
   } catch (error) {
     console.error("Error verifying OTP:", error);
     throw new Error("Failed to verify OTP.");
   }
 }
 
-
-
-
-module.exports ={generateSignUpOtp, verifyOtp}
+module.exports = { generateSignUpOtp, verifyOtp };

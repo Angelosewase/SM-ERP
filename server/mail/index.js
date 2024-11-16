@@ -2,6 +2,7 @@ const { generateSignUpOtp } = require("../auth/otp");
 const { transporter } = require("../config/nodemailer");
 
 async function sendEmail(recipientEmail, subject, message, isHtml = false) {
+  console.log("email sent to", recipientEmail);
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,

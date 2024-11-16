@@ -11,20 +11,34 @@ const createTeacherValidator = z.object({
     .refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid School ID"),
   subjects: z
     .array(
-      z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Subject ID")
-    ).optional(),
+      z
+        .string()
+        .refine(
+          (id) => mongoose.Types.ObjectId.isValid(id),
+          "Invalid Subject ID"
+        )
+    )
+    .optional(),
   classes: z
     .array(
-      z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Class ID")
+      z
+        .string()
+        .refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Class ID")
     )
     .min(1, "At least one class is required"),
-    gender: z.string()
+  gender: z.string(),
 });
 
 // Validator for updating a teacher (all fields are optional)
 const updateTeacherValidator = z.object({
-  firstName: z.string().min(3, "First name must be at least 3 characters").optional(),
-  lastName: z.string().min(3, "Last name must be at least 3 characters").optional(),
+  firstName: z
+    .string()
+    .min(3, "First name must be at least 3 characters")
+    .optional(),
+  lastName: z
+    .string()
+    .min(3, "Last name must be at least 3 characters")
+    .optional(),
   email: z.string().email("Invalid email address").optional(),
   schoolId: z
     .string()
@@ -32,21 +46,27 @@ const updateTeacherValidator = z.object({
     .optional(),
   subjects: z
     .array(
-      z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Subject ID")
+      z
+        .string()
+        .refine(
+          (id) => mongoose.Types.ObjectId.isValid(id),
+          "Invalid Subject ID"
+        )
     )
     .optional(),
   classes: z
     .array(
-      z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Class ID")
+      z
+        .string()
+        .refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Class ID")
     )
     .optional(),
 });
 
 // Validator for teacher ID (for delete and single teacher retrieval)
-const teacherIdValidator = z.string().refine(
-  (id) => mongoose.Types.ObjectId.isValid(id),
-  "Invalid Teacher ID"
-);
+const teacherIdValidator = z
+  .string()
+  .refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid Teacher ID");
 
 module.exports = {
   createTeacherValidator,

@@ -1,6 +1,7 @@
 const { ExpenseModel } = require("../models/Schemas");
 const { createExpenseRecordValidator, getExpenseRecordByIdValidator, updateExpenseRecordValidator, deleteExpenseRecordValidator } = require("../validators/Expense");
 const {invalidateSchoolCache} = require("../cache/services/cacheInvalidation")
+const { z } = require("zod");
 
 const createExpenseRecord = async (req, res) => {
   const schoolId = req.user.schoolId;
@@ -11,12 +12,12 @@ const createExpenseRecord = async (req, res) => {
 
   try {
     createExpenseRecordValidator.parse({ ...req.body, schoolId });
-    const { name, amount, transactionType, status, paymentDate } = req.body;
+    const { name, amount, status, paymentDate } = req.body;
     const newExpenseRecord = new ExpenseModel({
       name,
       schoolId,
       amount,
-      transactionType,
+      transactionType : "expense",
       status,
       paymentDate
     });

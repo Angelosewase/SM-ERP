@@ -147,7 +147,7 @@ const subjectSchema = new mongoose.Schema(
 
 const classSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, unique: true },
     students: [{ type: mongoose.Schema.Types.ObjectId, ref: "Student" }],
     subjects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Subject" }],
     schoolId: {

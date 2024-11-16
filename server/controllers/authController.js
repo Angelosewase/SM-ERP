@@ -38,6 +38,10 @@ const Login = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+
+    if (!user.active) {
+      return res.status(401).json({ message: "Account is not activated" });
+    }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
@@ -58,7 +62,9 @@ const Login = async (req, res) => {
       schoolId: associatedSchool._id,
     });
 
-    const refreshToken = generateRefreshToken({});
+    const refreshToken = generateRefreshToken({
+      userId: user._id,
+    });
 
     res.cookie("token", accessToken, {
       httpOnly: true,
@@ -106,11 +112,14 @@ const refreshToken = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const decoded = validateRefreshToken(refreshToken);
-    const user = await UserModel.findById(decoded.id);
+    const user = await UserModel.findById(decoded.userId);
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const token = generateAccessToken(user);
+      const token = generateAccessToken({
+        id: user._id,
+        schoolId: user.school,
+      });
     res.cookies("token", token, {
       httpOnly: true,
       secure: false,
@@ -172,7 +181,7 @@ async function authenticate(req, res, next) {
     }
     if (refreshToken) {
       const decoded = validateRefreshToken(refreshToken);
-      const user = await UserModel.findById(decoded.id);
+      const user = await UserModel.findById(decoded.userId);
       if (!user) {
         return res
           .status(401)
@@ -190,6 +199,7 @@ async function authenticate(req, res, next) {
       });
 
       req.user = { id: user._id, schoolId: user.school };
+      console.log(req.user, "refresh token validated")
       return next();
     }
 
@@ -217,7 +227,6 @@ async function OtpAccountVerification(req, res) {
       return res.status(400).json({ message: "Account is already activated" });
     }
     const result = await verifyOtp(userId, otpCode);
-    console.log(result);
     if (!result.success) {
       return res.json({ message: result.message });
     }
@@ -249,6 +258,23 @@ async function ChangePassword(req, res) {
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Current password is incorrect" });
     }
+    const passwordSchema = z.string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter") 
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+
+    try {
+      passwordSchema.parse(newPassword);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid password format",
+          errors: error.errors.map(err => err.message)
+        });
+      }
+    }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
@@ -270,5 +296,5 @@ module.exports = {
   signUpAdmin,
   authenticate,
   OtpAccountVerification,
-  ChangePassword
+  ChangePassword,
 };

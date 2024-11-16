@@ -27,14 +27,14 @@ const generateRefreshToken = (userId) => {
 const validateAccessToken = (token) => {
   const isValid = getAccessToken(token);
   if (isValid) {
-    return true;
+    return isValid;
   }
   return false;
 };
 
 const validateRefreshToken = (token) => {
   const isvalid = getRefreshToken(token);
-  if (isvalid) return true;
+  if (isvalid) return isvalid;
   return false;
 };
 

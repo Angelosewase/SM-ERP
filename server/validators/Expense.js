@@ -8,16 +8,17 @@ const expenseRecordSchema = z.object({
   paymentDate: z.date().optional(),
 });
 const createExpenseRecordValidator = expenseRecordSchema.extend({
-  schoolId: z.string().refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid School ID"),
+  schoolId: z
+    .string()
+    .refine((id) => mongoose.Types.ObjectId.isValid(id), "Invalid School ID"),
 });
-
 
 const updateExpenseRecordValidator = expenseRecordSchema.partial();
 const getExpenseRecordByIdValidator = z.object({
-  id: z.string().nonempty("ID is required"),
+  id: z.string().min(1, "ID is required"),
 });
 const deleteExpenseRecordValidator = z.object({
-  id: z.string().nonempty("ID is required"),
+  id: z.string().min(1, "ID is required"),
 });
 
 module.exports = {
