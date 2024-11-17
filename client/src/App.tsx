@@ -16,6 +16,7 @@ import Subjects from "./pages/Subjects";
 import Settings from "./pages/Settings";
 import Dashboard from "./pages/Dashboard";
 import Classes from "./pages/classes";
+import VerifyAccount from "./pages/VerifyAccount";
 import { CustomAlert } from "./components/custom/Alert";
 
 const routes = createBrowserRouter([
@@ -23,6 +24,10 @@ const routes = createBrowserRouter([
   {
     path: "/register",
     Component: SignUp,
+  },
+  {
+    path: "/verifyAccount",
+    Component: VerifyAccount,
   },
   {
     path: "/sys",

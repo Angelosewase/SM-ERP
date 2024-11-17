@@ -6,9 +6,14 @@ import PasswordInput from "@/components/custom/PasswordInput";
 import { SubmitSchoolInfo, SubmitUserInfo } from "@/app/Api/SignUp";
 import { useNavigate } from "react-router-dom";
 import { IsAuth } from "@/app/Api/auth";
-import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import {
+  runCompleteProcess,
+  runFailProcess,
+} from "@/app/features/proccesThunk";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/app/store";
+import { setSchool } from "@/app/features/schoolSlice";
+import { registerSchoolAndUser } from '@/app/features/schoolSlice';
 
 interface FormData {
   adminFirstName: string;
@@ -24,7 +29,7 @@ interface FormData {
 
 function SignUp() {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
 
   useLayoutEffect(() => {
     async function isAuth() {
@@ -37,7 +42,6 @@ function SignUp() {
     }
     isAuth();
   }, [navigate]);
-
 
   const [step, setStep] = useState<number>(1);
   const [formData, setFormData] = useState<FormData>({
@@ -59,54 +63,21 @@ function SignUp() {
         formData.adminLastName.length < 3 ||
         formData.adminEmail.length < 3
       ) {
-        console.log("please enter a valid credentials");
+        dispatch(runFailProcess("Please enter valid credentials"));
         return;
       }
-
       setStep(step + 1);
     } else if (step === 2) {
       if (formData.password !== formData.confirmPassword) {
-        dispatch(runFailProcess("password does not match"))
+        dispatch(runFailProcess("Passwords do not match"));
         return;
       }
-
-      const userData = {
-        firstName: formData.adminFirstName,
-        lastName: formData.adminLastName,
-        email: formData.adminEmail,
-        password: formData.password,
-      };
-
-      const userId = await SubmitUserInfo(userData);
-      if (userId) {
-        setFormData({ ...formData, adminUserId: userId });
-        dispatch(runCompleteProcess("user created successfully"))
-      } else {
-        dispatch(runFailProcess("failed to create user"))
-        return;
-      }
-
       setStep(step + 1);
     } else if (step === 3) {
-      const schoolData = {
-        schoolName: formData.schoolName,
-        address: formData.schoolLocation,
-        email: formData.schoolEmail,
-        admin: formData.adminUserId, // Use adminUserId from previous step
-      };
-
-      if (!schoolData.admin) {
-        dispatch(runFailProcess("school  created"))
-        return;
-      }
-      console.log(formData);
-      const schoolResponse = await SubmitSchoolInfo(schoolData);
-
-      if (schoolResponse) {
-        dispatch(runCompleteProcess("school account created succesfully"))
-        window.location.href = "/";
-      } else {
-        console.error("Failed to register school.");
+      const result = await dispatch(registerSchoolAndUser(formData));
+      console.log(result)
+      if (result) {
+        // window.location.href = "/verifyAccount";
       }
     }
   };
@@ -165,21 +136,21 @@ const SchoolRegistrationStep1: React.FC<{
             <Input
               name="adminFirstName"
               placeholder="Enter first name"
-              className="border-2 placeholder:text-md"
+              className="border-2 placeholder:text-md w-[350px] "
               value={formData.adminFirstName}
               onChange={updateFormData}
             />
             <Input
               name="adminLastName"
               placeholder="Enter last name"
-              className="border-2 placeholder:text-md"
+              className="border-2 placeholder:text-md w-[350px] "
               value={formData.adminLastName}
               onChange={updateFormData}
             />
             <Input
               name="adminEmail"
               placeholder="Enter your email"
-              className="border-2 placeholder:text-md"
+              className="border-2 placeholder:text-md w-[350px] "
               value={formData.adminEmail}
               onChange={updateFormData}
             />

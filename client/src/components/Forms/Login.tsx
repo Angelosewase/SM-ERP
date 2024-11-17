@@ -41,7 +41,7 @@ function LoginForm() {
       <Input
         name="email"
         placeholder="Enter email"
-        className="mb-4 pr-8 border-2"
+        className="mb-4 pr-8 border-2 w-[350px] "
         onChange={handleInputChange}
         value={loginInfo.email}
       />

@@ -19,8 +19,8 @@ function Login() {
   }, [navigate]);
   return (
     <div className="flex  w-[100vw] h-[100vh] justify-center items-center">
-      <div className=" bg-blue-900 w-[55vw] h-[70vh] flex">
-        <div className="w-7/12 relative ">
+      <div className=" bg-blue-900 w-[65vw] h-[70vh] flex">
+        <div className="w-6/12 relative ">
           <img src="/logIn.png" alt="" className="w-full h-full" />
           <div className="absolute top-56 left-16">
             <p className="text-5xl font-semibold text-white ">

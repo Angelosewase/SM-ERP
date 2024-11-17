@@ -85,7 +85,8 @@ async function sendOtp(email, userId) {
       </html>
     `;
 
-    await sendEmail(email, "Brainiacs Account Verification", htmlContent, true);
+    // await sendEmail(email, "Brainiacs Account Verification", htmlContent, true);
+    console.log(otp)
   } catch (error) {
     console.error("Error sending OTP:", error);
     throw error;

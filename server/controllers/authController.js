@@ -154,7 +154,6 @@ const signUpAdmin = async (req, res) => {
     });
     const savedUser = await user.save();
     sendOtp(email, savedUser._id);
-
     res
       .status(200)
       .json({ message: "Admin user created successfully", id: user._id });
