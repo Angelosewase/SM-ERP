@@ -1,11 +1,12 @@
+const { validateAccessToken } = require("../auth/signTokens");
 const { SchoolModel, UserModel } = require("../models/Schemas");
 const { getUserIdFromToken, getSchoolIdFromToken } = require("../utils/jwt");
 
 function generateTheuserResponse(user) {
-    if(!user){
-        console.log(user)
-        return
-    }
+  if (!user) {
+    console.log("userService.js line 6: " + user);
+    return;
+  }
   return {
     _id: user._id,
     firstName: user.firstName,
@@ -20,10 +21,10 @@ function generateTheuserResponse(user) {
 }
 
 function generateTheSchoolRespose(school) {
-    if(!school){
-        console.log(school)
-        return
-    }
+  if (!school) {
+    console.log("userService.js line 27: " + school);
+    return;
+  }
   return {
     _id: school._id,
     name: school.name,
@@ -41,13 +42,9 @@ function generateTheSchoolRespose(school) {
 }
 
 async function getAccountDetails(req, res) {
-  const token = req.cookies.token;
-  const userID = getUserIdFromToken(token);
-  const schoolID = getSchoolIdFromToken(token);
-
   try {
-    const user = await UserModel.findOne({ _id: userID });
-    const school = await SchoolModel.findOne({ _id: schoolID });
+    const user = await UserModel.findById(req.user.id);
+    const school = await SchoolModel.findById(req.user.schoolId);
     const responseUser = generateTheuserResponse(user);
     const schoolResponse = generateTheSchoolRespose(school);
 
@@ -57,7 +54,7 @@ async function getAccountDetails(req, res) {
       school: schoolResponse,
     });
   } catch (error) {
-    console.log(error);
+    console.log("userService.js line 60: " + error);
     res.status(500).send({ message: "internal server error" });
   }
 }

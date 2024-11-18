@@ -13,7 +13,6 @@ async function generateSignUpOtp(userId) {
     const otpHash = await bcrypt.hash(otp, 10);
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await OtpModel.create({ userId, otpValue: otpHash, expiresAt });
-    // console.log(otp)
     return otp;
   } catch (error) {
     console.error("Error generating OTP:", error);

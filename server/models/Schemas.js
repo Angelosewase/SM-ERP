@@ -100,7 +100,7 @@ const schoolSchema = new mongoose.Schema(
     name: { type: String, required: true },
     address: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    establishedYear: { type: Number },
+    establishedYear: { type: Number , default: new Date().getFullYear()},
     admin: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],

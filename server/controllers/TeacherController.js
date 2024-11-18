@@ -142,7 +142,7 @@ const getTeacherById = async (req,res) => {
     }
      res.status(200).json(teacher);
   } catch (error) {
-    console.error(error);
+    console.error("TeacherController.js line 145: " + error);
      res.status(500).json({message:"internal server error"})
   }
 };

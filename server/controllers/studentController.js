@@ -88,7 +88,7 @@ const createStudent = async (req, res) => {
     ]);
     res.status(201).json(newStudent);
   } catch (error) {
-    console.log(error);
+    console.log("studentController.js line 176: " + error);
     console.log(req.body);
 
     if (error instanceof z.ZodError) {

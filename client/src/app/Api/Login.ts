@@ -17,7 +17,7 @@ export async function Login(data: loginInInfo): Promise<loginResponse | null> {
 
   try {
     const response = await axios.post(
-      "http://localhost:3000/users/login",
+      "http://localhost:3000/auth/login",
       data,
       { withCredentials: true }
     );
@@ -40,7 +40,7 @@ export async function Login(data: loginInInfo): Promise<loginResponse | null> {
 
 export async function isLoggedIN() {
   try {
-    const response = await axios.get("http://localhost:3000/users/isAuth");
+    const response = await axios.get("http://localhost:3000/auth/isLoggedIn");
     console.log(response);
   } catch (error) {
     console.log(error);

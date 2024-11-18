@@ -4,6 +4,7 @@ import { RootState } from "../store";
 import { AppDispatch } from "../store";
 import { SubmitSchoolInfo, SubmitUserInfo } from "../Api/SignUp";
 import { runCompleteProcess, runFailProcess } from "./proccesThunk";
+import { FormData } from "@/pages/SignUp";
 
 export interface SchoolState {
   school: schoolIBase | null;
@@ -17,12 +18,9 @@ const initialState: SchoolState = {
   error: null,
 };
 
-// Create async thunk for school registration
-export const registerSchoolAndUser = (formData: any) => async (dispatch: AppDispatch) => {
+export const registerSchoolAndUser = (formData: FormData) => async (dispatch: AppDispatch) => {
   try {
     dispatch(fetchSchoolStart());
-
-    // First create the user
     const userData = {
       firstName: formData.adminFirstName,
       lastName: formData.adminLastName,
@@ -69,9 +67,24 @@ const schoolSlice = createSlice({
       state.error = null;
     },
     fetchSchoolSuccess(state, action: PayloadAction<schoolIBase>) {
-      console.log("fetchSchoolSuccess action payload:", action.payload);
-      state.school = action.payload;
-      state.loading = false;
+      return {
+        school: {
+             _id: action.payload._id,
+             name: action.payload.name,
+             address: action.payload.address,
+             email: action.payload.email,
+             admin: action.payload.admin,
+             teachers: action.payload.teachers,
+             students: action.payload.students,
+             parents: action.payload.parents,
+             classes: action.payload.classes,
+             establishedYear: action.payload.establishedYear,
+             createdAt: action.payload.createdAt,
+             updatedAt: action.payload.updatedAt,
+        },
+        loading: false,
+        error: null
+      };
     },
     fetchSchoolFailure(state, action: PayloadAction<string>) {
       state.loading = false;

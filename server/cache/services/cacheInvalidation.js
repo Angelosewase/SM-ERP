@@ -9,7 +9,7 @@ const invalidateSchoolCache = async (schoolId, patterns) => {
       }
     }
   } catch (error) {
-    console.error('Cache invalidation error:', error);
+    console.error("cacheInvalidation.js line 12: Cache invalidation error: " + error);
   }
 };
 

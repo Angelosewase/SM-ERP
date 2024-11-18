@@ -2,7 +2,7 @@ const { generateSignUpOtp } = require("../auth/otp");
 const { transporter } = require("../config/nodemailer");
 
 async function sendEmail(recipientEmail, subject, message, isHtml = false) {
-  console.log("email sent to", recipientEmail);
+  console.log("mail/index.js line 5: email sent to " + recipientEmail);
   try {
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -11,10 +11,10 @@ async function sendEmail(recipientEmail, subject, message, isHtml = false) {
       ...(isHtml ? { html: message } : { text: message }),
     };
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email sent: " + info.response);
+    console.log("mail/index.js line 17: Email sent: " + info.response);
     return { success: true, message: "Email sent successfully" };
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("mail/index.js line 20: Error sending email:", error);
     return { success: false, message: "Failed to send email" };
   }
 }
@@ -85,8 +85,7 @@ async function sendOtp(email, userId) {
       </html>
     `;
 
-    // await sendEmail(email, "Brainiacs Account Verification", htmlContent, true);
-    console.log(otp)
+    await sendEmail(email, "Brainiacs Account Verification", htmlContent, true);
   } catch (error) {
     console.error("Error sending OTP:", error);
     throw error;

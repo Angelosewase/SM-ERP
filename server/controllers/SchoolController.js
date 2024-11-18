@@ -6,6 +6,7 @@ const {
 } = require("../validators/school");
 const { UserModel, SchoolModel } = require("../models/Schemas");
 const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
+const { generateTheSchoolRespose } = require("../services/userService");
 
 async function RegisterSchool(req, res) {
   try {
@@ -43,12 +44,12 @@ async function RegisterSchool(req, res) {
 
     res
       .status(201)
-      .json({ message: "School registered successfully", school: newSchool });
+      .json({ message: "School registered successfully", school: generateTheSchoolRespose(newSchool)});
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors });
     }
-    console.log(error);
+    console.log("SchoolController.js line 52: " + error);
     res.status(500).json({ error: "Something went wrong" });
   }
 }

@@ -3,19 +3,14 @@ import { Button } from "../components/ui/Button";
 import Input from "../components/custom/Input";
 import { Progress } from "@/components/ui/progress";
 import PasswordInput from "@/components/custom/PasswordInput";
-import { SubmitSchoolInfo, SubmitUserInfo } from "@/app/Api/SignUp";
 import { useNavigate } from "react-router-dom";
 import { IsAuth } from "@/app/Api/auth";
-import {
-  runCompleteProcess,
-  runFailProcess,
-} from "@/app/features/proccesThunk";
+import { runFailProcess } from "@/app/features/proccesThunk";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/app/store";
-import { setSchool } from "@/app/features/schoolSlice";
 import { registerSchoolAndUser } from '@/app/features/schoolSlice';
 
-interface FormData {
+export interface FormData {
   adminFirstName: string;
   adminLastName: string;
   adminEmail: string;
@@ -24,7 +19,7 @@ interface FormData {
   schoolName: string;
   schoolEmail: string;
   schoolLocation: string;
-  adminUserId: string | null; // Store user ID after registration, null initially
+  adminUserId: string | null;
 }
 
 function SignUp() {
@@ -53,7 +48,7 @@ function SignUp() {
     schoolName: "",
     schoolEmail: "",
     schoolLocation: "",
-    adminUserId: null as string | null, // Store user ID after registration
+    adminUserId: null as string | null,
   });
 
   const handleNextStep = async () => {
@@ -77,7 +72,10 @@ function SignUp() {
       const result = await dispatch(registerSchoolAndUser(formData));
       console.log(result)
       if (result) {
-        // window.location.href = "/verifyAccount";
+        navigate("/verifyAccount");
+      }
+      if (result === null) {
+        dispatch(runFailProcess("Failed to create school"));
       }
     }
   };

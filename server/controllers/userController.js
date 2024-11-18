@@ -67,7 +67,7 @@ async function updateUser(req, res) {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    console.log(error);
+    console.log("userController.js line 70: " + error);
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
     }
@@ -105,7 +105,7 @@ async function uploadProfileImage(req, res) {
       message: "uploaded successfully",
     });
   } catch (error) {
-    console.log(error);
+    console.log("userController.js line 108: " + error);
   }
 }
 

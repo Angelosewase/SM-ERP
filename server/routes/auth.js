@@ -4,6 +4,8 @@ const {
   Logout,
   OtpAccountVerification,
   ChangePassword,
+  isLoggedIn,
+  authenticate,
 } = require("../controllers/authController");
 const { isValidObjectId } = require('mongoose');
 
@@ -18,5 +20,6 @@ router.post("/verify/:userId", (req, res, next) => {
   OtpAccountVerification(req, res, next);
 });
 router.post("/changePassword", ChangePassword)
+router.get("/isLoggedIn", authenticate, isLoggedIn)
 
 module.exports = router;

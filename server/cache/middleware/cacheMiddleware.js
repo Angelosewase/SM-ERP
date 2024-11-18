@@ -5,7 +5,6 @@ const cacheMiddleware = (duration = 3600) => {
     if (req.method !== 'GET') {
       return next();
     }
-
     const key = `${req.user.schoolId}:${req.originalUrl}`;
     
     try {

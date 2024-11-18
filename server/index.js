@@ -14,6 +14,7 @@ const {feesGroupRouter,FeesRouter} = require("./routes/feesRoute");
 const cookieParser = require("cookie-parser");
 // const { isAuth } = require("./middlewares/authentication");
 const { getAccountDetails } = require("./services/userService");
+const { authenticate } = require("./controllers/authController");
 const app = express();
 
 require("dotenv").config();
@@ -47,7 +48,7 @@ app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
 app.use("/class", classRouter);
 app.use("/parent", parentRouter);
-app.get("/details", getAccountDetails);
+app.get("/details", authenticate, getAccountDetails);
 app.use("/expenses", expenseRouter);
 app.use("/subjects", subjectRouter);
 app.use("/fees",FeesRouter);

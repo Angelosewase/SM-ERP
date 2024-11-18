@@ -53,7 +53,6 @@ const Login = async (req, res) => {
       res.status(404).json({ message: "Invalid user data" });
       return;
     }
-
     const userResponse = generateTheuserResponse(user);
     const schoolResponse = generateTheSchoolRespose(associatedSchool);
 
@@ -90,7 +89,7 @@ const Login = async (req, res) => {
         .status(400)
         .json({ message: "Invalid login data", errors: error.errors });
     }
-    console.error(error);
+    console.error("authController.js line 93: " + error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -101,7 +100,7 @@ const Logout = async (req, res) => {
     res.clearCookie("refreshToken");
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    console.error(error);
+    console.error("authController.js line 106: " + error);
   }
 };
 
@@ -112,7 +111,7 @@ const refreshToken = async (req, res) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const decoded = validateRefreshToken(refreshToken);
-    const user = await UserModel.findById(decoded.userId);
+    const user = await UserModel.findById(decoded);
     if (!user) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -128,7 +127,7 @@ const refreshToken = async (req, res) => {
     });
     res.status(200).json({ message: "Token refreshed" });
   } catch (error) {
-    console.error(error);
+    console.error("authController.js line 134: " + error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -171,7 +170,6 @@ const signUpAdmin = async (req, res) => {
 
 async function authenticate(req, res, next) {
   const { token, refreshToken } = req.cookies;
-
   try {
     if (token) {
       const decoded = validateAccessToken(token);
@@ -184,7 +182,7 @@ async function authenticate(req, res, next) {
       if (!user) {
         return res
           .status(401)
-          .json({ authorised: false, message: "not authorised" });
+          .json({ authorised: false, message: "not authorised, user not found" });
       }
       const newAccessToken = generateAccessToken({
         id: user._id,
@@ -198,7 +196,6 @@ async function authenticate(req, res, next) {
       });
 
       req.user = { id: user._id, schoolId: user.school };
-      console.log(req.user, "refresh token validated")
       return next();
     }
 
@@ -206,7 +203,7 @@ async function authenticate(req, res, next) {
       .status(401)
       .json({ authorised: false, message: "not authorised" });
   } catch (error) {
-    console.error(error);
+    console.error("authController.js line 227: " + error);
     return res
       .status(401)
       .json({ authorised: false, message: "not authorised" });
@@ -218,6 +215,9 @@ async function OtpAccountVerification(req, res) {
 
   try {
     const { otpCode } = req.body;
+    if (!otpCode) {
+      return res.status(400).json({ message: "OTP code is required" });
+    }
     const user = await UserModel.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -235,7 +235,7 @@ async function OtpAccountVerification(req, res) {
       .status(200)
       .json({ message: "Account has been successfully activated" });
   } catch (error) {
-    console.error("Error in OtpAccountVerification:", error);
+    console.error("authController.js line 241: Error in OtpAccountVerification: " + error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -288,6 +288,15 @@ async function ChangePassword(req, res) {
   }
 }
 
+
+async function isLoggedIn(req, res) {
+  const user = await UserModel.findById(req.user.id)
+  if (!user) {
+    return res.status(401).json({ message: "unauthorized" });
+  }
+  res.status(200).json({ authorised: true, user: generateTheuserResponse(user) })
+}
+
 module.exports = {
   Login,
   Logout,
@@ -296,4 +305,5 @@ module.exports = {
   authenticate,
   OtpAccountVerification,
   ChangePassword,
+  isLoggedIn,
 };

@@ -6,9 +6,12 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { schoolSelector } from "@/app/features/schoolSlice";
 import { verifyAccount } from "@/app/Api/auth";
+import { runCompleteProcess, runFailProcess } from "@/app/features/proccesThunk";
+import { AppDispatch } from "@/app/store";
+import { useNavigate } from "react-router-dom";
 
 export function InputOTPPattern({
   value,
@@ -57,29 +60,28 @@ export function InputOTPPattern({
 
 function VerifyAccount() {
   const [otpState, setOtpState] = useState<string>("");
-  const school = useSelector(schoolSelector)
-  console.log(school)
+  const school = useSelector(schoolSelector).school
+  const dispatch = useDispatch<AppDispatch>()
+  const navigate = useNavigate()
 
   async function handleSubmit() {
-    console.log("sumitting");
     if (!school) {
-      console.log("no user found");
+    dispatch(runFailProcess("no user found"))
       return;
     }
   if(otpState.length != 6){
-    console.log("Invalid otpcode ")
-    return
-  }
-
-    console.log(school.school?.admin);
-    console.log(otpState);
+    dispatch(runFailProcess("Invalid otpcode "))
+      return;
+    }
     try {
       const res = await verifyAccount({
-        optCode: otpState,
-      }, school.school?.admin[0] || "error");
-      console.log(res);
+        otpCode: otpState,
+      },school.admin[0] || "error");
+      dispatch(runCompleteProcess(res))
+      navigate("/")
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error)
+      dispatch(runFailProcess(error.message))
     }
   }
 

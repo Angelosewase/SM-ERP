@@ -83,7 +83,6 @@ const Fact: React.FC<FactProps> = ({ color, children, label, value }) => {
 
 const Facts: React.FC = () => {
   const school = useSelector(schoolSelector).school;
-  console.log(school);
   if (!school) {
     console.log("invalid state");
     return (

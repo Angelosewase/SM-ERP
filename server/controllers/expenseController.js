@@ -31,7 +31,7 @@ const createExpenseRecord = async (req, res) => {
     if (error instanceof z.ZodError) {
       res.status(400).json({ errors: error.errors });
     } else {
-      console.log(error);
+      console.log("expenseController.js line 34: " + error);
       res.status(500).json({ error: "Failed to create expense record" });
     }
   }
@@ -66,7 +66,7 @@ const getExpenseRecordById = async (req, res) => {
     if (error instanceof z.ZodError) {
       res.status(400).json({ errors: error.errors });
     } else {
-      console.log(error);
+      console.log("expenseController.js line 52: " + error);
       res.status(500).json({ error: "Failed to fetch expense record" });
     }
 
@@ -98,7 +98,7 @@ const updateExpenseRecord = async (req, res) => {
       if (error instanceof z.ZodError) {
         res.status(400).json({ errors: error.errors });
       } else {
-        console.log(error);
+        console.log("expenseController.js line 67: " + error);
         res.status(500).json({ error: "Failed to update expense record" });
       }
 
@@ -123,7 +123,7 @@ const updateExpenseRecord = async (req, res) => {
       if (error instanceof z.ZodError) {
         res.status(400).json({ errors: error.errors });
       } else {
-        console.log(error);
+        console.log("expenseController.js line 78: " + error);
         res.status(500).json({ error: "Failed to delete expense record" });
       }
 

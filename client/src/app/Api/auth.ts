@@ -2,7 +2,7 @@ import axios from "axios";
 
 export async function IsAuth(): Promise<string | null> {
   try {
-    const response = await axios.get("http://localhost:3000/auth/isAuth", {
+    const response = await axios.get("http://localhost:3000/auth/isLoggedIn", {
       withCredentials: true,
     });
     return response.data;

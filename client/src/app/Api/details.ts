@@ -1,5 +1,4 @@
 import axios from "axios";
-
 import { schoolIBase, UserIBase } from "../globals";
 
 export interface accountDetails {
