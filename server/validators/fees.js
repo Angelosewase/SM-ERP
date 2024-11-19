@@ -1,7 +1,7 @@
 const { z } = require("zod");
 const schoolIdValidator = z.string().min(1, "School ID is required");
 const classIdValidator = z.string().optional();
-const feeTypeValidator = z.string().min(1, "Fee type is required");
+const feeTypeValidator = z.string().min(2, "Fee type is required");
 const amountValidator = z.number()
 const dueDateValidator = z.date({
   required_error: "Due date is required",
@@ -13,7 +13,6 @@ const createFeeValidator = z.object({
   classId: classIdValidator,
   feeType: feeTypeValidator,
   amount: amountValidator,
-  dueDate: dueDateValidator,
 });
 
 const updateFeeValidator = createFeeValidator.partial();
@@ -26,6 +25,7 @@ const createFeeGroupValidator = z.object({
   description: descriptionValidator,
   schoolId: schoolIdValidator,
   amount: amountValidator,
+  fees: z.array(z.string()).min(1, "Fees are required"),
 });
 
 const updateFeeGroupValidator = createFeeGroupValidator.partial();

@@ -100,7 +100,7 @@ const schoolSchema = new mongoose.Schema(
     name: { type: String, required: true },
     address: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    establishedYear: { type: Number , default: new Date().getFullYear()},
+    establishedYear: { type: Number, default: new Date().getFullYear() },
     admin: [
       { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     ],
@@ -121,7 +121,7 @@ const userSchema = new mongoose.Schema(
     school: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
     role: { type: String, enum: ["admin", "teacher"], default: "teacher" },
     teacher: { type: mongoose.Schema.Types.ObjectId, ref: "Teacher" },
-    active :{type:Boolean , required:true , default:false}
+    active: { type: Boolean, required: true, default: false },
   },
   { timestamps: true }
 );
@@ -272,7 +272,6 @@ const feeSchema = new mongoose.Schema(
     },
     feeType: { type: String, required: true },
     amount: { type: Number, required: true },
-    dueDate: { type: Date, required: true },
   },
   { timestamps: true }
 );
@@ -314,6 +313,7 @@ const feeGroupSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    fees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fee", required: true }],
   },
   { timestamps: true }
 );
@@ -394,5 +394,5 @@ module.exports = {
   PaymentModel,
   FeeGroupModel,
   ProfilePicModel,
-  OtpModel, 
+  OtpModel,
 };

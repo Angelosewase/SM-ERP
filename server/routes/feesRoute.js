@@ -16,6 +16,7 @@ const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 const FeesRouter = express.Router();
 FeesRouter.use(authenticate);
 const feesGroupRouter = express.Router();
+feesGroupRouter.use(authenticate);
 
 FeesRouter.post("/", createFee);
 FeesRouter.get("/", cacheMiddleware(300), getFeesBySchool);

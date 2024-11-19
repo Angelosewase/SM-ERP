@@ -117,6 +117,10 @@ const deleteFee = async (req, res) => {
   }
 };
 
+
+
+// fees groups 
+
 const createFeeGroup = async (req, res) => {
   const schoolId = req.user.schoolId;
   if (!schoolId) {

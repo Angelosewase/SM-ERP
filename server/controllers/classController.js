@@ -186,11 +186,13 @@ const deleteClass = async (req, res) => {
 
 async function promoteclassHandler(req, res) {
   try {
-    const validData = promoteClassInofValidator(req.body);
-    promoteClass(validData.classId, validData.newClassId);
-    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
+    const validData = promoteClassInofValidator.parse(req.body);
+    await promoteClass(validData.classId, validData.newClassId);
+    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`, '/student']);
+    res.status(200).json({ message: "Class promoted successfully" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: error.message });
   }
 }
 

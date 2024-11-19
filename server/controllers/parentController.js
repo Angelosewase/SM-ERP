@@ -32,7 +32,7 @@ const createParent = async (req, res) => {
   }
 
   try {
-    createParentValidator.parse(req.body);
+    createParentValidator.parse({...req.body, schoolId});
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ errors: error.errors });
@@ -50,7 +50,7 @@ const createParent = async (req, res) => {
       phoneNumber,
       child,
       gender,
-      schoolId,
+      schoolId : schoolId
     });
     await StudentModel.findByIdAndUpdate(child, {
       $push: { parents: newParent._id },
@@ -63,6 +63,10 @@ const createParent = async (req, res) => {
     await invalidateSchoolCache(schoolId, [
       "/parent",
       `/parent/${newParent._id}`,
+    ]);
+    await invalidateSchoolCache(schoolId, [
+      "/student",
+      `/student/${child}`,
     ]);
 
     res.status(201).json(newParent);

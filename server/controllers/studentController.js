@@ -82,9 +82,11 @@ const createStudent = async (req, res) => {
     await ClassModel.findByIdAndUpdate(validateData.classId, {
       $push: { students: newStudent._id },
     });
-    await invalidateSchoolCache(schoolId, [
+    await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${newStudent._id}`,
+      '/class',
+      `/class/${validateData.classId}`,
     ]);
     res.status(201).json(newStudent);
   } catch (error) {
@@ -126,9 +128,12 @@ const deleteStudent = async (req, res) => {
     });
 
     const deletedStudent = await StudentModel.findByIdAndDelete(validatedId);
-    await invalidateSchoolCache(schoolId, [
+    await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validatedId}`,
+      '/class',
+      `/class/${student.classId}`,
+      '/parent', 
     ]);
 
     res.status(200).json(deletedStudent);
@@ -148,9 +153,11 @@ const updateStudent = async (req, res) => {
       validatedData,
       { new: true }
     );
-    await invalidateSchoolCache(schoolId, [
+    await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validID}`,
+      '/class',
+      `/class/${validatedData.classId}`,
     ]);
     res.status(200).json(updatedStudent);
   } catch (error) {
@@ -189,11 +196,13 @@ async function promoteStudentHandler(req, res) {
     await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validateData.studentId}`,
-      `/student/class/${validateData.fromClassId}`,
-      `/student/class/${validateData.toClassId} `,
+      '/class',
+      `/class/${validateData.fromClassId}`,
+      `/class/${validateData.toClassId} `,
     ]);
+    res.status(200).json({ message: "Student promoted successfully" });
   } catch (error) {
-    res.status(400).send({ message: "error promoting student" });
+    res.status(400).send({ message: "error promoting student" , error: error.message });
   }
 }
 

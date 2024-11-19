@@ -1,4 +1,4 @@
-const { ClassModel } = require("../models/Schemas");
+const { ClassModel, StudentModel } = require("../models/Schemas");
 
 const promoteClass = async (classId, newClassId) => {
   try {
@@ -12,7 +12,7 @@ const promoteClass = async (classId, newClassId) => {
       return { message: "No students to promote in this class" };
     }
 
-    await Student.updateMany(
+    await StudentModel.updateMany(
       { _id: { $in: studentIds } },
       { $set: { classId: newClassId } }
     );
