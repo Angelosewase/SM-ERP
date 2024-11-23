@@ -2,7 +2,6 @@ const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");
 
-
 const { z } = require("zod");
 const {
   createFeeValidator,
@@ -24,8 +23,8 @@ const createFee = async (req, res) => {
       schoolId,
       ...req.body,
     });
-    const { classId, feeType, amount, dueDate } = validatedData;
-    const fee = new FeeModel({ schoolId, classId, feeType, amount, dueDate });
+    const { classId, feeType, amount } = validatedData;
+    const fee = new FeeModel({ schoolId, classId, feeType, amount });
     await fee.save();
     await invalidateSchoolCache(schoolId, ["/fees", `/fees/${fee._id}`]);
     return res.status(201).json(fee);
@@ -87,10 +86,15 @@ const updateFee = async (req, res) => {
     const { id } = req.params;
     const validatedData = updateFeeValidator.parse(req.body);
 
-    const fee = await FeeModel.findByIdAndUpdate(id, validatedData, { new: true });
+    const fee = await FeeModel.findByIdAndUpdate(id, validatedData, {
+      new: true,
+    });
 
     if (!fee) return res.status(404).json({ message: "Fee not found" });
-    await invalidateSchoolCache(req.user.schoolId, ["/fees", `/fees/${fee._id}`]);
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/fees",
+      `/fees/${fee._id}`,
+    ]);
     return res.status(200).json(fee);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -117,9 +121,7 @@ const deleteFee = async (req, res) => {
   }
 };
 
-
-
-// fees groups 
+// fees groups
 
 const createFeeGroup = async (req, res) => {
   const schoolId = req.user.schoolId;
@@ -127,17 +129,33 @@ const createFeeGroup = async (req, res) => {
     res.status(401).json({ message: "Invalid credentials" });
     return;
   }
-  console.log(req.body.amount)
 
   try {
-    console.log(schoolId, req.body);
+
     const validatedData = createFeeGroupValidator.parse({
       schoolId,
       ...req.body,
     });
-    const { name, description,amount } = validatedData;
+    const { name, description, fees } = validatedData;
 
-    const feeGroup = new FeeGroupModel({ name, description, schoolId , amount});
+    const amount = await fees.reduce(async (promise, feeID) => {
+      const sum = await promise;
+      const fee = await FeeModel.findById(feeID);
+      if (!fee) {
+        throw new Error(`Fee with ID ${feeID} not found`);
+      }
+      return sum + fee.amount;
+    }, Promise.resolve(0));
+
+    console.log(amount);
+
+    const feeGroup = new FeeGroupModel({
+      name,
+      description,
+      schoolId,
+      amount,
+      fees,
+    });
     await feeGroup.save();
     await invalidateSchoolCache(req.user.schoolId, [
       "/fees-groups",
@@ -176,7 +194,8 @@ const getFeeGroupById = async (req, res) => {
   try {
     const { id } = req.params;
     const feeGroup = await FeeGroupModel.findById(id);
-    if (!feeGroup) return res.status(404).json({ message: "Fee group not found" });
+    if (!feeGroup)
+      return res.status(404).json({ message: "Fee group not found" });
     return res.status(200).json(feeGroup);
   } catch (error) {
     return res.status(500).json({ message: "Error fetching fee group", error });
@@ -188,9 +207,12 @@ const updateFeeGroup = async (req, res) => {
     const { id } = req.params;
     const validatedData = updateFeeGroupValidator.parse(req.body);
 
-    const feeGroup = await FeeGroupModel.findByIdAndUpdate(id, validatedData, { new: true });
+    const feeGroup = await FeeGroupModel.findByIdAndUpdate(id, validatedData, {
+      new: true,
+    });
 
-    if (!feeGroup) return res.status(404).json({ message: "Fee group not found" });
+    if (!feeGroup)
+      return res.status(404).json({ message: "Fee group not found" });
     await invalidateSchoolCache(req.user.schoolId, [
       "/fees-groups",
       `/fees-groups/${feeGroup._id}`,
@@ -210,7 +232,8 @@ const deleteFeeGroup = async (req, res) => {
   try {
     const { id } = req.params;
     const feeGroup = await FeeGroupModel.findByIdAndDelete(id);
-    if (!feeGroup) return res.status(404).json({ message: "Fee group not found" });
+    if (!feeGroup)
+      return res.status(404).json({ message: "Fee group not found" });
     await invalidateSchoolCache(req.user.schoolId, [
       "/fees-groups",
       `/fees-groups/${feeGroup._id}`,

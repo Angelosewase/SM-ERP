@@ -15,46 +15,6 @@ const parentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const transactionRecordSchema = new mongoose.Schema(
-  {
-    studentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
-    },
-    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
-    amount: { type: Number, required: true },
-    paymentDate: { type: Date, default: Date.now },
-    transactionType: {
-      type: String,
-      enum: ["tuition", "books", "uniform"],
-      required: true,
-    },
-    status: {
-      type: String,
-      enum: ["paid", "pending", "overdue"],
-      default: "pending",
-    },
-  },
-  { timestamps: true }
-);
-
-const expenseRecordSchema = new mongoose.Schema(
-  {
-    name: String,
-    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
-    amount: { type: Number, required: true },
-    paymentDate: { type: Date, default: Date.now },
-    transactionType: String,
-    status: {
-      type: String,
-      enum: ["paid", "pending", "overdue"],
-      default: "pending",
-    },
-  },
-  { timestamps: true }
-);
-
 const studentSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true },
@@ -72,8 +32,11 @@ const studentSchema = new mongoose.Schema(
     },
     parents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Parent" }],
     gender: { type: String, enum: ["male", "female"], required: true },
-    balance: { type: Number, default: 0 },
-    fees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fee" }],
+    feesStatus: {
+      type: String,
+      enum: ["paid", "unpaid", "pending"],
+      default: "unpaid",
+    },
   },
   { timestamps: true }
 );
@@ -266,31 +229,9 @@ const feeSchema = new mongoose.Schema(
       ref: "School",
       required: true,
     },
-    classId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
-    },
-    feeType: { type: String, required: true },
+    feeType: { type: String, required: true, unique: true },
     amount: { type: Number, required: true },
-  },
-  { timestamps: true }
-);
-
-const paymentSchema = new mongoose.Schema(
-  {
-    studentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student",
-      required: true,
-    },
-    feeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Fee",
-      required: true,
-    },
-    amountPaid: { type: Number, required: true },
-    paymentDate: { type: Date, default: Date.now },
-    paymentMethod: { type: String },
+    category: String,
   },
   { timestamps: true }
 );
@@ -313,7 +254,88 @@ const feeGroupSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    fees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Fee", required: true }],
+    fees: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Fee", required: true },
+    ],
+  },
+  { timestamps: true }
+);
+
+const feesAssignmentSchema = new mongoose.Schema(
+  {
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "School",
+      required: true,
+    },
+    classId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Class",
+      required: true,
+    },
+    feesGroups: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "FeeGroup",
+        required: true,
+        unique: true,
+      },
+    ],
+  },
+  { timestamps: true }
+);
+
+const transactionRecordSchema = new mongoose.Schema(
+  {
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
+    amount: { type: Number, required: true },
+    paymentDate: { type: Date, default: Date.now },
+    status: {
+      type: String,
+      enum: ["paid", "pending", "overdue"],
+      default: "pending",
+    },
+    feesId: { type: mongoose.Schema.Types.ObjectId, ref: "Fee" },
+    paymentMethod: { type: String, default: "cash" },
+    feeGroup: { type: mongoose.Schema.Types.ObjectId, ref: "FeeGroup" },
+  },
+  { timestamps: true }
+);
+
+const paymentSchema = new mongoose.Schema(
+  {
+    studentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student",
+      required: true,
+    },
+    feesPaid: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Fee",
+        required: true,
+      },
+    ],
+    feesToBePaid: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Fee",
+        required: true,
+      },
+    ],
+    pendingFeesPayments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Fee",
+        required: true,
+      },
+    ],
+    paymentDate: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
@@ -350,6 +372,22 @@ const OtpSchema = new mongoose.Schema({
   },
 });
 
+const expenseRecordSchema = new mongoose.Schema(
+  {
+    name: String,
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School" },
+    amount: { type: Number, required: true },
+    paymentDate: { type: Date, default: Date.now },
+    transactionType: String,
+    status: {
+      type: String,
+      enum: ["paid", "pending", "overdue"],
+      default: "pending",
+    },
+  },
+  { timestamps: true }
+);
+
 //models
 
 const FeeGroupModel = mongoose.model("FeeGroup", feeGroupSchema);
@@ -359,6 +397,7 @@ const FinancialTransactionModel = mongoose.model(
   "TransactionRecord",
   transactionRecordSchema
 );
+
 const ExpenseModel = mongoose.model("ExpenseModel", expenseRecordSchema);
 const TeacherModel = mongoose.model("Teacher", teacherSchema);
 const StudentModel = mongoose.model("Student", studentSchema);
@@ -374,6 +413,10 @@ const FeeModel = mongoose.model("Fee", feeSchema);
 const PaymentModel = mongoose.model("Payment", paymentSchema);
 const ProfilePicModel = mongoose.model("ProfilePics", ProfilePicsSchema);
 const OtpModel = mongoose.model("Otp", OtpSchema);
+const FeesAssignmentModel = mongoose.model(
+  "feesAssignment",
+  feesAssignmentSchema
+);
 
 module.exports = {
   UserModel,
@@ -395,4 +438,5 @@ module.exports = {
   FeeGroupModel,
   ProfilePicModel,
   OtpModel,
+  FeesAssignmentModel,
 };

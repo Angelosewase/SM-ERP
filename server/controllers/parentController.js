@@ -39,20 +39,10 @@ const createParent = async (req, res) => {
     }
   }
 
-  const { firstName, lastName, email, address, phoneNumber, child, gender } =
-    req.body;
   try {
-    const newParent = await ParentModel.create({
-      firstName,
-      lastName,
-      email,
-      address,
-      phoneNumber,
-      child,
-      gender,
-      schoolId : schoolId
-    });
-    await StudentModel.findByIdAndUpdate(child, {
+   const validatedData = createParentValidator.parse({...req.body, schoolId});
+    const newParent = await ParentModel.create(validatedData);
+    await StudentModel.findByIdAndUpdate(validatedData.child, {
       $push: { parents: newParent._id },
     });
 
@@ -66,7 +56,7 @@ const createParent = async (req, res) => {
     ]);
     await invalidateSchoolCache(schoolId, [
       "/student",
-      `/student/${child}`,
+      `/student/${validatedData.child}`,
     ]);
 
     res.status(201).json(newParent);

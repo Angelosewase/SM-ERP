@@ -1,3 +1,4 @@
+const { default: mongoose } = require("mongoose");
 const { z } = require("zod");
 const schoolIdValidator = z.string().min(1, "School ID is required");
 const classIdValidator = z.string().optional();
@@ -24,8 +25,7 @@ const createFeeGroupValidator = z.object({
   name: nameValidator,
   description: descriptionValidator,
   schoolId: schoolIdValidator,
-  amount: amountValidator,
-  fees: z.array(z.string()).min(1, "Fees are required"),
+  fees: z.array(z.string()).min(1, "Fees are required").refine((values) => values.every(val => mongoose.Types.ObjectId.isValid(val)), "Invalid fee id"),
 });
 
 const updateFeeGroupValidator = createFeeGroupValidator.partial();

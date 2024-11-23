@@ -13,7 +13,7 @@ const  { z }  = require("zod")
 
  const phoneNumberValidator = z.string().optional();
 
- const childValidator = z.string().optional();
+ const childValidator = z.string().refine((val)=>mongoose.Types.ObjectId.isValid(val), "Invalid child ID");
 
  const genderValidator = z.enum(["male", "female"]);
 
