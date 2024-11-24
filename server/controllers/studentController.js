@@ -18,7 +18,9 @@ const {
 const { objectIdValidator } = require("../validators/user");
 const { promoteStudent } = require("../services/studentService");
 const { uploadToCloudinary } = require("../config/cloudinaryConfig");
-const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
+const {
+  invalidateSchoolCache,
+} = require("../cache/services/cacheInvalidation");
 
 const getStudents = async (req, res) => {
   const schoolId = req.user.schoolId;
@@ -85,7 +87,7 @@ const createStudent = async (req, res) => {
     await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${newStudent._id}`,
-      '/class',
+      "/class",
       `/class/${validateData.classId}`,
     ]);
     res.status(201).json(newStudent);
@@ -131,9 +133,9 @@ const deleteStudent = async (req, res) => {
     await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validatedId}`,
-      '/class',
+      "/class",
       `/class/${student.classId}`,
-      '/parent', 
+      "/parent",
     ]);
 
     res.status(200).json(deletedStudent);
@@ -156,7 +158,7 @@ const updateStudent = async (req, res) => {
     await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validID}`,
-      '/class',
+      "/class",
       `/class/${validatedData.classId}`,
     ]);
     res.status(200).json(updatedStudent);
@@ -196,13 +198,15 @@ async function promoteStudentHandler(req, res) {
     await invalidateSchoolCache(req.user.schoolId, [
       "/student",
       `/student/${validateData.studentId}`,
-      '/class',
+      "/class",
       `/class/${validateData.fromClassId}`,
       `/class/${validateData.toClassId} `,
     ]);
     res.status(200).json({ message: "Student promoted successfully" });
   } catch (error) {
-    res.status(400).send({ message: "error promoting student" , error: error.message });
+    res
+      .status(400)
+      .send({ message: "error promoting student", error: error.message });
   }
 }
 
@@ -214,14 +218,14 @@ async function uploadStudentImage(req, res) {
   profileImage = req.file.path;
 
   const { id } = req.params;
-  if(!id){
-    res.status(400).send({message: "no student id provided"})
-  return;
+  if (!id) {
+    res.status(400).send({ message: "no student id provided" });
+    return;
   }
   const student = await StudentModel.findById(id);
   if (!student) {
     res.status(404).send({ message: "student not found" });
-    return
+    return;
   }
   try {
     const result = await uploadToCloudinary(profileImage);
@@ -250,7 +254,9 @@ const getStudentsByClass = async (req, res) => {
     const students = await StudentModel.find({ classId });
 
     if (!students) {
-      return res.status(404).json({ message: "No students found for this class" });
+      return res
+        .status(404)
+        .json({ message: "No students found for this class" });
     }
 
     res.status(200).json(students);
@@ -260,6 +266,21 @@ const getStudentsByClass = async (req, res) => {
   }
 };
 
+async function getStudentFeesPaymentStatus(req, res) {
+  try {
+    const { id } = req.params;
+    const studentPayments = await PaymentModel.find({ studentId: id }).populate(
+      "paidFees",
+      "pendingFees",
+      "feesToBePaid"
+    );
+    res.status(200).json(studentPayments);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error fetching student fees payment status" });
+  }
+}
 
 module.exports = {
   getStudents,
@@ -270,4 +291,5 @@ module.exports = {
   getStudentbyStudentId,
   uploadStudentImage,
   getStudentsByClass,
+  getStudentFeesPaymentStatus,
 };

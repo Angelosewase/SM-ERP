@@ -1,4 +1,12 @@
-const { ClassModel, SchoolModel, ScheduleModel, StudentModel, SubjectModel, TeacherModel } = require("../models/Schemas");
+const {
+  ClassModel,
+  SchoolModel,
+  ScheduleModel,
+  StudentModel,
+  SubjectModel,
+  TeacherModel,
+  PaymentModel,
+} = require("../models/Schemas");
 const {
   createClassValidator,
   updateClassValidator,
@@ -9,8 +17,11 @@ const mongoose = require("mongoose");
 const {
   promoteClass,
   convertClassesToValueNamePairs,
+  assignFeesToClass,
 } = require("../services/classService");
-const { invalidateSchoolCache } = require('../cache/services/cacheInvalidation');
+const {
+  invalidateSchoolCache,
+} = require("../cache/services/cacheInvalidation");
 
 const getClasses = async (req, res) => {
   const schoolId = req.user.schoolId;
@@ -26,9 +37,7 @@ const getClasses = async (req, res) => {
   }
 };
 
-
-
-const getFormatedClasses = async (req, res) => {
+const getFormattedClasses = async (req, res) => {
   const schoolId = req.user.schoolId;
   if (!schoolId) {
     res.status(401).json({ message: "invalid credentials" });
@@ -55,9 +64,10 @@ const getClassById = async (req, res) => {
 
   try {
     const validatedId = idValidator.parse(id);
-    const classData = await ClassModel.findById(validatedId).populate(
-      "students"
-    ).populate("subjects", "name").populate("schoolId");
+    const classData = await ClassModel.findById(validatedId)
+      .populate("students")
+      .populate("subjects", "name")
+      .populate("schoolId");
     if (!classData) {
       return res.status(404).json({ error: "Class not found" });
     }
@@ -73,7 +83,6 @@ const createClass = async (req, res) => {
     res.status(401).json({ message: "invalid credentials" });
     return;
   }
-
   try {
     const validatedData = createClassValidator.parse({
       ...req.body,
@@ -91,8 +100,8 @@ const createClass = async (req, res) => {
     const newClass = await ClassModel.create(validatedData);
     await SchoolModel.findByIdAndUpdate(schoolID, {
       $push: { classes: newClass._id },
-    })
-    await invalidateSchoolCache(req.user.schoolId, ['/class']);
+    });
+    await invalidateSchoolCache(req.user.schoolId, ["/class"]);
 
     res.status(201).json(newClass);
   } catch (error) {
@@ -125,7 +134,10 @@ const updateClass = async (req, res) => {
     if (!updatedClass) {
       return res.status(404).json({ error: "Class not found" });
     }
-    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/class",
+      `/class/${req.params.id}`,
+    ]);
     res.status(200).json(updatedClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -173,7 +185,10 @@ const deleteClass = async (req, res) => {
     });
 
     const deletedClass = await ClassModel.findByIdAndDelete(validatedId);
-    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`]);
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/class",
+      `/class/${req.params.id}`,
+    ]);
     res.status(200).json(deletedClass);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -183,15 +198,51 @@ const deleteClass = async (req, res) => {
   }
 };
 
-
-async function promoteclassHandler(req, res) {
+async function promoteClassHandler(req, res) {
   try {
     const validData = promoteClassInofValidator.parse(req.body);
     await promoteClass(validData.classId, validData.newClassId);
-    await invalidateSchoolCache(req.user.schoolId, ['/class', `/class/${req.params.id}`, '/student']);
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/class",
+      `/class/${req.params.id}`,
+      "/student",
+    ]);
     res.status(200).json({ message: "Class promoted successfully" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function assignFeesToClassController(req, res) {
+  const { classId } = req.params;
+  const { feesGroups } = req.body;
+  try {
+    await assignFeesToClass(classId, feesGroups);
+    await invalidateSchoolCache(req.user.schoolId, [
+      "/class",
+      `/class/${req.params.id}`,
+      "/fees-groups",
+    ]);
+    res.status(200).json({ message: "Fees assigned to class successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function getStudentsFeesPaymentStatus(req, res) {
+  try {
+    const { classId } = req.params;
+    const studentsPaymentInfo = [];
+    const students = await StudentModel.find({ classId });
+    for (const student of students) {
+      const studentPayments = await PaymentModel.find({
+        studentId: student._id,
+      }).populate("paidFees pendingFees feesToBePaid");
+      studentsPaymentInfo.push({ student, studentPayments });
+    }
+    res.status(200).json(studentsPaymentInfo);
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
 }
@@ -202,6 +253,8 @@ module.exports = {
   createClass,
   updateClass,
   deleteClass,
-  getFormatedClasses,
-  promoteclassHandler
+  getFormattedClasses,
+  promoteClassHandler,
+  assignFeesToClassController,
+  getStudentsFeesPaymentStatus,
 };

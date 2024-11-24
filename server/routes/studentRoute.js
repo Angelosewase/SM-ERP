@@ -8,6 +8,7 @@ const {
   getStudentbyStudentId,
   uploadStudentImage,
   getStudentsByClass,
+  getStudentFeesPaymentStatus,
 } = require("../controllers/studentController");
 const { uploadSingle } = require("../middlewares/multer");
 const {authenticate} = require("../controllers/authController");
@@ -23,5 +24,6 @@ router.put("/:id", updateStudent);
 router.post("/promoteStudent", promoteStudentHandler);
 router.post("/upload/:id", uploadSingle, uploadStudentImage);
 router.get("/class/:classId", cacheMiddleware(300),getStudentsByClass);
+router.get("/:id/fees-payment-status",cacheMiddleware(300), getStudentFeesPaymentStatus);
 
 module.exports = router;

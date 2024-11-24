@@ -7,13 +7,13 @@ const {
   FinancialTransactionModel,
 } = require("../models/Schemas");
 
-const recordFeesPayment = async (
+async function recordFeesPayment(
   studentId,
   amount,
   feesId,
   paymentMethod,
   feesGroup
-) => {
+) {
   try {
     // Validate input parameters
     if (!studentId || !amount || !feesId || !feesGroup) {
@@ -80,31 +80,15 @@ const recordFeesPayment = async (
 
     await payment.save();
 
-    // Update payment status
-    const paymentStatus = await PaymentModel.findOne({
-      studentId,
-    });
-    if (paymentStatus) {
-      if (amount >= fees.amount) {
-        paymentStatus.feesPaid.push(feesId);
-      } else {
-        paymentStatus.pendingFeesPayments.push(feesId);
-      }
-      await paymentStatus.save();
-    } else {
-      const newPaymentStatus = new PaymentModel({
-        studentId,
-        feesToBePaid: feesAssigned.reduce((allFees, assignment) => {
-          assignment.feesGroups.forEach((group) => {
-            allFees.push(...group.fees);
-          });
-          return allFees;
-        }, []),
-        pendingFeesPayments: amount < fees.amount ? [feesId] : [],
-        feesPaid: amount >= fees.amount ? [feesId] : [],
-      });
-      await newPaymentStatus.save();
+    // Find or create payment status
+    let paymentStatus = await PaymentModel.findOne({ studentId });
+    if (!paymentStatus) {
+      paymentStatus = await createPaymentStatus(studentId, student.classId);
     }
+
+    // Update payment status based on amount
+    const status = amount >= fees.amount ? "paid" : "pending";
+    await updatePaymentStatus(studentId, feesId, status);
 
     return payment;
   } catch (error) {
@@ -112,6 +96,114 @@ const recordFeesPayment = async (
   }
 };
 
+const createPaymentStatus = async (studentId, classId) => {
+  try {
+    // Validate input parameters
+    if (!studentId || !classId) {
+      throw new Error("Missing required parameters");
+    }
+
+    // Check if student and class exist
+    const [student, classDoc] = await Promise.all([
+      StudentModel.findById(studentId),
+      ClassModel.findById(classId),
+    ]);
+
+    if (!student || !classDoc) {
+      throw new Error(
+        `No student or class found with ID: ${studentId} or ${classId}`
+      );
+    }
+
+    // Get fees assignments for the class
+    const feesAssigned = await FeesAssignmentModel.find({
+      classId,
+    }).populate("feesGroups");
+
+    if (!feesAssigned || feesAssigned.length === 0) {
+      throw new Error("No fees assigned to the given class");
+    }
+
+    // Extract all fees from fee groups
+    const feesArray = feesAssigned.reduce((allFees, assignment) => {
+      assignment.feesGroups.forEach((group) => {
+        allFees.push(...group.fees);
+      });
+      return allFees;
+    }, []);
+
+    // Create and save new payment status
+    const studentFeeStatus = new PaymentModel({
+      studentId,
+      feesToBePaid: feesArray,
+      feesPaid: [],
+      pendingFeesPayments: feesArray,
+    });
+
+    await studentFeeStatus.save();
+    return studentFeeStatus;
+  } catch (error) {
+    console.error("Error creating fee status:", error.message);
+    throw error;
+  }
+};
+const updatePaymentStatus = async (studentId, feesId, status) => {
+  try {
+
+    if (!studentId || !feesId || !status) {
+      throw new Error("Missing required parameters");
+    }
+
+    if (!['paid', 'pending'].includes(status)) {
+      throw new Error("Invalid status. Must be 'paid' or 'pending'");
+    }
+
+    const paymentStatus = await PaymentModel.findOne({ studentId });
+    if (!paymentStatus) {
+      throw new Error("No payment status found for this student");
+    }
+
+    if (status === 'paid') {
+
+      const feeIndex = paymentStatus.pendingFeesPayments.findIndex(
+        (feeId) => feeId.toString() === feesId
+      );
+
+      if (feeIndex === -1) {
+        throw new Error("Fee not found in pending payments");
+      }
+
+      const paidFee = paymentStatus.pendingFeesPayments[feeIndex];
+      paymentStatus.pendingFeesPayments.splice(feeIndex, 1);
+      paymentStatus.feesPaid.push(paidFee);
+
+    } else {
+      const feeIndex = paymentStatus.feesPaid.findIndex(
+        (feeId) => feeId.toString() === feesId
+      );
+
+      if (feeIndex === -1) {
+        throw new Error("Fee not found in paid fees");
+      }
+
+      const pendingFee = paymentStatus.feesPaid[feeIndex];
+      paymentStatus.feesPaid.splice(feeIndex, 1);
+      paymentStatus.pendingFeesPayments.push(pendingFee);
+    }
+
+    await paymentStatus.save();
+    const feesStatus = paymentStatus.pendingFeesPayments.length === 0 ? "paid" : "pending";
+    await StudentModel.findByIdAndUpdate(studentId, { feesStatus });
+
+    return paymentStatus;
+  } catch (error) {
+    console.error("Error updating payment status:", error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   recordFeesPayment,
+  createPaymentStatus,
+  updatePaymentStatus,
 };

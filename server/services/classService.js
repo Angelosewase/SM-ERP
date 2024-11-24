@@ -1,4 +1,11 @@
-const { ClassModel, StudentModel } = require("../models/Schemas");
+const {
+  invalidateSchoolCache,
+} = require("../cache/services/cacheInvalidation");
+const {
+  ClassModel,
+  StudentModel,
+  FeesAssignmentModel,
+} = require("../models/Schemas");
 
 const promoteClass = async (classId, newClassId) => {
   try {
@@ -37,8 +44,38 @@ function convertClassesToValueNamePairs(classes) {
   return classes.map(function (classObj) {
     return {
       value: classObj._id,
-      name: classObj.name, 
+      name: classObj.name,
     };
   });
 }
-module.exports = { promoteClass, convertClassesToValueNamePairs };
+
+async function assignFeesToClass(classId, feesGroups) {
+  try {
+    const Class = await ClassModel.findById(classId);
+    if (!Class) {
+      throw new Error("Class not found");
+    }
+
+    const classAssignedFees = await FeesAssignmentModel.create({
+      schoolId: Class.schoolId,
+      classId,
+      feesGroups,
+    });
+    await invalidateSchoolCache(Class.schoolId, [
+      "/class",
+      `/class/${classId}`,
+      "/fees-assignments",
+    ]);
+
+    return classAssignedFees;
+  } catch (error) {
+    console.error("Error assigning fees to class:", error);
+    throw new Error("Failed to assign fees to class");
+  }
+}
+
+module.exports = {
+  promoteClass,
+  convertClassesToValueNamePairs,
+  assignFeesToClass,
+};

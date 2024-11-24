@@ -1,4 +1,10 @@
-const { StudentModel, ClassModel, FeesAssignmentModel } = require("../models/Schemas");
+const {
+  StudentModel,
+  ClassModel,
+  FeesAssignmentModel,
+  FinancialTransactionModel,
+  PaymentModel,
+} = require("../models/Schemas");
 
 const promoteStudent = async (studentId, fromClassId, toClassId) => {
   try {
@@ -46,34 +52,41 @@ const promoteStudent = async (studentId, fromClassId, toClassId) => {
 
 const verifyTheStudentFees = async (studentId) => {
   try {
+    // Find student
     const student = await StudentModel.findById(studentId);
     if (!student) {
-      throw new Error(`no student with Id:${studentId}  provided`);
+      throw new Error(`no student with Id:${studentId} provided`);
     }
-    const FeesAssigned = await FeesAssignmentModel.findOne({
-      classId: student.classId
-    });
-    if (!FeesAssigned) {
+
+    // Find fees assigned to student's class
+    const feesAssigned = await FeesAssignmentModel.findOne({
+      classId: student.classId,
+    }).populate("feesGroups");
+
+    if (!feesAssigned) {
       throw new Error("no fees assigned to the given student");
     }
 
-    const fees = await FinancialTransactionModel.find({
-      studentId: student._id
-    });
-
-    const isAllFeesPayed = fees.every(fee => fee.status === "paid");
-    if (!isAllFeesPayed) {
-      throw new Error("some fees are not payed"); 
+    // Get student's payment status
+    const paymentStatus = await PaymentModel.findOne({ studentId });
+    if (!paymentStatus) {
+      throw new Error("no payment status found for student");
     }
 
+    // Check if there are any pending payments
+    if (paymentStatus.pendingFeesPayments.length > 0) {
+      throw new Error("some fees are not paid");
+    }
+
+    // If we get here, all fees are paid
     student.feesStatus = "paid";
     await student.save();
-    return { message: "all fees are payed" };
 
+    return { message: "all fees are paid" };
   } catch (error) {
     console.error("Error verifying student fees:", error.message);
     throw error;
   }
 };
 
-module.exports = { promoteStudent , verifyTheStudentFees};
+module.exports = { promoteStudent, verifyTheStudentFees };

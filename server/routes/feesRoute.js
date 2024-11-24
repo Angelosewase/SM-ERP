@@ -10,6 +10,7 @@ const {
   getFeeGroupById,
   updateFeeGroup,
   deleteFeeGroup,
+  recordFeesPaymentController,
 } = require("../controllers/FeesController");
 const { authenticate } = require("../controllers/authController");
 const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
@@ -23,8 +24,8 @@ FeesRouter.get("/", cacheMiddleware(300), getFeesBySchool);
 FeesRouter.get("/:id", cacheMiddleware(300), getFeeById);
 FeesRouter.put("/:id", updateFee);
 FeesRouter.delete("/:id", deleteFee);
+FeesRouter.post("/record-payment", recordFeesPaymentController);
 
-//
 feesGroupRouter.post("/", createFeeGroup);
 feesGroupRouter.get("/", cacheMiddleware(300), getFeeGroupsBySchool);
 feesGroupRouter.get("/:id", cacheMiddleware(300), getFeeGroupById);
