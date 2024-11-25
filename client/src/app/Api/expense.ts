@@ -52,7 +52,7 @@ export const deleteExpense = async (id: string): Promise<{ message: string } | {
 };
 
 
-const handleError = (error: any): { error: string } => {
+const handleError = (error:any): { error: string } => {
   if (error.response) {
     return { error: error.response.data.message || "An error occurred" };
   } else if (error.request) {

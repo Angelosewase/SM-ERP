@@ -19,6 +19,7 @@ router.post("/verify/:userId", (req, res, next) => {
   }
   OtpAccountVerification(req, res, next);
 });
+
 router.post("/changePassword", ChangePassword)
 router.get("/isLoggedIn", authenticate, isLoggedIn)
 

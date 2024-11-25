@@ -26,7 +26,10 @@ export const logout = async () => {
   }
 };
 
-export async function verifyAccount(data: any, userId :string): Promise<string> {
+export async function verifyAccount(
+  data: unknown, 
+  userId :string
+): Promise<string> {
   try {
     const response = await axios.post(
       `http://localhost:3000/auth/verify/${userId}`,

@@ -14,8 +14,8 @@ const {
 
 const z = require("zod");
 const {
-  generateTheuserResponse,
-  generateTheSchoolRespose,
+  generateTheuserResponse: generateTheUserResponse,
+  generateTheSchoolRespose: generateTheSchoolResponse,
 } = require("../services/userService");
 const {
   generateAccessToken,
@@ -53,8 +53,8 @@ const Login = async (req, res) => {
       res.status(404).json({ message: "Invalid user data" });
       return;
     }
-    const userResponse = generateTheuserResponse(user);
-    const schoolResponse = generateTheSchoolRespose(associatedSchool);
+    const userResponse = generateTheUserResponse(user);
+    const schoolResponse = generateTheSchoolResponse(associatedSchool);
 
     const accessToken = generateAccessToken({
       id: user._id,
@@ -267,6 +267,7 @@ async function ChangePassword(req, res) {
     try {
       passwordSchema.parse(newPassword);
     } catch (error) {
+    
       if (error instanceof z.ZodError) {
         return res.status(400).json({ 
           message: "Invalid password format",
@@ -294,7 +295,7 @@ async function isLoggedIn(req, res) {
   if (!user) {
     return res.status(401).json({ message: "unauthorized" });
   }
-  res.status(200).json({ authorised: true, user: generateTheuserResponse(user) })
+  res.status(200).json({ authorised: true, user: generateTheUserResponse(user) })
 }
 
 module.exports = {

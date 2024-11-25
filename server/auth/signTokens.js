@@ -21,7 +21,7 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (userId) => {
   return jwt.sign(userId, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRY,
-  });
+  });a
 };
 
 const validateAccessToken = (token) => {
