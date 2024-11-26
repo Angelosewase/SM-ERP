@@ -1,4 +1,4 @@
-const { client } = require('../../config/redis');
+const { client } = require('../../../config/redis');
 
 class CacheService {
   async get(key) {
@@ -9,7 +9,6 @@ class CacheService {
       EX: expireTime
     });
   }
-
   async del(key) {
     await client.del(key);
   }

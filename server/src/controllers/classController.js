@@ -247,6 +247,16 @@ async function getStudentsFeesPaymentStatus(req, res) {
   }
 }
 
+const getClassesBySubjectId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const classes = await ClassModel.find({ subjects: id });
+    res.status(200).json(classes);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch classes" });
+  }
+}
+
 module.exports = {
   getClasses,
   getClassById,
@@ -257,4 +267,5 @@ module.exports = {
   promoteClassHandler,
   assignFeesToClassController,
   getStudentsFeesPaymentStatus,
+  getClassesBySubjectId
 };

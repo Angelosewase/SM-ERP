@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");
+const { createSubjectValidator } = require("../validators/subject");
+const { z } = require("zod");
 
 const createSubject = async (req, res) => {
   const session = await mongoose.startSession();
@@ -15,11 +17,11 @@ const createSubject = async (req, res) => {
   }
 
   try {
-    const validatedData = createSubjectValidator.parse(req.body);
-    const { name, teacherId, description, classes, days } = validatedData;
+    const validatedData = await createSubjectValidator.parseAsync(req.body);
+    const { name, teachers, description, classes, days } = validatedData;
     const newSubject = new SubjectModel({
       name,
-      teacherId,
+      teachers,
       description,
       classes,
       days,
@@ -28,8 +30,8 @@ const createSubject = async (req, res) => {
 
     await newSubject.save({ session });
 
-    await TeacherModel.findByIdAndUpdate(
-      teacherId,
+    await TeacherModel.updateMany(
+      { _id: { $in: teachers } },
       { $push: { subjects: newSubject._id } },
       { new: true, session }
     );
@@ -47,9 +49,15 @@ const createSubject = async (req, res) => {
     ]);
     res.status(201).json(newSubject);
   } catch (error) {
+    console.log(error);
+
+    if (error instanceof z.ZodError) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: error.message });
+    }
     await session.abortTransaction();
     session.endSession();
-    console.error(error);
     res.status(500).json({ error: "Failed to create subject" });
   }
 };
@@ -61,13 +69,12 @@ const getAllSubjects = async (req, res) => {
     return;
   }
   try {
-    const subjects = await SubjectModel.find({ schoolId }).populate(
-      "teacherId"
-    );
+    const subjects = await SubjectModel.find({ schoolId }).populate("teachers");
     // .populate("classes", "name");
 
     res.status(200).json(subjects);
   } catch (error) {
+    invalidateSchoolCache(req.user.schoolId, ["/subject"]);
     res.status(500).json({ error: "Failed to fetch subjects" });
   }
 };
@@ -77,7 +84,7 @@ const getSubjectById = async (req, res) => {
     const { id } = req.params;
     const subject = await SubjectModel.findById(id)
       .populate("classes", "name")
-      .populate("teacherId");
+      .populate("teachers", "firstName  lastName");
 
     if (!subject) {
       return res.status(404).json({ error: "Subject not found" });
@@ -148,10 +155,22 @@ const deleteSubject = async (req, res) => {
   }
 };
 
+//function to get subject by class id
+const getSubjectsByClassId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const subjects = await SubjectModel.find({ classes: id });
+    res.status(200).json(subjects);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch subjects" });
+  }
+};
+
 module.exports = {
   createSubject,
   getAllSubjects,
   updateSubject,
   deleteSubject,
   getSubjectById,
+  getSubjectsByClassId,
 };

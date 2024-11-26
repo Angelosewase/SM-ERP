@@ -4,7 +4,7 @@ const {
   schoolValidationSchema,
   schoolUpdateSchema,
 } = require("../validators/school");
-const { UserModel, SchoolModel } = require("../models/Schemas");
+const { UserModel, SchoolModel } = require("../src/models/Schemas");
 const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
 const { generateTheSchoolRespose } = require("../services/userService");
 

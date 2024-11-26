@@ -92,11 +92,11 @@ const userSchema = new mongoose.Schema(
 const subjectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    teacherId: {
+    teachers:[ {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Teacher",
       required: true,
-    },
+    }],
     description: String,
     classes: [{ type: mongoose.Types.ObjectId, ref: "Class" }],
     days: {

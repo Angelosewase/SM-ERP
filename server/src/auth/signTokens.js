@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
-const { getAccessToken, getRefreshToken } = require("../utils/jwt");
+const { getAccessToken, getRefreshToken } = require("../../utils/jwt");
 
 const app = express();
 app.use(express.json());

@@ -1,6 +1,6 @@
 const { validateAccessToken } = require("../auth/signTokens");
 const { SchoolModel, UserModel } = require("../models/Schemas");
-const { getUserIdFromToken, getSchoolIdFromToken } = require("../utils/jwt");
+const { getUserIdFromToken, getSchoolIdFromToken } = require("../../utils/jwt");
 
 function generateTheuserResponse(user) {
   if (!user) {

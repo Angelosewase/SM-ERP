@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const cacheMiddleware = require('../cache/middleware/cacheMiddleware');
+const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 const {
   getClasses,
   getClassById,
@@ -11,8 +11,9 @@ const {
   promoteClassHandler,
   assignFeesToClassController,
   getStudentsFeesPaymentStatus,
+  getClassesBySubjectId,
 } = require("../controllers/classController");
-const {authenticate} = require("../controllers/authController")
+const { authenticate } = require("../controllers/authController");
 
 router.use(authenticate);
 
@@ -20,12 +21,21 @@ router.use(authenticate);
 router.get("/", cacheMiddleware(300), getClasses);
 router.get("/fmt", cacheMiddleware(300), getFormattedClasses);
 router.get("/:id", cacheMiddleware(300), getClassById);
-router.get("/:id/fees-payment-status", cacheMiddleware(300), getStudentsFeesPaymentStatus);
+router.get(
+  "/:id/fees-payment-status",
+  cacheMiddleware(300),
+  getStudentsFeesPaymentStatus
+);
+router.get("/subject/:subjectId", cacheMiddleware(300), getClassesBySubjectId);
+router.get("/students/fees-payment-status", getStudentsFeesPaymentStatus);
+
 
 router.post("/", createClass);
 router.put("/:id", updateClass);
 router.delete("/:id", deleteClass);
 router.post("/promote", promoteClassHandler);
 router.post("/:id/assign-fees", assignFeesToClassController);
+router.post("/:id/assign-fees",assignFeesToClassController);
+
 
 module.exports = router;
