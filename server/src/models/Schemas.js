@@ -34,8 +34,8 @@ const studentSchema = new mongoose.Schema(
     gender: { type: String, enum: ["male", "female"], required: true },
     feesStatus: {
       type: String,
-      enum: ["paid", "unpaid", "pending"],
-      default: "unpaid",
+      enum: ["paid", "unpaid", "pending", "unassigned"],
+      default: "unassigned",
     },
   },
   { timestamps: true }
@@ -301,7 +301,7 @@ const transactionRecordSchema = new mongoose.Schema(
       default: "pending",
     },
     feesId: { type: mongoose.Schema.Types.ObjectId, ref: "Fee" },
-    paymentMethod: { type: String, default: "cash" },
+    paymentMethod: { type: String, default: "Bank" },
     feeGroup: { type: mongoose.Schema.Types.ObjectId, ref: "FeeGroup" },
   },
   { timestamps: true }

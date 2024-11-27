@@ -13,7 +13,7 @@ const {
   getStudentsFeesPaymentStatus,
   getClassesBySubjectId,
 } = require("../controllers/classController");
-const { authenticate } = require("../controllers/authController");
+const { authenticate } = require("../middlewares/auth");
 
 router.use(authenticate);
 
@@ -27,15 +27,11 @@ router.get(
   getStudentsFeesPaymentStatus
 );
 router.get("/subject/:subjectId", cacheMiddleware(300), getClassesBySubjectId);
-router.get("/students/fees-payment-status", getStudentsFeesPaymentStatus);
-
 
 router.post("/", createClass);
 router.put("/:id", updateClass);
 router.delete("/:id", deleteClass);
 router.post("/promote", promoteClassHandler);
 router.post("/:id/assign-fees", assignFeesToClassController);
-router.post("/:id/assign-fees",assignFeesToClassController);
-
 
 module.exports = router;

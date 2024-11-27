@@ -1,6 +1,6 @@
 const express = require('express');
 const { getTeachers, createTeacher, deleteTeacher, updateTeacher, getTeacherById, uploadTeaherImage } = require('../controllers/TeacherController');
-const {authenticate} = require("../controllers/authController")
+const {authenticate} = require("../middlewares/auth");
 const { uploadSingle } = require('../middlewares/multer');
 const cacheMiddleware = require('../cache/middleware/cacheMiddleware');
 

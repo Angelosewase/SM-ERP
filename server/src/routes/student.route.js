@@ -11,7 +11,7 @@ const {
   getStudentFeesPaymentStatus,
 } = require("../controllers/studentController");
 const { uploadSingle } = require("../middlewares/multer");
-const {authenticate} = require("../controllers/authController");
+const {authenticate} = require("../middlewares/auth");
 const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 const router = express.Router();
 router.use(authenticate)

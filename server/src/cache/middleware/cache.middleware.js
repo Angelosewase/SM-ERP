@@ -1,4 +1,4 @@
-const cacheService = require('../services/cacheService');
+const cacheService = require('../services/cache.service');
 
 const cacheMiddleware = (duration = 3600) => {
   return async (req, res, next) => {

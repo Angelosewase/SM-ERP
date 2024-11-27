@@ -8,6 +8,7 @@ const {
   ExamResultsModel,
   PaymentModel,
   ProfilePicModel,
+  FeesAssignmentModel,
 } = require("../models/Schemas");
 const { z } = require("zod");
 const {
@@ -67,6 +68,7 @@ const createStudent = async (req, res) => {
 
     const school = await SchoolModel.findById(schoolId);
     const Class = await ClassModel.findById(classId);
+
     if (!school) {
       res.status(404).send({ message: "school not found" });
       return;
@@ -76,7 +78,14 @@ const createStudent = async (req, res) => {
       res.status(404).send({ message: "class not found" });
       return;
     }
-    const newStudent = await StudentModel.create(validateData);
+    isFeesAssigned = await FeesAssignmentModel.findOne({
+      classId: validateData.classId,
+    });
+
+    const newStudent = await StudentModel.create({
+      ...validateData,
+      feesStatus: isFeesAssigned ? "unpaid" : "unassigned",
+    });
 
     await SchoolModel.findByIdAndUpdate(validateData.schoolId, {
       $push: { students: newStudent._id },

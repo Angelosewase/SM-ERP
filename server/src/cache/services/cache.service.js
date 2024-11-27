@@ -1,4 +1,4 @@
-const { client } = require('../../../config/redis');
+const { client } = require('../../config/redis');
 
 class CacheService {
   async get(key) {

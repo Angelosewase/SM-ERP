@@ -1,6 +1,6 @@
 const express = require('express');
 const { getParents, createParent, deleteParent, updateParent, getParentById } = require('../controllers/parentController');
-const {authenticate} = require("../controllers/authController")
+const {authenticate} = require("../middlewares/auth");
 const cacheMiddleware = require('../cache/middleware/cacheMiddleware');
 
 const router = express.Router();

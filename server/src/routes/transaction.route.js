@@ -1,6 +1,6 @@
 const express = require('express');
 const { getTransactions, createTransaction, deleteTransaction, updateTransaction } = require('../controllers/transactionsController');
-const {authenticate} = require("../controllers/authController")
+const {authenticate} = require("../middlewares/auth");
 const cacheMiddleware = require('../cache/middleware/cacheMiddleware');
 
 const router = express.Router();

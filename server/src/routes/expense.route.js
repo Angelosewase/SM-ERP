@@ -7,7 +7,7 @@ const {
   deleteExpenseRecord,
 } = require("../controllers/expenseController");
 const router = express.Router();
-const {authenticate} = require("../controllers/authController")
+const {authenticate} = require("../middlewares/auth");
 router.use(authenticate);
 const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
 

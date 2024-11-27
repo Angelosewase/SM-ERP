@@ -217,12 +217,15 @@ async function promoteClassHandler(req, res) {
 async function assignFeesToClassController(req, res) {
   const { classId } = req.params;
   const { feesGroups } = req.body;
+  if(!feesGroups) return res.status(400).json({ error: "fees groups are required" });
+  if(!classId) return res.status(400).json({ error: "class id is required" });
   try {
     await assignFeesToClass(classId, feesGroups);
     await invalidateSchoolCache(req.user.schoolId, [
       "/class",
       `/class/${req.params.id}`,
       "/fees-groups",
+      `/${classId}/fees-payment-status`,
     ]);
     res.status(200).json({ message: "Fees assigned to class successfully" });
   } catch (error) {
@@ -232,30 +235,52 @@ async function assignFeesToClassController(req, res) {
 
 async function getStudentsFeesPaymentStatus(req, res) {
   try {
-    const { classId } = req.params;
+    const { id } = req.params;
+    console.log("class Id :" + id);
     const studentsPaymentInfo = [];
-    const students = await StudentModel.find({ classId });
+    const students = await StudentModel.find({ classId: id });
     for (const student of students) {
       const studentPayments = await PaymentModel.find({
         studentId: student._id,
       }).populate("paidFees pendingFees feesToBePaid");
-      studentsPaymentInfo.push({ student, studentPayments });
+      studentsPaymentInfo.push({
+        student,
+        studentPayments:
+          studentPayments.length > 0
+            ? studentPayments
+            : "no student payment found for this student",
+      });
     }
     res.status(200).json(studentsPaymentInfo);
   } catch (error) {
     res.status(500).json({ error: error.message });
+    s;
   }
 }
 
 const getClassesBySubjectId = async (req, res) => {
   try {
-    const { id } = req.params;
-    const classes = await ClassModel.find({ subjects: id });
+    const { subjectId } = req.params;
+
+    if (!subjectId) {
+      return res.status(400).json({ error: "Subject ID is required" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(subjectId)) {
+      return res.status(400).json({ error: "Invalid subject ID" });
+    }
+
+    if (!(await SubjectModel.findById(subjectId))) {
+      return res.status(400).json({ error: "Subject not found" });
+    }
+
+    const classes = await ClassModel.find({ subjects: { $in: [subjectId] } });
     res.status(200).json(classes);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to fetch classes" });
   }
-}
+};
 
 module.exports = {
   getClasses,
@@ -267,5 +292,5 @@ module.exports = {
   promoteClassHandler,
   assignFeesToClassController,
   getStudentsFeesPaymentStatus,
-  getClassesBySubjectId
+  getClassesBySubjectId,
 };

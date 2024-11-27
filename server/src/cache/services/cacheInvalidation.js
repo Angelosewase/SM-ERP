@@ -1,4 +1,4 @@
-const cacheService = require('./cacheService');
+const cacheService = require('./cache.service');
 
 const invalidateSchoolCache = async (schoolId, patterns) => {
   try {

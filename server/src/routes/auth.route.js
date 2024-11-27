@@ -5,9 +5,9 @@ const {
   OtpAccountVerification,
   ChangePassword,
   isLoggedIn,
-  authenticate,
 } = require("../controllers/authController");
 const { isValidObjectId } = require('mongoose');
+const {authenticate} = require("../middlewares/auth");
 
 const router = require("express").Router();
 router.post("/register", signUpAdmin);

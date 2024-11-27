@@ -7,9 +7,9 @@ const {
   updateSubject,
   deleteSubject,
   getSubjectsByClassId,
-} = require("../controllers/subjectController");
-const { authenticate } = require("../controllers/authController");
-const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
+} = require("../controllers/subject.controller");
+const {authenticate} = require("../middlewares/auth");
+const cacheMiddleware = require("../cache/middleware/cache.middleware");
 
 const router = express.Router();
 router.use(authenticate);
