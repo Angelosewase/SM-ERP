@@ -11,14 +11,14 @@ const {
   createClassValidator,
   updateClassValidator,
   promoteClassInofValidator,
-} = require("../validators/class");
+} = require("../validators/class.validator");
 const { z } = require("zod");
 const mongoose = require("mongoose");
 const {
   promoteClass,
   convertClassesToValueNamePairs,
   assignFeesToClass,
-} = require("../services/classService");
+} = require("../services/class.service");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");

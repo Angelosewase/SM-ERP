@@ -3,7 +3,7 @@ const {
   createTeacherValidator,
   updateTeacherValidator,
   teacherIdValidator,
-} = require("../validators/teacher");
+} = require("../validators/teacher.validator");
 const { z } = require("zod");
 const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
 

@@ -15,7 +15,6 @@ async function recordFeesPayment(
   feesGroup
 ) {
   try {
-    // Validate input parameters
     if (!studentId || !amount || !feesId || !feesGroup) {
       throw new Error("Missing required parameters");
     }
@@ -24,32 +23,24 @@ async function recordFeesPayment(
       throw new Error("Amount must be greater than 0");
     }
 
-    // Find and validate student
-    const student = await StudentModel.findById(studentId);
+    const [student, fees, feeGroup] = await Promise.all([
+      StudentModel.findById(studentId),
+      FeeModel.findById(feesId),
+      FeeGroupModel.findById(feesGroup),
+    ]);
+
     if (!student) {
       throw new Error(`No student found with ID: ${studentId}`);
     }
-
-    // Find and validate fees
-    const fees = await FeeModel.findById(feesId);
     if (!fees) {
       throw new Error(`No fees found with ID: ${feesId}`);
     }
-
-    // Find and validate fee group
-    const feeGroup = await FeeGroupModel.findById(feesGroup);
-    if (!feeGroup) {
-      throw new Error(`No fee group found with ID: ${feesGroup}`);
-    }
-
-    // Validate fee belongs to fee group
-    if (!feeGroup.fees.includes(feesId)) {
+    if (!feeGroup || !feeGroup.fees.includes(feesId)) {
       throw new Error(
         `Fee with ID: ${feesId} is not assigned to the given fee group`
       );
     }
 
-    // Get fees assigned to student's class
     const feesAssigned = await FeesAssignmentModel.find({
       classId: student.classId,
     }).populate("feesGroups");
@@ -58,7 +49,6 @@ async function recordFeesPayment(
       throw new Error("No fees assigned to the student's class");
     }
 
-    // Validate fee is assigned to student
     const isFeeAssigned = feesAssigned.some((assignment) =>
       assignment.feesGroups.some((group) => group.fees.includes(feesId))
     );
@@ -66,8 +56,6 @@ async function recordFeesPayment(
     if (!isFeeAssigned) {
       throw new Error(`Fee with ID: ${feesId} is not assigned to the student`);
     }
-
-    // Create transaction record
     const payment = new FinancialTransactionModel({
       schoolId: student.schoolId,
       studentId,
@@ -94,16 +82,73 @@ async function recordFeesPayment(
   } catch (error) {
     throw new Error(`Failed to record fees payment: ${error.message}`);
   }
-};
+}
+
+async function updateFeesPayment(
+  studentId,
+  amount,
+  feesId,
+  paymentMethod,
+  feesGroupId,
+  action = "add"
+) {
+  try {
+    if (!studentId || !amount || !feesId || !feesGroupId) {
+      throw new Error("Missing required parameters");
+    }
+
+    if (amount < 1) {
+      throw new Error("Amount must be greater than 0");
+    }
+
+    const fee = await FeeModel.findById(feesId);
+    if (!fee) {
+      throw new Error("No fee found with the given ID");
+    }
+
+    if (!["add", "update", "remove"].includes(action)) {
+      throw new Error("Invalid action. Must be 'add', 'update' or 'remove'");
+    }
+
+    const transactionRecord = FinancialTransactionModel.updateOne(
+      {
+        studentId,
+        feesId,
+      },
+      {
+        $set: {
+          amount:
+            action === "add"
+              ? { $inc: { amount } }
+              : action === "update"
+              ? amount
+              : { $dec: { amount } },
+          paymentMethod,
+          feeGroup: feesGroupId,
+        },
+      }
+    );
+
+    await transactionRecord.save();
+
+    if (amount < fee.amount) {
+      await updatePaymentStatus(studentId, feesId, "pending");
+    } else {
+      await updatePaymentStatus(studentId, feesId, "paid");
+    }
+
+    return { message: "Payment updated successfully" };
+  } catch (error) {
+    throw new Error(`Failed to update fees payment: ${error.message}`);
+  }
+}
 
 const createPaymentStatus = async (studentId, classId) => {
   try {
-    // Validate input parameters
     if (!studentId || !classId) {
       throw new Error("Missing required parameters");
     }
 
-    // Check if student and class exist
     const [student, classDoc] = await Promise.all([
       StudentModel.findById(studentId),
       ClassModel.findById(classId),
@@ -115,7 +160,6 @@ const createPaymentStatus = async (studentId, classId) => {
       );
     }
 
-    // Get fees assignments for the class
     const feesAssigned = await FeesAssignmentModel.find({
       classId,
     }).populate("feesGroups");
@@ -124,15 +168,12 @@ const createPaymentStatus = async (studentId, classId) => {
       throw new Error("No fees assigned to the given class");
     }
 
-    // Extract all fees from fee groups
     const feesArray = feesAssigned.reduce((allFees, assignment) => {
       assignment.feesGroups.forEach((group) => {
         allFees.push(...group.fees);
       });
       return allFees;
     }, []);
-
-    // Create and save new payment status
     const studentFeeStatus = new PaymentModel({
       studentId,
       feesToBePaid: feesArray,
@@ -149,12 +190,11 @@ const createPaymentStatus = async (studentId, classId) => {
 };
 const updatePaymentStatus = async (studentId, feesId, status) => {
   try {
-
     if (!studentId || !feesId || !status) {
       throw new Error("Missing required parameters");
     }
 
-    if (!['paid', 'pending'].includes(status)) {
+    if (!["paid", "pending"].includes(status)) {
       throw new Error("Invalid status. Must be 'paid' or 'pending'");
     }
 
@@ -163,8 +203,7 @@ const updatePaymentStatus = async (studentId, feesId, status) => {
       throw new Error("No payment status found for this student");
     }
 
-    if (status === 'paid') {
-
+    if (status === "paid") {
       const feeIndex = paymentStatus.pendingFeesPayments.findIndex(
         (feeId) => feeId.toString() === feesId
       );
@@ -176,7 +215,6 @@ const updatePaymentStatus = async (studentId, feesId, status) => {
       const paidFee = paymentStatus.pendingFeesPayments[feeIndex];
       paymentStatus.pendingFeesPayments.splice(feeIndex, 1);
       paymentStatus.feesPaid.push(paidFee);
-
     } else {
       const feeIndex = paymentStatus.feesPaid.findIndex(
         (feeId) => feeId.toString() === feesId
@@ -192,7 +230,8 @@ const updatePaymentStatus = async (studentId, feesId, status) => {
     }
 
     await paymentStatus.save();
-    const feesStatus = paymentStatus.pendingFeesPayments.length === 0 ? "paid" : "pending";
+    const feesStatus =
+      paymentStatus.pendingFeesPayments.length === 0 ? "paid" : "pending";
     await StudentModel.findByIdAndUpdate(studentId, { feesStatus });
 
     return paymentStatus;
@@ -202,8 +241,26 @@ const updatePaymentStatus = async (studentId, feesId, status) => {
   }
 };
 
+const resetPaymentStatus = async (studentId) => {
+  try {
+    const paymentStatus = await PaymentModel.findOne({ studentId });
+    if (!paymentStatus) {
+      throw new Error("No payment status found for this student");
+    }
+    paymentStatus.pendingFeesPayments = paymentStatus.feesPaid;
+    paymentStatus.feesPaid = [];
+    await paymentStatus.save();
+    await StudentModel.findByIdAndUpdate(studentId, { feesStatus: "unpaid" });
+  } catch (error) {
+    console.error("Error resetting payment status:", error.message);
+    throw error;
+  }
+};
+
 module.exports = {
   recordFeesPayment,
   createPaymentStatus,
   updatePaymentStatus,
+  resetPaymentStatus,
+  updateFeesPayment,
 };

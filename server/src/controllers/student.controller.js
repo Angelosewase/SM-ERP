@@ -15,10 +15,10 @@ const {
   registerStudentValidator,
   updateStudentValidator,
   promoteStudentValidator,
-} = require("../validators/student");
-const { objectIdValidator } = require("../validators/user");
-const { promoteStudent } = require("../services/studentService");
-const { uploadToCloudinary } = require("../config/cloudinaryConfig");
+} = require("../validators/student.validator");
+const { objectIdValidator } = require("../validators/user.validator");
+const { promoteStudent } = require("../services/student.service");
+const { uploadToCloudinary } = require("../config/cloudinary");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");

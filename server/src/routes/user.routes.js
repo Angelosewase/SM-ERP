@@ -4,7 +4,7 @@ const {
   getLoggedInUser,
   updateUser,
   uploadProfileImage,
-} = require("../controllers/userController");
+} = require("../controllers/user.controller");
 const { uploadSingle } = require("../middlewares/multer");
 const { authenticate } = require("../middlewares/auth");
 const UserRouter = express.Router();

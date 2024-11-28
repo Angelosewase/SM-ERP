@@ -6,7 +6,7 @@ require("dotenv").config();
 const {
   loginInfoValidator,
   registerUserInfoValidator,
-} = require("../validators/user");
+} = require("../validators/user.validator");
 const {
   validateAccessToken,
   validateRefreshToken,
@@ -16,7 +16,7 @@ const z = require("zod");
 const {
   generateTheuserResponse: generateTheUserResponse,
   generateTheSchoolRespose: generateTheSchoolResponse,
-} = require("../services/userService");
+} = require("../services/user.service");
 const {
   generateAccessToken,
   generateRefreshToken,

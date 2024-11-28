@@ -1,14 +1,26 @@
 {
-  "name": "server",
+  "name": "Brainiacs SM-ERP Backend",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start":"node index.js"
+    "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "School management",
+    "enterprise resource planning",
+    "SM"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Angelosewase/SM-ERP.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Angelosewase/SM-ERP/issues"
+  },
+  "homepage": "https://github.com/Angelosewase/SM-ERP#readme",
+  "author": "Sewase Angel ",
   "license": "ISC",
   "description": "",
   "dependencies": {
@@ -24,6 +36,8 @@
     "nodemailer": "^6.9.16",
     "otp-generator": "^4.0.1",
     "redis": "^4.7.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {

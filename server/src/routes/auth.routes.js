@@ -5,9 +5,9 @@ const {
   OtpAccountVerification,
   ChangePassword,
   isLoggedIn,
-} = require("../controllers/authController");
-const { isValidObjectId } = require('mongoose');
-const {authenticate} = require("../middlewares/auth");
+} = require("../controllers/auth.controller");
+const { isValidObjectId } = require("mongoose");
+const { authenticate } = require("../middlewares/auth");
 
 const router = require("express").Router();
 router.post("/register", signUpAdmin);
@@ -20,7 +20,7 @@ router.post("/verify/:userId", (req, res, next) => {
   OtpAccountVerification(req, res, next);
 });
 
-router.post("/changePassword", ChangePassword)
-router.get("/isLoggedIn", authenticate, isLoggedIn)
+router.post("/changePassword", ChangePassword);
+router.get("/isLoggedIn", authenticate, isLoggedIn);
 
 module.exports = router;

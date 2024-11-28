@@ -3,7 +3,7 @@ const { ParentModel, StudentModel, SchoolModel } = require("../models/Schemas");
 const {
   createParentValidator,
   updateParentValidator,
-} = require("../validators/parent");
+} = require("../validators/parent.validator");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");

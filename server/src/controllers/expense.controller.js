@@ -4,7 +4,7 @@ const {
   getExpenseRecordByIdValidator,
   updateExpenseRecordValidator,
   deleteExpenseRecordValidator,
-} = require("../validators/Expense");
+} = require("../validators/expense.validator");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");

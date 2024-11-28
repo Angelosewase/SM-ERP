@@ -1,13 +1,13 @@
 const express = require("express");
 const { SchoolModel } = require("../models/Schemas");
-const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
+const cacheMiddleware = require("../cache/middleware/cache.middleware");
 const {
   RegisterSchool,
   deleteSchool,
   getSchoolById,
   getSchools,
   updateSchool,
-} = require("../controllers/SchoolController");
+} = require("../controllers/school.controller");
 const { authenticate } = require("../middlewares/auth");
 const router = express.Router();
 router.post("/register", RegisterSchool);

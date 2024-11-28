@@ -9,10 +9,10 @@ const {
   uploadStudentImage,
   getStudentsByClass,
   getStudentFeesPaymentStatus,
-} = require("../controllers/studentController");
+} = require("../controllers/student.controller");
 const { uploadSingle } = require("../middlewares/multer");
 const {authenticate} = require("../middlewares/auth");
-const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
+const cacheMiddleware = require("../cache/middleware/cache.middleware");
 const router = express.Router();
 router.use(authenticate)
 

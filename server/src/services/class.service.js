@@ -4,6 +4,7 @@ const {
   StudentModel,
   FeesAssignmentModel,
   FeeGroupModel,
+  PaymentModel,
 } = require("../models/Schemas");
 const { feesAssignmentValidator } = require("../validators/fees.validator");
 
@@ -77,19 +78,89 @@ async function assignFeesToClass(classId, feesGroups) {
     //find all the students
     const students = await StudentModel.find({ classId: Class._id });
     const fees = feesGroups.map(async (feeGroupId) => {
-      const feeGroup = FeeGroupModel.findById(feeGroupId);
-      return feeGroup.fees.map((feeId) => feeId);
+      const feeGroup = await FeeGroupModel.findById(feeGroupId);
+      if (!feeGroup) {
+        throw new Error(`Fee group with id ${feeGroupId} not found`);
+      }
+      return feeGroup.fees;
     });
 
-    //for each student check for possible fees payment
-    //create a student fees record containing the fees
+    students.forEach(async (student) => {
+      const StudentPaymentData = await PaymentModel.findOne({
+        studentId: student._id,
+      });
+      if (!StudentPaymentData) {
+        await PaymentModel.create({
+          studentId: student._id,
+          pendingFeesPayments: fees,
+          feesToBePaid: fees,
+        });
+      } else {
+        StudentPaymentData.pendingFeesPayments.push(...fees);
+        StudentPaymentData.feesToBePaid.push(...fees);
+        await StudentPaymentData.save({ session });
+      }
+    });
 
     await classAssignedFees.save({ session });
     await session.commitTransaction();
     return classAssignedFees;
   } catch (error) {
     console.error("Error assigning fees to class:", error);
+    (await session).abortTransaction();
     throw new Error("Failed to assign fees to class");
+  }
+}
+
+//function to remove fees groups from the class
+
+async function removeFees(classId, feesGroups) {
+  const session = mongoose.startSession();
+  if (!classId) {
+    throw new Error("Class id is required");
+  }
+  try {
+    const Class = await ClassModel.findById(classId);
+    if (!Class) {
+      throw new Error("class not found");
+    }
+
+    await FeesAssignmentModel.updateMany(
+      { classId },
+      { $pull: { feesGroups: { $in: feesGroups } } },
+      { session }
+    );
+    const fees = feesGroups.map(async (feeGroupId) => {
+      const feeGroup = await FeeGroupModel.findById(feeGroupId);
+      if (!feeGroup) {
+        throw new Error(`Fee group with id ${feeGroupId} not found`);
+      }
+      return feeGroup.fees;
+    });
+
+    const students = await StudentModel.find({ classId: Class._id });
+    students.forEach(async (student) => {
+      const StudentPaymentData = await PaymentModel.findOne({
+        studentId: student._id,
+      });
+      if (!StudentPaymentData) {
+        throw new Error("student payment data not found ");
+      }
+      await PaymentModel.updateMany(
+        { studentId: student._id },
+        {
+          $pullAll: {
+            feesToBePaid: fees,
+            pendingFeesPayments: fees,
+          },
+        },
+        { session }
+      );
+      return;
+    });
+  } catch (error) {
+    (await session).abortTransaction();
+    throw new Error("Failed to remove fees from class", error);
   }
 }
 
@@ -97,4 +168,5 @@ module.exports = {
   promoteClass,
   convertClassesToValueNamePairs,
   assignFeesToClass,
+  removeFees
 };

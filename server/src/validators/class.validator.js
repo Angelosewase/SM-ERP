@@ -1,6 +1,6 @@
 const { z } = require("zod");
 const mongoose = require("mongoose");
-const { objectIdValidator } = require("./user");
+const { objectIdValidator } = require("./user.validator");
 
 const createClassValidator = z.object({
   name: z.string().min(3, "Class name must be at least 3 characters"),

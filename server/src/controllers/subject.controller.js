@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const {
   invalidateSchoolCache,
 } = require("../cache/services/cacheInvalidation");
-const { createSubjectValidator } = require("../validators/subject");
+const { createSubjectValidator } = require("../validators/subject.validator");
 const { z } = require("zod");
 
 const createSubject = async (req, res) => {

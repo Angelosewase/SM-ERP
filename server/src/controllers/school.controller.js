@@ -3,10 +3,10 @@ const z = require("zod");
 const {
   schoolValidationSchema,
   schoolUpdateSchema,
-} = require("../validators/school");
+} = require("../validators/school.validator");
 const { UserModel, SchoolModel } = require("../models/Schemas");
 const { invalidateSchoolCache } = require("../cache/services/cacheInvalidation");
-const { generateTheSchoolRespose } = require("../services/userService");
+const { generateTheSchoolRespose } = require("../services/user.service");
 
 async function RegisterSchool(req, res) {
   try {

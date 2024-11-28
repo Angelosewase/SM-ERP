@@ -9,14 +9,14 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const {
   userUpdateSchema,
-} = require("../validators/user.js");
+} = require("../validators/user.validator.js");
 
 const {
   generateJwtToken,
   validateJwtToken,
   getUserIdFromToken,
 } = require("../utils/jwt.js");
-const { uploadToCloudinary } = require("../config/cloudinaryConfig.js");
+const { uploadToCloudinary } = require("../config/cloudinary.js");
 
 async function isAuth(req, res) {
   const token = req.cookies.token;

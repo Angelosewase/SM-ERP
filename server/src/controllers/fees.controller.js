@@ -8,9 +8,9 @@ const {
   updateFeeValidator,
   createFeeGroupValidator,
   updateFeeGroupValidator,
-} = require("../validators/fees");
+} = require("../validators/fees.validator.js");
 const { FeeModel, FeeGroupModel } = require("../models/Schemas");
-const { recordFeesPayment } = require("../services/payments");
+const { recordFeesPayment } = require("../services/fees.service.js");
 
 const createFee = async (req, res) => {
   const schoolId = req.user.schoolId;
@@ -132,7 +132,6 @@ const createFeeGroup = async (req, res) => {
   }
 
   try {
-
     const validatedData = createFeeGroupValidator.parse({
       schoolId,
       ...req.body,
@@ -246,19 +245,6 @@ const deleteFeeGroup = async (req, res) => {
 };
 
 
-
-async function recordFeesPaymentController(req, res) {
-  try {
-    const { studentId, amount, feesId, paymentMethod, feesGroup } = req.body;
-    await recordFeesPayment(studentId, amount, feesId, paymentMethod, feesGroup);
-    return res.status(200).json({ message: "Fees payment recorded successfully" });
-  } catch (error) {
-    return res.status(500).json({ message: "Error recording fees payment", error });
-  }
-}
-
-
-
 module.exports = {
   createFee,
   getFeesBySchool,
@@ -270,5 +256,4 @@ module.exports = {
   getFeeGroupById,
   updateFeeGroup,
   deleteFeeGroup,
-  recordFeesPaymentController
 };

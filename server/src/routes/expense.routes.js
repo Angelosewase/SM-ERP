@@ -5,11 +5,11 @@ const {
   getExpenseRecordById,
   updateExpenseRecord,
   deleteExpenseRecord,
-} = require("../controllers/expenseController");
+} = require("../controllers/expense.controller");
 const router = express.Router();
 const {authenticate} = require("../middlewares/auth");
 router.use(authenticate);
-const cacheMiddleware = require("../cache/middleware/cacheMiddleware");
+const cacheMiddleware = require("../cache/middleware/cache.middleware");
 
 router.post("", createExpenseRecord);
 router.get("", cacheMiddleware(300), getAllExpenseRecords);
